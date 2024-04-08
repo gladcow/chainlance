@@ -37,9 +37,9 @@ contract ChainLance {
 
     struct Bid {
         uint256 id;
-        uint256 bidder;
+        address bidder;
         uint256 price;
-        uint32 timespan;
+        uint256 timespan;
     }
     enum ProjectState {
         Open,
@@ -53,13 +53,13 @@ contract ChainLance {
         address owner;
         uint256 price;
         ProjectState state;
-        mapping(uint256=>Bid) bids;
-        uint256 worker;
-        uint32 startedAt;
-        uint32 timespan;
+        address worker;
+        uint256 startedAt;
+        uint256 timespan;
     }
 
     mapping(uint256=>Project) public projects;
+    mapping(uint256=>mapping(uint256=>Bid)) public bids;
 
     function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
         Project memory temp = projects[external_description];
@@ -68,7 +68,9 @@ contract ChainLance {
             id: external_description,
             owner: msg.sender,
             price: _price,
-            state: Open,
+            state: ProjectState.Open,
+            worker: address(0),
+            startedAt: 0,
             timespan: _timespan
         });
         emit ProjectCreated(external_description, msg.sender);
@@ -77,10 +79,10 @@ contract ChainLance {
     function bidProject(uint256 projectId, uint256 external_description, uint256 _price, uint32 _timespan) external {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == Open, "not open");
-        Bid memory temp2 = projects[projectId].bids[external_description];
+        require(temp.state == ProjectState.Open, "not open");
+        Bid memory temp2 = bids[projectId][external_description];
         require(temp2.id != external_description, "exists");
-        projects[projectId].bids[external_description] = Bid({
+        bids[projectId][external_description] = Bid({
             id: external_description,
             bidder : msg.sender,
             price : _price,
@@ -92,16 +94,16 @@ contract ChainLance {
     function acceptBid(uint256 projectId, uint256 bidId) external payable {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == Open, "not open");
-        Bid memory temp2 = projects[projectId].bids[bidId];
-        require(temp2.id != bidId, "unknown bid");
+        require(temp.state == ProjectState.Open, "not open");
+        Bid memory temp2 = bids[projectId][bidId];
+        require(temp2.id == bidId, "unknown bid");
         require(msg.value >= temp2.price, "not enough value"); // TODO: fee processing
-        projects[projectId].state = InWork;
+        projects[projectId].state = ProjectState.InWork;
         projects[projectId].price = temp2.price;
         projects[projectId].timespan = temp2.timespan;
         projects[projectId].startedAt = block.timestamp;
         projects[projectId].worker = temp2.bidder;
-        delete(projects[projectId].bids);
+        bids[projectId][bidId].id = 0;
 
         emit BidAccepted(projectId, bidId);
     }
@@ -109,9 +111,9 @@ contract ChainLance {
     function submitWork(uint256 projectId) external {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == InWork, "not in work");
+        require(temp.state == ProjectState.InWork, "not in work");
         require(temp.worker == msg.sender, "not worker");
-        projects[projectId].state = InReview;
+        projects[projectId].state = ProjectState.InReview;
 
         emit WorkSubmitted(projectId);
     }
@@ -119,19 +121,19 @@ contract ChainLance {
     function acceptWork(uint256 projectId) external {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == InReview, "not in review");
+        require(temp.state == ProjectState.InReview, "not in review");
         require(temp.owner == msg.sender, "not owner");
-        projects[projectId].state = Completed;
+        projects[projectId].state = ProjectState.Completed;
 
-        emit WorkCompleted(projectId);
+        emit WorkAccepted(projectId);
     }
 
     function rejectWork(uint256 projectId) external {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == InReview, "not in review");
+        require(temp.state == ProjectState.InReview, "not in review");
         require(temp.owner == msg.sender, "not owner");
-        projects[projectId].state = InWork;
+        projects[projectId].state = ProjectState.InWork;
 
         emit WorkRejected(projectId);
     }
@@ -139,19 +141,20 @@ contract ChainLance {
     function cancelWork(uint256 projectId) external {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == InWork, "not in work");
+        require(temp.state == ProjectState.InWork, "not in work");
         require(temp.owner == msg.sender, "not owner");
-        projects[projectId].state = Open;
-        delete(projects[projectId].worker);
-        delete(projects[projectId].startedAt);
+        require(block.timestamp > temp.startedAt + temp.timespan);
+        projects[projectId].state = ProjectState.Open;
+        projects[projectId].worker = address(0);
+        projects[projectId].startedAt = 0;
         emit WorkCanceled(projectId);
-        msg.sender.transfer(temp.price); // TODO: process fees
+        payable(msg.sender).transfer(temp.price); // TODO: process fees
     }
 
     function cancelProject(uint256 projectId) external {
         Project memory temp = projects[projectId];
         require(temp.id == projectId, "unknown project");
-        require(temp.state == Open, "not open");
+        require(temp.state == ProjectState.Open, "not open");
         require(temp.owner == msg.sender, "not owner");
         delete(projects[projectId]);
         emit ProjectCanceled(projectId);
