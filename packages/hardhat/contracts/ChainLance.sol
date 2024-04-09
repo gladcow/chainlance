@@ -59,6 +59,7 @@ contract ChainLance {
     }
 
     mapping(uint256=>Project) public projects;
+    uint256[] public projectList;
     mapping(uint256=>mapping(uint256=>Bid)) public bids;
 
     function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
