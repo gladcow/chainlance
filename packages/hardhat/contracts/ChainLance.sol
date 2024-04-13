@@ -2,6 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract ChainLance {
     event ProjectCreated(
@@ -59,7 +60,8 @@ contract ChainLance {
     }
 
     mapping(uint256=>Project) public projects;
-    uint256[] public projectList;
+    using EnumerableSet for EnumerableSet.UintSet;
+    EnumerableSet.UintSet private projectList;
     mapping(uint256=>mapping(uint256=>Bid)) public bids;
 
     function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
@@ -74,6 +76,7 @@ contract ChainLance {
             startedAt: 0,
             timespan: _timespan
         });
+        projectList.add(external_description);
         emit ProjectCreated(external_description, msg.sender);
     }
 
@@ -125,7 +128,7 @@ contract ChainLance {
         require(temp.state == ProjectState.InReview, "not in review");
         require(temp.owner == msg.sender, "not owner");
         projects[projectId].state = ProjectState.Completed;
-
+        payable(projects[projectId].worker).transfer(temp.price); // TODO: process fees
         emit WorkAccepted(projectId);
     }
 
@@ -146,10 +149,8 @@ contract ChainLance {
         require(temp.owner == msg.sender, "not owner");
         require(block.timestamp > temp.startedAt + temp.timespan);
         projects[projectId].state = ProjectState.Open;
-        projects[projectId].worker = address(0);
-        projects[projectId].startedAt = 0;
-        emit WorkCanceled(projectId);
         payable(msg.sender).transfer(temp.price); // TODO: process fees
+        emit WorkCanceled(projectId);
     }
 
     function cancelProject(uint256 projectId) external {
@@ -157,7 +158,9 @@ contract ChainLance {
         require(temp.id == projectId, "unknown project");
         require(temp.state == ProjectState.Open, "not open");
         require(temp.owner == msg.sender, "not owner");
-        delete(projects[projectId]);
+        projects[projectId].worker = address(0);
+        projects[projectId].startedAt = 0;
+        projectList.remove(projectId);
         emit ProjectCanceled(projectId);
     }
 

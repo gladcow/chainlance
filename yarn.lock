@@ -1244,7 +1244,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.3.1":
+"@noble/hashes@npm:^1.3.1, @noble/hashes@npm:^1.4.0":
   version: 1.4.0
   resolution: "@noble/hashes@npm:1.4.0"
   checksum: 8ba816ae26c90764b8c42493eea383716396096c5f7ba6bea559993194f49d80a73c081f315f4c367e51bd2d5891700bcdfa816b421d24ab45b41cb03e4f3342
@@ -1634,6 +1634,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openzeppelin/contracts@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@openzeppelin/contracts@npm:5.0.2"
+  checksum: 0cce6fc284bd1d89e2a447027832a62f1356b44ee31088899453e10349a63a62df2f07da63d76e4c41aad9c86b96b650b2b6fc85439ef276850dda1170a047fd
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts@npm:~4.8.1":
   version: 4.8.3
   resolution: "@openzeppelin/contracts@npm:4.8.3"
@@ -1824,9 +1831,9 @@ __metadata:
   linkType: hard
 
 "@rushstack/eslint-patch@npm:^1.3.3":
-  version: 1.10.1
-  resolution: "@rushstack/eslint-patch@npm:1.10.1"
-  checksum: ea539ec4d44632cc4a57aa12a37c6d79905b90f94f2c37788fcc0048eae542091dd791177a0adcf51a67fd379f954c8754e2e689ff80af460f531e6bdb03d78d
+  version: 1.10.2
+  resolution: "@rushstack/eslint-patch@npm:1.10.2"
+  checksum: 2bac46e0f662c6b9c1f1d2268e4165a779331b9229eaeeb360852feaecdc5cb4adf8e1a36ac510b3545a83f83de702811b984afe26ec7d4a79e1c0ea708e2bfe
   languageName: node
   linkType: hard
 
@@ -2524,12 +2531,12 @@ __metadata:
   linkType: hard
 
 "@types/eslint@npm:~8":
-  version: 8.56.7
-  resolution: "@types/eslint@npm:8.56.7"
+  version: 8.56.9
+  resolution: "@types/eslint@npm:8.56.9"
   dependencies:
     "@types/estree": "*"
     "@types/json-schema": "*"
-  checksum: 26b036e27e369981843585248591b15068f1ba3ac44a01c09c34717f0b57cbb422a7ed2b497b51093b0ead97739e187dde65bbd5893ec901672dac39f41c8038
+  checksum: c0c033fc724774b791bf97465cfe246814eda1f82460aff2daa64dfce1b1a01626c75f4281d2ab10dcd9176446df0b4bf57e8ac542da6476902e28683e89137d
   languageName: node
   linkType: hard
 
@@ -2602,11 +2609,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 20.12.5
-  resolution: "@types/node@npm:20.12.5"
+  version: 20.12.7
+  resolution: "@types/node@npm:20.12.7"
   dependencies:
     undici-types: ~5.26.4
-  checksum: 38358c091392bb3def1136772ada4ccd39a9429d459160b5ab728b690d2f15f2212eafd9e65ce716e270f70a4e6927ebffccfefc08dabdf68f4016c1fc8a7938
+  checksum: 7cc979f7e2ca9a339ec71318c3901b9978555257929ef3666987f3e447123bc6dc92afcc89f6347e09e07d602fde7d51bcddea626c23aa2bb74aeaacfd1e1686
   languageName: node
   linkType: hard
 
@@ -2701,12 +2708,12 @@ __metadata:
   linkType: hard
 
 "@types/react@npm:*, @types/react@npm:^18.0.21":
-  version: 18.2.74
-  resolution: "@types/react@npm:18.2.74"
+  version: 18.2.78
+  resolution: "@types/react@npm:18.2.78"
   dependencies:
     "@types/prop-types": "*"
     csstype: ^3.0.2
-  checksum: 093c0e350552e61393e2ba30169aa620e2e64c1e2d0ff38efd2a7549ded689b6ab6bffb65fe0f7ef9e143174de54442d942bd70c014649f464c52465701208d8
+  checksum: f686d735707d46690d05ac76e8c8a619802ea6a4a8f2837981669f7dc13b6984751edc4994242afa3be279df15c67b72a5a658f02a7c5ca16f9a0b4878f1bf18
   languageName: node
   linkType: hard
 
@@ -3608,12 +3615,12 @@ __metadata:
   linkType: hard
 
 "@walletconnect/logger@npm:^2.0.1":
-  version: 2.1.0
-  resolution: "@walletconnect/logger@npm:2.1.0"
+  version: 2.1.2
+  resolution: "@walletconnect/logger@npm:2.1.2"
   dependencies:
     "@walletconnect/safe-json": ^1.0.2
     pino: 7.11.0
-  checksum: fdd3c2f4881dae98edb3b7f4fd2d1613adbe6fe17fd941b6f149344dc5a3f6d156259d48cccc7d595b961507efd0d729c86845d22a14757442eb478c6cee0b20
+  checksum: a2bb88b76d95ec5a95279dcc919f1d044d17be8fdda98a01665a607561b445bb56f2245a280933fb19aa7d41d41b688d0ffdb434ac56c46163ad2eb5338f389a
   languageName: node
   linkType: hard
 
@@ -4812,9 +4819,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001406, caniuse-lite@npm:^1.0.30001587, caniuse-lite@npm:^1.0.30001599":
-  version: 1.0.30001606
-  resolution: "caniuse-lite@npm:1.0.30001606"
-  checksum: fcf2d799d8cb159f4f5b44cd9d2171b18df4bcfdf2770cc8a79c4bb0bc5fd19ed089854223865ced32eacffb60a0a9257c8a1d0ef239e9dc3909f587727e9bb5
+  version: 1.0.30001609
+  resolution: "caniuse-lite@npm:1.0.30001609"
+  checksum: 462f38b5c33ce544dcfa65cc3940fca7fe2d3d916ec2d9c9905ea7becf6930c540774a1278f901fe44d3b85f7d7a2f05523d27602c6ce93bb2b3806e9f3e9989
   languageName: node
   linkType: hard
 
@@ -5834,9 +5841,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.668":
-  version: 1.4.729
-  resolution: "electron-to-chromium@npm:1.4.729"
-  checksum: fc7d28957d2aa72c57220e8b60e86f523d782a413440d2a8f38563844343b62e6caee9bf866019ba0839eb6e0c247297c6057d86152fa45855f32da88c44bd90
+  version: 1.4.736
+  resolution: "electron-to-chromium@npm:1.4.736"
+  checksum: dcba6d43ffbc40e5d3decb3a0de67b9721a257fefde4eceac0d75202029c62ace7b377d217f49d1ba9cfbad61f89a14514e85a4de77b7205cee336f2e1f0baee
   languageName: node
   linkType: hard
 
@@ -6830,11 +6837,11 @@ __metadata:
   linkType: hard
 
 "ethereum-bloom-filters@npm:^1.0.6":
-  version: 1.0.10
-  resolution: "ethereum-bloom-filters@npm:1.0.10"
+  version: 1.1.0
+  resolution: "ethereum-bloom-filters@npm:1.1.0"
   dependencies:
-    js-sha3: ^0.8.0
-  checksum: 4019cc6f9274ae271a52959194a72f6e9b013366f168f922dc3b349319faf7426bf1010125ee0676b4f75714fe4a440edd4e7e62342c121a046409f4cd4c0af9
+    "@noble/hashes": ^1.4.0
+  checksum: 9565cd1e2002509852a05461cc93ee6874e8f961e0f66929cfc34d05f6f451fcfa4df287f8735ee184e4ba5f6e63a76a3c69bbeda5dda5bdf486f68fb9fa61f3
   languageName: node
   linkType: hard
 
@@ -11003,9 +11010,9 @@ __metadata:
   linkType: hard
 
 "preact@npm:^10.12.0, preact@npm:^10.16.0":
-  version: 10.20.1
-  resolution: "preact@npm:10.20.1"
-  checksum: af5ed9bdf44bfa5487479c09fa971a32902987f277c74d6244f9d9466ccd5c1efd3a0949e7dc2227177623878b1adafcc5c50cee6617a84f72d1cebe55ff76ba
+  version: 10.20.2
+  resolution: "preact@npm:10.20.2"
+  checksum: 497c755065cdaf9d687e38c1cfaf935e20e98cc95a4b8c977a538dc74d41133a13ebed26d34001d11fa08b7d6811de28add74e94a3404bf35b222aa5e966fd1b
   languageName: node
   linkType: hard
 
@@ -11170,11 +11177,11 @@ __metadata:
   linkType: hard
 
 "qs@npm:^6.4.0, qs@npm:^6.9.4":
-  version: 6.12.0
-  resolution: "qs@npm:6.12.0"
+  version: 6.12.1
+  resolution: "qs@npm:6.12.1"
   dependencies:
     side-channel: ^1.0.6
-  checksum: ba007fb2488880b9c6c3df356fe6888b9c1f4c5127552edac214486cfe83a332de09a5c40d490d79bb27bef977ba1085a8497512ff52eaac72e26564f77ce908
+  checksum: aa761d99e65b6936ba2dd2187f2d9976afbcda38deb3ff1b3fe331d09b0c578ed79ca2abdde1271164b5be619c521ec7db9b34c23f49a074e5921372d16242d5
   languageName: node
   linkType: hard
 
@@ -11840,6 +11847,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "se-2@workspace:."
   dependencies:
+    "@openzeppelin/contracts": ^5.0.2
     husky: ~8.0.3
     lint-staged: ~13.2.2
     next: ~14.0.4
@@ -12104,12 +12112,12 @@ __metadata:
   linkType: hard
 
 "socks@npm:^2.7.1":
-  version: 2.8.1
-  resolution: "socks@npm:2.8.1"
+  version: 2.8.3
+  resolution: "socks@npm:2.8.3"
   dependencies:
     ip-address: ^9.0.5
     smart-buffer: ^4.2.0
-  checksum: 29586d42e9c36c5016632b2bcb6595e3adfbcb694b3a652c51bc8741b079c5ec37bdd5675a1a89a1620078c8137208294991fabb50786f92d47759a725b2b62e
+  checksum: 7a6b7f6eedf7482b9e4597d9a20e09505824208006ea8f2c49b71657427f3c137ca2ae662089baa73e1971c62322d535d9d0cf1c9235cf6f55e315c18203eadd
   languageName: node
   linkType: hard
 
