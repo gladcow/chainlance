@@ -83,10 +83,43 @@ contract ChainLance {
         return projectList.values();
     }
 
+    function listOwnerProjects(address owner) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].owner == owner) {
+                count++;
+            }
+        }
+        uint256[] memory result = new uint256[](count);
+        uint256 position = 0;
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].owner == owner) {
+                result[position++] = projectList.at(i);
+            }
+        }
+        return result;
+    }
+
+    function listWorkerProjects(address worker) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].worker == worker) {
+                count++;
+            }
+        }
+        uint256[] memory result = new uint256[](count);
+        uint256 position = 0;
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].worker == worker) {
+                result[position++] = projectList.at(i);
+            }
+        }
+        return result;
+    }
+
     function bidProject(uint256 projectId, uint256 external_description, uint256 _price, uint32 _timespan) external {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.Open, "not open");
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.Open, "not open");
         Bid memory temp2 = bids[projectId][external_description];
         require(temp2.id != external_description, "exists");
         bids[projectId][external_description] = Bid({
@@ -99,9 +132,8 @@ contract ChainLance {
     }
 
     function acceptBid(uint256 projectId, uint256 bidId) external payable {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.Open, "not open");
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.Open, "not open");
         Bid memory temp2 = bids[projectId][bidId];
         require(temp2.id == bidId, "unknown bid");
         require(msg.value >= temp2.price, "not enough value"); // TODO: fee processing
@@ -116,53 +148,46 @@ contract ChainLance {
     }
 
     function submitWork(uint256 projectId) external {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.InWork, "not in work");
-        require(temp.worker == msg.sender, "not worker");
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.InWork, "not in work");
+        require(projects[projectId].worker == msg.sender, "not worker");
         projects[projectId].state = ProjectState.InReview;
 
         emit WorkSubmitted(projectId);
     }
 
     function acceptWork(uint256 projectId) external {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.InReview, "not in review");
-        require(temp.owner == msg.sender, "not owner");
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.InReview, "not in review");
+        require(projects[projectId].owner == msg.sender, "not owner");
         projects[projectId].state = ProjectState.Completed;
-        payable(projects[projectId].worker).transfer(temp.price); // TODO: process fees
+        payable(projects[projectId].worker).transfer(projects[projectId].price); // TODO: process fees
         emit WorkAccepted(projectId);
     }
 
     function rejectWork(uint256 projectId) external {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.InReview, "not in review");
-        require(temp.owner == msg.sender, "not owner");
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.InReview, "not in review");
+        require(projects[projectId].owner == msg.sender, "not owner");
         projects[projectId].state = ProjectState.InWork;
 
         emit WorkRejected(projectId);
     }
 
     function cancelWork(uint256 projectId) external {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.InWork, "not in work");
-        require(temp.owner == msg.sender, "not owner");
-        require(block.timestamp > temp.startedAt + temp.timespan);
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.InWork, "not in work");
+        require(projects[projectId].owner == msg.sender, "not owner");
+        require(block.timestamp > projects[projectId].startedAt + projects[projectId].timespan, "not timed out");
         projects[projectId].state = ProjectState.Open;
-        payable(msg.sender).transfer(temp.price); // TODO: process fees
+        payable(msg.sender).transfer(projects[projectId].price); // TODO: process fees
         emit WorkCanceled(projectId);
     }
 
     function cancelProject(uint256 projectId) external {
-        Project memory temp = projects[projectId];
-        require(temp.id == projectId, "unknown project");
-        require(temp.state == ProjectState.Open, "not open");
-        require(temp.owner == msg.sender, "not owner");
-        projects[projectId].worker = address(0);
-        projects[projectId].startedAt = 0;
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.Open, "not open");
+        require(projects[projectId].owner == msg.sender, "not owner");
         projectList.remove(projectId);
         emit ProjectCanceled(projectId);
     }
