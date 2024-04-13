@@ -65,8 +65,7 @@ contract ChainLance {
     mapping(uint256=>mapping(uint256=>Bid)) public bids;
 
     function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
-        Project memory temp = projects[external_description];
-        require(temp.id != external_description, "exists");
+        require(!projectList.contains(external_description), "exists");
         projects[external_description] = Project({
             id: external_description,
             owner: msg.sender,
@@ -78,6 +77,10 @@ contract ChainLance {
         });
         projectList.add(external_description);
         emit ProjectCreated(external_description, msg.sender);
+    }
+
+    function listProjects() external view returns (uint256[] memory) {
+        return projectList.values();
     }
 
     function bidProject(uint256 projectId, uint256 external_description, uint256 _price, uint32 _timespan) external {
