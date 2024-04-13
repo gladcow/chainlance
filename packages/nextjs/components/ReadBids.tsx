@@ -2,14 +2,13 @@ import { useState } from "react";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 export const ReadBids = () => {
-  const [jobId, setJobId] = useState(0);
   const [workId, setWorkId] = useState(0);
   const [showBids, setShowBids] = useState(false);
 
   const { data: reciept } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "bids",
-    args: [BigInt(jobId), BigInt(workId)],
+    args: [BigInt(workId)],
     watch: true,
   });
   return (
@@ -17,15 +16,6 @@ export const ReadBids = () => {
       <div className="card-body items-center">
         <h2 className="card-title">Read Bids</h2>
         <div className="card-actions justify-center">
-          <input
-            type="text"
-            placeholder="Job id"
-            className="input border border-primary"
-            onChange={e => {
-              setJobId(Number(e.target.value));
-              setShowBids(false);
-            }}
-          />
           <input
             type="text"
             placeholder="Work id"

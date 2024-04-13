@@ -38,6 +38,7 @@ contract ChainLance {
 
     struct Bid {
         uint256 id;
+        uint256 projectId;
         address bidder;
         uint256 price;
         uint256 timespan;
@@ -62,7 +63,8 @@ contract ChainLance {
     mapping(uint256=>Project) public projects;
     using EnumerableSet for EnumerableSet.UintSet;
     EnumerableSet.UintSet private projectList;
-    mapping(uint256=>mapping(uint256=>Bid)) public bids;
+    mapping(uint256=>Bid) public bids;
+    EnumerableSet.UintSet private bidList;
 
     function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
         require(!projectList.contains(external_description), "exists");
@@ -120,29 +122,63 @@ contract ChainLance {
     function bidProject(uint256 projectId, uint256 external_description, uint256 _price, uint32 _timespan) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
-        Bid memory temp2 = bids[projectId][external_description];
-        require(temp2.id != external_description, "exists");
-        bids[projectId][external_description] = Bid({
-            id: external_description,
+        require(!bidList.contains(external_description), "exists");
+        bids[external_description] = Bid({
+            id : external_description,
+            projectId : projectId,
             bidder : msg.sender,
             price : _price,
             timespan : _timespan
         });
+        bidList.add(external_description);
         emit BidCreated(external_description, projectId, msg.sender, _price, _timespan);
+    }
+
+    function listProjectBids(uint256 projectId) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < bidList.length(); i++) {
+            if (bids[bidList.at(i)].projectId == projectId) {
+                count++;
+            }
+        }
+        uint256[] memory result = new uint256[](count);
+        uint256 position = 0;
+        for (uint256 i = 0; i < bidList.length(); i++) {
+            if (bids[bidList.at(i)].projectId == projectId) {
+                result[position++] = bidList.at(i);
+            }
+        }
+        return result;
+    }
+
+    function listWorkerBids(address worker) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < bidList.length(); i++) {
+            if (bids[bidList.at(i)].bidder == worker) {
+                count++;
+            }
+        }
+        uint256[] memory result = new uint256[](count);
+        uint256 position = 0;
+        for (uint256 i = 0; i < bidList.length(); i++) {
+            if (bids[bidList.at(i)].bidder == worker) {
+                result[position++] = bidList.at(i);
+            }
+        }
+        return result;
     }
 
     function acceptBid(uint256 projectId, uint256 bidId) external payable {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
-        Bid memory temp2 = bids[projectId][bidId];
-        require(temp2.id == bidId, "unknown bid");
-        require(msg.value >= temp2.price, "not enough value"); // TODO: fee processing
+        require(bidList.contains(bidId), "unknown bid");
+        require(msg.value >= bids[bidId].price, "not enough value"); // TODO: fee processing
         projects[projectId].state = ProjectState.InWork;
-        projects[projectId].price = temp2.price;
-        projects[projectId].timespan = temp2.timespan;
+        projects[projectId].price = bids[bidId].price;
+        projects[projectId].timespan = bids[bidId].timespan;
         projects[projectId].startedAt = block.timestamp;
-        projects[projectId].worker = temp2.bidder;
-        bids[projectId][bidId].id = 0;
+        projects[projectId].worker = bids[bidId].bidder;
+        bidList.remove(bidId);
 
         emit BidAccepted(projectId, bidId);
     }
