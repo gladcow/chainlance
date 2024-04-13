@@ -52,6 +52,7 @@ contract ChainLance {
     }
     struct Project {
         uint256 id;
+        uint256 parentId;
         address owner;
         uint256 price;
         ProjectState state;
@@ -70,6 +71,26 @@ contract ChainLance {
         require(!projectList.contains(external_description), "exists");
         projects[external_description] = Project({
             id: external_description,
+            parentId : 0,
+            owner: msg.sender,
+            price: _price,
+            state: ProjectState.Open,
+            worker: address(0),
+            startedAt: 0,
+            timespan: _timespan
+        });
+        projectList.add(external_description);
+        emit ProjectCreated(external_description, msg.sender);
+    }
+
+    function createSubproject(uint256 parentId, uint256 external_description, uint256 _price, uint32 _timespan) external {
+        require(!projectList.contains(external_description), "exists");
+        require(projectList.contains(parentId), "unknown parent");
+        require(projects[parentId].state == ProjectState.InWork, "parent not in work");
+        require(projects[parentId].worker == msg.sender, "not worker in parent");
+        projects[external_description] = Project({
+            id: external_description,
+            parentId : parentId,
             owner: msg.sender,
             price: _price,
             state: ProjectState.Open,
@@ -187,6 +208,13 @@ contract ChainLance {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.InWork, "not in work");
         require(projects[projectId].worker == msg.sender, "not worker");
+        // verify all child projects are completed
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].parentId == projectId) {
+                require(projects[projectList.at(i)].state == ProjectState.Completed, "uncompleted child");
+            }
+        }
+
         projects[projectId].state = ProjectState.InReview;
 
         emit WorkSubmitted(projectId);

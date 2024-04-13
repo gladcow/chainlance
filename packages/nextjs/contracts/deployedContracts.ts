@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ChainLance: {
-      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+      address: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
       abi: [
         {
           anonymous: false,
@@ -299,6 +299,34 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "uint256",
+              name: "parentId",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "external_description",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint32",
+              name: "_timespan",
+              type: "uint32",
+            },
+          ],
+          name: "createSubproject",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "address",
               name: "owner",
               type: "address",
@@ -398,6 +426,11 @@ const deployedContracts = {
             {
               internalType: "uint256",
               name: "id",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "parentId",
               type: "uint256",
             },
             {
