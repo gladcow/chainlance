@@ -59,6 +59,8 @@ contract ChainLance {
         address worker;
         uint256 startedAt;
         uint256 timespan;
+        bool ownerRated;
+        bool workerRated;
     }
 
     mapping(uint256=>Project) public projects;
@@ -66,6 +68,7 @@ contract ChainLance {
     EnumerableSet.UintSet private projectList;
     mapping(uint256=>Bid) public bids;
     EnumerableSet.UintSet private bidList;
+    mapping(address=>uint32) public rates;
 
     function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
         require(!projectList.contains(external_description), "exists");
@@ -77,7 +80,9 @@ contract ChainLance {
             state: ProjectState.Open,
             worker: address(0),
             startedAt: 0,
-            timespan: _timespan
+            timespan: _timespan,
+            ownerRated : false,
+            workerRated : false
         });
         projectList.add(external_description);
         emit ProjectCreated(external_description, msg.sender);
@@ -96,7 +101,9 @@ contract ChainLance {
             state: ProjectState.Open,
             worker: address(0),
             startedAt: 0,
-            timespan: _timespan
+            timespan: _timespan,
+            ownerRated : false,
+            workerRated : false
         });
         projectList.add(external_description);
         emit ProjectCreated(external_description, msg.sender);
@@ -252,8 +259,37 @@ contract ChainLance {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
         require(projects[projectId].owner == msg.sender, "not owner");
-        projectList.remove(projectId);
+        projects[projectId].state == ProjectState.Canceled;
         emit ProjectCanceled(projectId);
     }
 
+    function rateOwner(uint256 projectId, bool rate) external {
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.Completed ||
+            projects[projectId].state == ProjectState.Canceled, "not completed");
+        require(projects[projectId].worker == msg.sender, "not worker");
+        require(!projects[projectId].ownerRated, "rated already");
+
+        projects[projectId].ownerRated = true;
+        if (rate) {
+            rates[projects[projectId].owner]++;
+        } else {
+            rates[projects[projectId].owner]--;
+        }
+    }
+
+    function rateWorker(uint256 projectId, bool rate) external {
+        require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].state == ProjectState.Completed ||
+            projects[projectId].state == ProjectState.Canceled, "not completed");
+        require(projects[projectId].owner == msg.sender, "not owner");
+        require(!projects[projectId].workerRated, "rated already");
+
+        projects[projectId].workerRated = true;
+        if (rate) {
+            rates[projects[projectId].worker]++;
+        } else {
+            rates[projects[projectId].worker]--;
+        }
+    }
 }
