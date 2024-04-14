@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ChainLance: {
-      address: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
+      address: "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
       abi: [
         {
           anonymous: false,
@@ -365,6 +365,25 @@ const deployedContracts = {
         {
           inputs: [],
           name: "listProjects",
+          outputs: [
+            {
+              internalType: "uint256[]",
+              name: "",
+              type: "uint256[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "enum ChainLance.ProjectState",
+              name: "state",
+              type: "uint8",
+            },
+          ],
+          name: "listProjectsWithState",
           outputs: [
             {
               internalType: "uint256[]",

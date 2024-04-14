@@ -147,6 +147,23 @@ contract ChainLance {
         return result;
     }
 
+    function listProjectsWithState(ProjectState state) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].state == state) {
+                count++;
+            }
+        }
+        uint256[] memory result = new uint256[](count);
+        uint256 position = 0;
+        for (uint256 i = 0; i < projectList.length(); i++) {
+            if (projects[projectList.at(i)].state == state) {
+                result[position++] = projectList.at(i);
+            }
+        }
+        return result;
+    }
+
     function bidProject(uint256 projectId, uint256 external_description, uint256 _price, uint32 _timespan) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
