@@ -8,7 +8,6 @@ export const ReadProjects = () => {
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
     args: [0],
-    watch: true,
   });
   return (
     <div className="self-start card w-96 bg-base-100 shadow-xl m-5">

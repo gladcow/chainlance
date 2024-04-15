@@ -45,6 +45,9 @@
   },
   "packageManager": "yarn@3.2.3",
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
+    "@openzeppelin/contracts": "^5.0.2",
+    "react-data-table-component": "^7.6.2",
+    "styled-components": "^6.1.8"
+
   }
 }

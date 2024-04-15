@@ -19,7 +19,7 @@ export const WriteCreateProject = () => {
   return (
     <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
       <div className="card-body items-center">
-        <h2 className="card-title">Submit Work</h2>
+        <h2 className="card-title">Create Project</h2>
         <div className="card-actions justify-center">
           <input
             type="text"
