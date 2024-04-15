@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { json } from "@helia/json";
+import { createHelia } from "helia";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 export const WriteCreateProject = () => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [externalDiscription, setExternalDiscription] = useState(0);
   const [price, setPrice] = useState(0);
   const [timeSpan, setTimeSpan] = useState(0);
@@ -16,11 +20,45 @@ export const WriteCreateProject = () => {
       setReciept(txnReceipt.blockHash.toString());
     },
   });
+  const writeToIPFS = async function () {
+    const helia = await createHelia();
+    const j = json(helia);
+
+    setExternalDiscription(Number(await j.add({ title: title, description: description })));
+  };
   return (
     <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
       <div className="card-body items-center">
         <h2 className="card-title">Create Project</h2>
         <div className="card-actions justify-center">
+          <input
+            type="text"
+            placeholder="Title"
+            className="input border border-primary"
+            onChange={e => {
+              setTitle(e.target.value);
+              setShowProjects(false);
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            className="input border border-primary"
+            onChange={e => {
+              setDescription(e.target.value);
+              setShowProjects(false);
+            }}
+          />
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              writeToIPFS();
+              setShowProjects(false);
+            }}
+          >
+            Send to IPFS
+          </button>
+
           <input
             type="text"
             placeholder="projectId"
