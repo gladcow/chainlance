@@ -6,7 +6,7 @@ import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 export const WriteCreateProject = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [externalDiscription, setExternalDiscription] = useState(0);
+  const [externalDiscription, setExternalDiscription] = useState("");
   const [price, setPrice] = useState(0);
   const [timeSpan, setTimeSpan] = useState(0);
   const [showProjects, setShowProjects] = useState(false);
@@ -15,16 +15,18 @@ export const WriteCreateProject = () => {
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
     functionName: "createProject",
-    args: [BigInt(externalDiscription), BigInt(price), timeSpan],
+    args: [externalDiscription, BigInt(price), timeSpan],
     onBlockConfirmation: txnReceipt => {
       setReciept(txnReceipt.blockHash.toString());
     },
   });
   const writeToIPFS = async function () {
+    // TODO: move this to page initialization
     const helia = await createHelia();
     const j = json(helia);
 
-    setExternalDiscription(Number(await j.add({ title: title, description: description })));
+    const cid = await j.add({ title: title, description: description });
+    setExternalDiscription(cid.toString());
   };
   return (
     <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
@@ -64,9 +66,10 @@ export const WriteCreateProject = () => {
             placeholder="projectId"
             className="input border border-primary"
             onChange={e => {
-              setExternalDiscription(Number(e.target.value));
+              setExternalDiscription(e.target.value);
               setShowProjects(false);
             }}
+            value={externalDiscription}
           />
           <input
             type="text"

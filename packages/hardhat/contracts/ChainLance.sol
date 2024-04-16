@@ -2,43 +2,44 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "./StringSet.sol";
+
 
 contract ChainLance {
     event ProjectCreated(
-        uint256 id,
+        string id,
         address owner
     );
     event BidCreated(
-        uint256 id,
-        uint256 project,
+        string id,
+        string project,
         address bidder,
         uint256 amount,
         uint32 timespan
     );
     event BidAccepted(
-        uint256 projectId,
-        uint256 bidId
+        string projectId,
+        string bidId
     );
     event WorkSubmitted(
-        uint256 projectId
+        string projectId
     );
     event WorkAccepted(
-        uint256 projectId
+        string projectId
     );
     event WorkRejected(
-        uint256 projectId
+        string projectId
     );
     event WorkCanceled(
-        uint256 projectId
+        string projectId
     );
     event ProjectCanceled(
-        uint256 id
+        string projectId
     );
 
     struct Bid {
-        uint256 id;
-        uint256 projectId;
+        string id;
+        string projectId;
         address bidder;
         uint256 price;
         uint256 timespan;
@@ -51,8 +52,8 @@ contract ChainLance {
         Canceled
     }
     struct Project {
-        uint256 id;
-        uint256 parentId;
+        string id;
+        string parentId;
         address owner;
         uint256 price;
         ProjectState state;
@@ -63,18 +64,18 @@ contract ChainLance {
         bool workerRated;
     }
 
-    mapping(uint256=>Project) public projects;
-    using EnumerableSet for EnumerableSet.UintSet;
-    EnumerableSet.UintSet private projectList;
-    mapping(uint256=>Bid) public bids;
-    EnumerableSet.UintSet private bidList;
+    mapping(string=>Project) public projects;
+    using EnumerableStringSet for EnumerableStringSet.StringSet;
+    EnumerableStringSet.StringSet private projectList;
+    mapping(string=>Bid) public bids;
+    EnumerableStringSet.StringSet private bidList;
     mapping(address=>uint32) public rates;
 
-    function createProject(uint256 external_description, uint256 _price, uint32 _timespan) external {
+    function createProject(string calldata external_description, uint256 _price, uint32 _timespan) external {
         require(!projectList.contains(external_description), "exists");
         projects[external_description] = Project({
             id: external_description,
-            parentId : 0,
+            parentId : "",
             owner: msg.sender,
             price: _price,
             state: ProjectState.Open,
@@ -88,7 +89,7 @@ contract ChainLance {
         emit ProjectCreated(external_description, msg.sender);
     }
 
-    function createSubproject(uint256 parentId, uint256 external_description, uint256 _price, uint32 _timespan) external {
+    function createSubproject(string calldata parentId, string calldata external_description, uint256 _price, uint32 _timespan) external {
         require(!projectList.contains(external_description), "exists");
         require(projectList.contains(parentId), "unknown parent");
         require(projects[parentId].state == ProjectState.InWork, "parent not in work");
@@ -109,18 +110,18 @@ contract ChainLance {
         emit ProjectCreated(external_description, msg.sender);
     }
 
-    function listProjects() external view returns (uint256[] memory) {
+    function listProjects() external view returns (string[] memory) {
         return projectList.values();
     }
 
-    function listOwnerProjects(address owner) external view returns (uint256[] memory) {
+    function listOwnerProjects(address owner) external view returns (string[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < projectList.length(); i++) {
             if (projects[projectList.at(i)].owner == owner) {
                 count++;
             }
         }
-        uint256[] memory result = new uint256[](count);
+        string[] memory result = new string[](count);
         uint256 position = 0;
         for (uint256 i = 0; i < projectList.length(); i++) {
             if (projects[projectList.at(i)].owner == owner) {
@@ -130,14 +131,14 @@ contract ChainLance {
         return result;
     }
 
-    function listWorkerProjects(address worker) external view returns (uint256[] memory) {
+    function listWorkerProjects(address worker) external view returns (string[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < projectList.length(); i++) {
             if (projects[projectList.at(i)].worker == worker) {
                 count++;
             }
         }
-        uint256[] memory result = new uint256[](count);
+        string[] memory result = new string[](count);
         uint256 position = 0;
         for (uint256 i = 0; i < projectList.length(); i++) {
             if (projects[projectList.at(i)].worker == worker) {
@@ -147,14 +148,14 @@ contract ChainLance {
         return result;
     }
 
-    function listProjectsWithState(ProjectState state) external view returns (uint256[] memory) {
+    function listProjectsWithState(ProjectState state) external view returns (string[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < projectList.length(); i++) {
             if (projects[projectList.at(i)].state == state) {
                 count++;
             }
         }
-        uint256[] memory result = new uint256[](count);
+        string[] memory result = new string[](count);
         uint256 position = 0;
         for (uint256 i = 0; i < projectList.length(); i++) {
             if (projects[projectList.at(i)].state == state) {
@@ -164,7 +165,8 @@ contract ChainLance {
         return result;
     }
 
-    function bidProject(uint256 projectId, uint256 external_description, uint256 _price, uint32 _timespan) external {
+    function bidProject(string calldata projectId, string calldata external_description,
+        uint256 _price, uint32 _timespan) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
         require(!bidList.contains(external_description), "exists");
@@ -179,31 +181,31 @@ contract ChainLance {
         emit BidCreated(external_description, projectId, msg.sender, _price, _timespan);
     }
 
-    function listProjectBids(uint256 projectId) external view returns (uint256[] memory) {
+    function listProjectBids(string calldata projectId) external view returns (string[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < bidList.length(); i++) {
-            if (bids[bidList.at(i)].projectId == projectId) {
+            if (EnumerableStringSet.equal(bids[bidList.at(i)].projectId, projectId)) {
                 count++;
             }
         }
-        uint256[] memory result = new uint256[](count);
+        string[] memory result = new string[](count);
         uint256 position = 0;
         for (uint256 i = 0; i < bidList.length(); i++) {
-            if (bids[bidList.at(i)].projectId == projectId) {
+            if (EnumerableStringSet.equal(bids[bidList.at(i)].projectId, projectId)) {
                 result[position++] = bidList.at(i);
             }
         }
         return result;
     }
 
-    function listWorkerBids(address worker) external view returns (uint256[] memory) {
+    function listWorkerBids(address worker) external view returns (string[] memory) {
         uint256 count = 0;
         for (uint256 i = 0; i < bidList.length(); i++) {
             if (bids[bidList.at(i)].bidder == worker) {
                 count++;
             }
         }
-        uint256[] memory result = new uint256[](count);
+        string[] memory result = new string[](count);
         uint256 position = 0;
         for (uint256 i = 0; i < bidList.length(); i++) {
             if (bids[bidList.at(i)].bidder == worker) {
@@ -213,7 +215,7 @@ contract ChainLance {
         return result;
     }
 
-    function acceptBid(uint256 projectId, uint256 bidId) external payable {
+    function acceptBid(string calldata projectId, string calldata bidId) external payable {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
         require(bidList.contains(bidId), "unknown bid");
@@ -228,13 +230,13 @@ contract ChainLance {
         emit BidAccepted(projectId, bidId);
     }
 
-    function submitWork(uint256 projectId) external {
+    function submitWork(string calldata projectId) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.InWork, "not in work");
         require(projects[projectId].worker == msg.sender, "not worker");
         // verify all child projects are completed
         for (uint256 i = 0; i < projectList.length(); i++) {
-            if (projects[projectList.at(i)].parentId == projectId) {
+            if (EnumerableStringSet.equal(projects[projectList.at(i)].parentId, projectId)) {
                 require(projects[projectList.at(i)].state == ProjectState.Completed, "uncompleted child");
             }
         }
@@ -244,7 +246,7 @@ contract ChainLance {
         emit WorkSubmitted(projectId);
     }
 
-    function acceptWork(uint256 projectId) external {
+    function acceptWork(string calldata projectId) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.InReview, "not in review");
         require(projects[projectId].owner == msg.sender, "not owner");
@@ -253,7 +255,7 @@ contract ChainLance {
         emit WorkAccepted(projectId);
     }
 
-    function rejectWork(uint256 projectId) external {
+    function rejectWork(string calldata projectId) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.InReview, "not in review");
         require(projects[projectId].owner == msg.sender, "not owner");
@@ -262,7 +264,7 @@ contract ChainLance {
         emit WorkRejected(projectId);
     }
 
-    function cancelWork(uint256 projectId) external {
+    function cancelWork(string calldata projectId) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.InWork, "not in work");
         require(projects[projectId].owner == msg.sender, "not owner");
@@ -272,7 +274,7 @@ contract ChainLance {
         emit WorkCanceled(projectId);
     }
 
-    function cancelProject(uint256 projectId) external {
+    function cancelProject(string calldata projectId) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
         require(projects[projectId].owner == msg.sender, "not owner");
@@ -280,7 +282,7 @@ contract ChainLance {
         emit ProjectCanceled(projectId);
     }
 
-    function rateOwner(uint256 projectId, bool rate) external {
+    function rateOwner(string calldata projectId, bool rate) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Completed ||
             projects[projectId].state == ProjectState.Canceled, "not completed");
@@ -295,7 +297,7 @@ contract ChainLance {
         }
     }
 
-    function rateWorker(uint256 projectId, bool rate) external {
+    function rateWorker(string calldata projectId, bool rate) external {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Completed ||
             projects[projectId].state == ProjectState.Canceled, "not completed");

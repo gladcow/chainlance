@@ -8,12 +8,12 @@ import { Table } from "~~/components/table";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
-  const [projectId] = useState(0);
+  const [projectId] = useState("");
 
   const {} = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "projects",
-    args: [BigInt(projectId)],
+    args: [projectId],
     watch: true,
   });
 

@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 export const WriteSubmitWork = () => {
-  const [projectId, setProjectId] = useState(0);
+  const [projectId, setProjectId] = useState("");
   const [showProjects, setShowProjects] = useState(false);
   const [reciept, setReciept] = useState("");
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
     functionName: "submitWork",
-    args: [BigInt(projectId)],
+    args: [projectId],
     onBlockConfirmation: txnReceipt => {
       setReciept(txnReceipt.blockHash.toString());
     },
@@ -24,7 +24,7 @@ export const WriteSubmitWork = () => {
             placeholder="Write your greeting"
             className="input border border-primary"
             onChange={e => {
-              setProjectId(Number(e.target.value));
+              setProjectId(e.target.value);
               setShowProjects(false);
             }}
           />

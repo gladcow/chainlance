@@ -3,11 +3,11 @@ import { parseEther } from "viem";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 export const ChainLance = () => {
-  const [newProjectId, setNewProjectId] = useState(0);
+  const [newProjectId, setNewProjectId] = useState("");
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
     functionName: "submitWork",
-    args: [BigInt(newProjectId)],
+    args: [newProjectId],
     value: parseEther("0.1"),
     blockConfirmations: 1,
     onBlockConfirmation: txnReceipt => {
@@ -21,7 +21,7 @@ export const ChainLance = () => {
         type="text"
         placeholder="Write your greeting"
         className="input border border-primary"
-        onChange={e => setNewProjectId(parseInt(e.target.value))}
+        onChange={e => setNewProjectId(e.target.value)}
       />
       <button className="btn btn-primary" onClick={() => writeAsync()} disabled={isLoading}>
         {isLoading ? <span className="loading loading-spinner loading-sm"></span> : <>Send</>}

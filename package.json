@@ -47,6 +47,7 @@
   "dependencies": {
     "@helia/json": "^3.0.3",
     "@openzeppelin/contracts": "^5.0.2",
+    "bs58": "^5.0.0",
     "helia": "^4.1.1",
     "react-data-table-component": "^7.6.2",
     "styled-components": "^6.1.8"

@@ -3,7 +3,7 @@ import DataTable from "react-data-table-component";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth/useScaffoldContractRead";
 
 interface DataItem {
-  id: number;
+  id: string;
   watch: ReactElement;
 }
 
@@ -72,9 +72,9 @@ const customStyles = {
 export function Table() {
   const [search, SetSearch] = useState("");
   const [filter, setFilter] = useState<DataItem[]>([]);
-  const [project, setProject] = useState(0);
+  const [project, setProject] = useState("");
   const [info, setInfo] = useState("");
-  let item = 0;
+  let item = "";
 
   const { data: reciept } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -85,16 +85,16 @@ export function Table() {
   const { data: infoFull } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "projects",
-    args: [BigInt(project)],
+    args: [project],
   });
 
   const dataItems: DataItem[] = useMemo(() => {
     const items: DataItem[] = [];
     if (reciept) {
       for (let i = 0; i < reciept.length; i++) {
-        item = Number(reciept[i]);
+        item = reciept[i];
 
-        const currentProject = Number(item);
+        const currentProject = item;
 
         const dataItem: DataItem = {
           id: currentProject,

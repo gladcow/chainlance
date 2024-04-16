@@ -7,22 +7,22 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     ChainLance: {
-      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
       abi: [
         {
           anonymous: false,
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "bidId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "BidAccepted",
@@ -33,15 +33,15 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "id",
-              type: "uint256",
+              type: "string",
             },
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "project",
-              type: "uint256",
+              type: "string",
             },
             {
               indexed: false,
@@ -70,9 +70,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
-              name: "id",
-              type: "uint256",
+              internalType: "string",
+              name: "projectId",
+              type: "string",
             },
           ],
           name: "ProjectCanceled",
@@ -83,9 +83,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "id",
-              type: "uint256",
+              type: "string",
             },
             {
               indexed: false,
@@ -102,9 +102,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "WorkAccepted",
@@ -115,9 +115,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "WorkCanceled",
@@ -128,9 +128,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "WorkRejected",
@@ -141,9 +141,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "WorkSubmitted",
@@ -152,14 +152,14 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "bidId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "acceptBid",
@@ -170,9 +170,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "acceptWork",
@@ -183,14 +183,14 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "external_description",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "uint256",
@@ -211,22 +211,22 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "bids",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "id",
-              type: "uint256",
+              type: "string",
             },
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "address",
@@ -250,9 +250,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "cancelProject",
@@ -263,9 +263,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "cancelWork",
@@ -276,9 +276,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "external_description",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "uint256",
@@ -299,14 +299,14 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "parentId",
-              type: "uint256",
+              type: "string",
             },
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "external_description",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "uint256",
@@ -335,9 +335,9 @@ const deployedContracts = {
           name: "listOwnerProjects",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "string[]",
               name: "",
-              type: "uint256[]",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -346,17 +346,17 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "listProjectBids",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "string[]",
               name: "",
-              type: "uint256[]",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -367,9 +367,9 @@ const deployedContracts = {
           name: "listProjects",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "string[]",
               name: "",
-              type: "uint256[]",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -386,9 +386,9 @@ const deployedContracts = {
           name: "listProjectsWithState",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "string[]",
               name: "",
-              type: "uint256[]",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -405,9 +405,9 @@ const deployedContracts = {
           name: "listWorkerBids",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "string[]",
               name: "",
-              type: "uint256[]",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -424,9 +424,9 @@ const deployedContracts = {
           name: "listWorkerProjects",
           outputs: [
             {
-              internalType: "uint256[]",
+              internalType: "string[]",
               name: "",
-              type: "uint256[]",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -435,22 +435,22 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "projects",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "id",
-              type: "uint256",
+              type: "string",
             },
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "parentId",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "address",
@@ -499,9 +499,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "bool",
@@ -517,9 +517,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
             {
               internalType: "bool",
@@ -554,9 +554,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "rejectWork",
@@ -567,9 +567,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "uint256",
+              internalType: "string",
               name: "projectId",
-              type: "uint256",
+              type: "string",
             },
           ],
           name: "submitWork",
