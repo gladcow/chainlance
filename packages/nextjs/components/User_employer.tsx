@@ -1,25 +1,25 @@
 import { ShowInfo } from "./ShowInfoCard";
-import { WriteSubmitWork } from "./WriteSubmitWork";
+import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
 
-interface UserWorkerProps {
+interface UserEmployerProps {
   data: any;
   columns: any;
   info: any;
 }
 
-export const UserWorker = ({ data, columns, info }: UserWorkerProps) => {
+export const UserEmployer = ({ data, columns, info }: UserEmployerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
         <div className="self-start card w-5/6 bg-base-100 shadow-xl m-5">
           <div className="card-body">
             <h2 className="card-title">Hello</h2>
-            <p>For a worker</p>
+            <p>For a employer</p>
           </div>
         </div>
 
-        <WriteSubmitWork></WriteSubmitWork>
+        <WriteCreateProject></WriteCreateProject>
         <ShowInfo info={info}></ShowInfo>
       </div>
 

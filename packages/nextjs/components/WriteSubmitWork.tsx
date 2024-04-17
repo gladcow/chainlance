@@ -15,7 +15,7 @@ export const WriteSubmitWork = () => {
     },
   });
   return (
-    <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
+    <div className="self-start card w-5/6 bg-base-100 shadow-xl m-5">
       <div className="card-body items-center">
         <h2 className="card-title">Submit Work</h2>
         <div className="card-actions justify-center">
