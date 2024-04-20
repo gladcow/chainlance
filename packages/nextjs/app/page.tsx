@@ -54,7 +54,7 @@ const Home: NextPage = () => {
       <NavBarChain tab={tab} setTab={setTab}></NavBarChain>
       <div className="flex flex-row items-start h-96">
         {tab === "main" && (
-          <div className="card w-96 bg-base-100 shadow-xl">
+          <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <p>
                 Chainlance is a decentralized freelance marketplace. Chainlance sets itself apart from other freelance
