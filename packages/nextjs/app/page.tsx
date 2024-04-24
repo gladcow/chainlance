@@ -45,7 +45,7 @@ const Home: NextPage = () => {
     };
 
     init();
-  }, [helia]);
+  }, [helia, nodeId]);
 
   const data = projectlist
     ? projectlist.map(projectId => ({
