@@ -2,11 +2,13 @@ import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
 
 interface UserEmployerProps {
-  data: any;
-  columns: any;
+    data: any;
+    columns: any;
+    helia: any;
+    heliaOnline: boolean;
 }
 
-export const UserEmployer = ({ data, columns }: UserEmployerProps) => {
+export const UserEmployer = ({ data, columns, helia, heliaOnline }: UserEmployerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -16,13 +18,9 @@ export const UserEmployer = ({ data, columns }: UserEmployerProps) => {
             <p>For a employer</p>
           </div>
         </div>
-
-        <WriteCreateProject></WriteCreateProject>
+          <WriteCreateProject helia={helia} heliaOnline={heliaOnline}></WriteCreateProject>
       </div>
 
-      <div className="justify-end grow">
-        <TableWithSearchAndSort data={data} columns={columns} />
-      </div>
       <div className="justify-end grow">
         <TableWithSearchAndSort data={data} columns={columns} />
       </div>

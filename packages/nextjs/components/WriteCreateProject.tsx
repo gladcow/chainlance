@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { json } from "@helia/json";
-import { createHelia } from "helia";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
-export const WriteCreateProject = () => {
+interface WriteCreateProjectProps {
+  helia: any;
+  heliaOnline: boolean;
+}
+
+export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [externalDiscription, setExternalDiscription] = useState("");
@@ -20,12 +24,9 @@ export const WriteCreateProject = () => {
       setReciept(txnReceipt.blockHash.toString());
     },
   });
-  const writeToIPFS = async function () {
-    // TODO: move this to page initialization
-    const helia = await createHelia();
-    const j = json(helia);
-
-    const cid = await j.add({ title: title, description: description });
+  const writeProjectDetailsToIPFS = async function () {
+    const j = await json(helia);
+    const cid = await j.add({ title: title, description: description, price: price, timeSpan: timeSpan });
     setExternalDiscription(cid.toString());
   };
   return (
@@ -51,16 +52,35 @@ export const WriteCreateProject = () => {
               setShowProjects(false);
             }}
           />
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              writeToIPFS();
+          <input
+            type="text"
+            placeholder="Price"
+            className="input border border-primary"
+            onChange={e => {
+              setPrice(Number(e.target.value));
               setShowProjects(false);
             }}
-          >
-            Send to IPFS
-          </button>
-
+          />
+          <input
+            type="text"
+            placeholder="Time"
+            className="input border border-primary"
+            onChange={e => {
+              setTimeSpan(Number(e.target.value));
+              setShowProjects(false);
+            }}
+          />
+          {heliaOnline && (
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                writeProjectDetailsToIPFS();
+                setShowProjects(false);
+              }}
+            >
+              Send to IPFS
+            </button>
+          )}
           <input
             type="text"
             placeholder="projectId"
@@ -71,24 +91,6 @@ export const WriteCreateProject = () => {
             }}
             value={externalDiscription}
           />
-          <input
-            type="text"
-            placeholder="price"
-            className="input border border-primary"
-            onChange={e => {
-              setPrice(Number(e.target.value));
-              setShowProjects(false);
-            }}
-          />
-          <input
-            type="text"
-            placeholder="timeSpan"
-            className="input border border-primary"
-            onChange={e => {
-              setTimeSpan(Number(e.target.value));
-              setShowProjects(false);
-            }}
-          />
           <button
             className="btn btn-primary"
             onClick={() => {
@@ -97,7 +99,7 @@ export const WriteCreateProject = () => {
             }}
             disabled={isLoading}
           >
-            {isLoading ? <span className="loading loading-spinner loading-sm"></span> : <>Send</>}
+            {isLoading ? <span className="loading loading-spinner loading-sm"></span> : <>Create Project</>}
           </button>
 
           {!reciept || !showProjects ? (
@@ -105,7 +107,7 @@ export const WriteCreateProject = () => {
           ) : (
             <div className="transition ease-in-out delay-50 card w-30 bg-primary text-primary-content">
               <div className="card-body">
-                <h2 className="card-title">Card title!</h2>
+                <h2 className="card-title">Project Created!</h2>
                 <p className="break-all"> {reciept ? reciept : <></>}</p>
               </div>
             </div>

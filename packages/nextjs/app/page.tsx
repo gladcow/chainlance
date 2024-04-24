@@ -1,20 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createHelia } from "helia";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
 import { UserWorker } from "~~/components/User_Worker";
 import { UserEmployer } from "~~/components/User_employer";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
+// import {json} from "@helia/json";
+// import { CID } from 'multiformats/cid'
+
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
+  const [project, setProject] = useState("");
+  const [nodeId, setId] = useState("");
+  const [helia, setHelia] = useState({});
+  const [heliaOnline, setHeliaOnline] = useState(false);
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
     args: [0],
   });
+
+  const { data: infoFull } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "projects",
+    args: [project],
+  }) as { data: any[] | undefined; isLoading: boolean };
+
+  useEffect(() => {
+    const init = async () => {
+      if (nodeId.length > 0) return;
+
+      const heliaNode = await createHelia();
+
+      const id = heliaNode.libp2p.peerId.toString();
+      const nodeIsOnline = heliaNode.libp2p.status === "started";
+
+      setHelia(heliaNode);
+      setId(id);
+      setHeliaOnline(nodeIsOnline);
+    };
+
+    init();
+  }, [helia]);
 
   const data = projectlist
     ? projectlist.map(projectId => ({
@@ -63,7 +94,7 @@ const Home: NextPage = () => {
 
         {tab === "employer" && (
           <>
-            <UserEmployer data={data} columns={columns}></UserEmployer>
+            <UserEmployer data={data} columns={columns} helia={helia} heliaOnline={heliaOnline}></UserEmployer>
           </>
         )}
       </div>
