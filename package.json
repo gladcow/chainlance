@@ -47,9 +47,12 @@
   "dependencies": {
     "@helia/json": "^3.0.3",
     "@openzeppelin/contracts": "^5.0.2",
+    "blockstore-core": "^4.4.1",
     "blockstore-idb": "^1.1.8",
     "bs58": "^5.0.0",
+    "datastore-core": "^9.2.9",
     "helia": "^4.1.1",
+    "libp2p": "^1.4.3",
     "react-data-table-component": "^7.6.2",
     "styled-components": "^6.1.8"
   }

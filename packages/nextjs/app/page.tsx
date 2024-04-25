@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MemoryBlockstore } from "blockstore-core";
+import { MemoryDatastore } from "datastore-core";
 import { createHelia } from "helia";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
@@ -31,8 +33,10 @@ const Home: NextPage = () => {
   useEffect(() => {
     const init = async () => {
       if (nodeId.length > 0) return;
+      const blockstore = new MemoryBlockstore();
+      const datastore = new MemoryDatastore();
 
-      const heliaNode = await createHelia();
+      const heliaNode = await createHelia({ datastore, blockstore });
 
       const id = heliaNode.libp2p.peerId.toString();
       const nodeIsOnline = heliaNode.libp2p.status === "started";
