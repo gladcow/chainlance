@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 import { createHelia } from "helia";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
+import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { UserWorker } from "~~/components/User_Worker";
 import { UserEmployer } from "~~/components/User_employer";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
-
-// import {json} from "@helia/json";
-// import { CID } from 'multiformats/cid'
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
@@ -49,7 +47,7 @@ const Home: NextPage = () => {
 
   const data = projectlist
     ? projectlist.map(projectId => ({
-        id: projectId,
+        id: <ProjectTitleFromId projectId={projectId} helia={helia} heliaOnline={heliaOnline}></ProjectTitleFromId>,
       }))
     : [];
   const columns = ["id"];
