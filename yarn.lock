@@ -6757,7 +6757,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"datastore-core@npm:^9.2.9":
+"datastore-core@npm:^9.0.0, datastore-core@npm:^9.2.9":
   version: 9.2.9
   resolution: "datastore-core@npm:9.2.9"
   dependencies:
@@ -6774,6 +6774,19 @@ __metadata:
     it-sort: ^3.0.4
     it-take: ^3.0.4
   checksum: 82311198971b0603c7ca5a3275a2ef7df82981d29fd0c120d190c7902d3b08afa5497cbe80551a363a9d6b9b1a1f587147df600a5c217765e50d9f1b0d9db338
+  languageName: node
+  linkType: hard
+
+"datastore-idb@npm:^2.1.9":
+  version: 2.1.9
+  resolution: "datastore-idb@npm:2.1.9"
+  dependencies:
+    datastore-core: ^9.0.0
+    idb: ^8.0.0
+    interface-datastore: ^8.0.0
+    it-filter: ^3.0.4
+    it-sort: ^3.0.4
+  checksum: 9029b28ace578b077e351236fd44ecdbbaf782b8cda284a61c8686555fc08144592dc5d04b7bfdeb9d63fa65c24414e1bb90b5a1a95e12e334c115b3a00bc2bc
   languageName: node
   linkType: hard
 
@@ -13899,6 +13912,7 @@ __metadata:
     blockstore-idb: ^1.1.8
     bs58: ^5.0.0
     datastore-core: ^9.2.9
+    datastore-idb: ^2.1.9
     helia: ^4.1.1
     husky: ~8.0.3
     libp2p: ^1.4.3

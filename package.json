@@ -51,6 +51,7 @@
     "blockstore-idb": "^1.1.8",
     "bs58": "^5.0.0",
     "datastore-core": "^9.2.9",
+    "datastore-idb": "^2.1.9",
     "helia": "^4.1.1",
     "libp2p": "^1.4.3",
     "react-data-table-component": "^7.6.2",

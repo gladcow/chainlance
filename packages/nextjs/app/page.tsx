@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MemoryBlockstore } from "blockstore-core";
-import { MemoryDatastore } from "datastore-core";
+import { IDBBlockstore } from "blockstore-idb";
+import { IDBDatastore } from "datastore-idb";
 import { createHelia } from "helia";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
@@ -17,6 +17,8 @@ const Home: NextPage = () => {
   const [nodeId, setId] = useState("");
   const [helia, setHelia] = useState({});
   const [heliaOnline, setHeliaOnline] = useState(false);
+  const [blockstore, setBlockstore] = useState({});
+  const [datastore, setDatastore] = useState({});
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -33,8 +35,12 @@ const Home: NextPage = () => {
   useEffect(() => {
     const init = async () => {
       if (nodeId.length > 0) return;
-      const blockstore = new MemoryBlockstore();
-      const datastore = new MemoryDatastore();
+      const blockstore = new IDBBlockstore("/ipfs/blockstore");
+      await blockstore.open();
+      setBlockstore(blockstore);
+      const datastore = new IDBDatastore("/ipfs/datastore");
+      await datastore.open();
+      setDatastore(datastore);
 
       const heliaNode = await createHelia({ datastore, blockstore });
 
@@ -47,7 +53,20 @@ const Home: NextPage = () => {
     };
 
     init();
-  }, [helia, nodeId]);
+
+    return () => {
+      if (nodeId.length > 0) {
+        // @ts-ignore
+        helia.stop();
+        // @ts-ignore
+        datastore.close();
+        // @ts-ignore
+        blockstore.close();
+        setHeliaOnline(false);
+        setId("");
+      }
+    };
+  }, [blockstore, datastore, helia, nodeId]);
 
   const data = projectlist
     ? projectlist.map(projectId => ({
