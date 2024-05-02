@@ -1,14 +1,12 @@
-import { ShowInfo } from "./ShowInfoCard";
 import { WriteSubmitWork } from "./WriteSubmitWork";
 import TableWithSearchAndSort from "./table_daisy";
 
 interface UserWorkerProps {
   data: any;
   columns: any;
-  info: any;
 }
 
-export const UserWorker = ({ data, columns, info }: UserWorkerProps) => {
+export const UserWorker = ({ data, columns }: UserWorkerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -20,7 +18,6 @@ export const UserWorker = ({ data, columns, info }: UserWorkerProps) => {
         </div>
 
         <WriteSubmitWork></WriteSubmitWork>
-        <ShowInfo info={info}></ShowInfo>
       </div>
 
       <div className="justify-end grow">

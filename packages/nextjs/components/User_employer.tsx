@@ -1,14 +1,12 @@
-import { ShowInfo } from "./ShowInfoCard";
 import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
 
 interface UserEmployerProps {
   data: any;
   columns: any;
-  info: any;
 }
 
-export const UserEmployer = ({ data, columns, info }: UserEmployerProps) => {
+export const UserEmployer = ({ data, columns }: UserEmployerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -20,7 +18,6 @@ export const UserEmployer = ({ data, columns, info }: UserEmployerProps) => {
         </div>
 
         <WriteCreateProject></WriteCreateProject>
-        <ShowInfo info={info}></ShowInfo>
       </div>
 
       <div className="justify-end grow">
