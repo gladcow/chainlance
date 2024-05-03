@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { noise } from "@chainsafe/libp2p-noise";
+import { yamux } from "@chainsafe/libp2p-yamux";
+import { mplex } from "@libp2p/mplex";
 import { IDBBlockstore } from "blockstore-idb";
 import { IDBDatastore } from "datastore-idb";
 import { createHelia } from "helia";
@@ -35,14 +38,27 @@ const Home: NextPage = () => {
   useEffect(() => {
     const init = async () => {
       if (nodeId.length > 0) return;
-      const blockstore = new IDBBlockstore("/ipfs/blockstore");
+      const blockstore = new IDBBlockstore("/ipfs_test/blockstore");
       await blockstore.open();
       setBlockstore(blockstore);
-      const datastore = new IDBDatastore("/ipfs/datastore");
+      const datastore = new IDBDatastore("/ipfs_test/datastore");
       await datastore.open();
       setDatastore(datastore);
 
-      const heliaNode = await createHelia({ datastore, blockstore });
+      const heliaNode = await createHelia({
+        libp2p: {
+          streamMuxers: [yamux(), mplex()],
+          connectionEncryption: [noise()],
+          connectionManager: {
+            maxConnections: 200,
+            minConnections: 4,
+            maxIncomingPendingConnections: 100,
+            inboundConnectionThreshold: 100,
+          },
+        },
+        datastore: datastore,
+        blockstore: blockstore,
+      });
 
       const id = heliaNode.libp2p.peerId.toString();
       const nodeIsOnline = heliaNode.libp2p.status === "started";
@@ -54,18 +70,18 @@ const Home: NextPage = () => {
 
     init();
 
-    return () => {
-      if (nodeId.length > 0) {
-        // @ts-ignore
-        helia.stop();
-        // @ts-ignore
-        datastore.close();
-        // @ts-ignore
-        blockstore.close();
-        setHeliaOnline(false);
-        setId("");
-      }
-    };
+    // return () => {
+    //   if (nodeId.length > 0) {
+    //     // @ts-ignore
+    //     helia.stop();
+    //     // @ts-ignore
+    //     datastore.close();
+    //     // @ts-ignore
+    //     blockstore.close();
+    //     setHeliaOnline(false);
+    //     setId("");
+    //   }
+    // };
   }, [blockstore, datastore, helia, nodeId]);
 
   const data = projectlist
