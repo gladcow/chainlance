@@ -9,7 +9,6 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
-  const [project, setProject] = useState("");
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -17,28 +16,12 @@ const Home: NextPage = () => {
     args: [0],
   });
 
-  const { data: infoFull } = useScaffoldContractRead({
-    contractName: "ChainLance",
-    functionName: "projects",
-    args: [project],
-  }) as { data: any[] | undefined; isLoading: boolean };
-
   const data = projectlist
     ? projectlist.map(projectId => ({
         id: projectId,
-        info: (
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setProject(projectId);
-            }}
-          >
-            View Details
-          </button>
-        ),
       }))
     : [];
-  const columns = ["id", "info"];
+  const columns = ["id"];
 
   const [projectId] = useState("");
 
@@ -74,19 +57,15 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker data={data} columns={columns} info={infoFull ? infoFull : []}></UserWorker>
+            <UserWorker data={data} columns={columns}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer data={data} columns={columns} info={infoFull}></UserEmployer>
+            <UserEmployer data={data} columns={columns}></UserEmployer>
           </>
         )}
-        {/* <WriteCreateProject></WriteCreateProject>
-        <ReadProjects></ReadProjects>
-        <ShowInfoCard info={info}></ShowInfoCard>
-        <Table data={data}></Table> */}
       </div>
     </>
   );
