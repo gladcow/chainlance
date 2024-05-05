@@ -9,14 +9,12 @@ import { IDBDatastore } from "datastore-idb";
 import { createHelia } from "helia";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
-import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { UserWorker } from "~~/components/User_Worker";
 import { UserEmployer } from "~~/components/User_employer";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
-  const [project, setProject] = useState("");
   const [nodeId, setId] = useState("");
   const [helia, setHelia] = useState({});
   const [heliaOnline, setHeliaOnline] = useState(false);
@@ -28,12 +26,6 @@ const Home: NextPage = () => {
     functionName: "listProjectsWithState",
     args: [0],
   });
-
-  const { data: infoFull } = useScaffoldContractRead({
-    contractName: "ChainLance",
-    functionName: "projects",
-    args: [project],
-  }) as { data: any[] | undefined; isLoading: boolean };
 
   useEffect(() => {
     const init = async () => {
@@ -86,7 +78,8 @@ const Home: NextPage = () => {
 
   const data = projectlist
     ? projectlist.map(projectId => ({
-        id: <ProjectTitleFromId projectId={projectId} helia={helia} heliaOnline={heliaOnline}></ProjectTitleFromId>,
+        id: projectId,
+        //id: <ProjectTitleFromId projectId={projectId} helia={helia} heliaOnline={heliaOnline}></ProjectTitleFromId>,
       }))
     : [];
   const columns = ["id"];
@@ -125,7 +118,7 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker data={data} columns={columns}></UserWorker>
+            <UserWorker data={data} columns={columns} helia={helia} heliaOnline={heliaOnline}></UserWorker>
           </>
         )}
 

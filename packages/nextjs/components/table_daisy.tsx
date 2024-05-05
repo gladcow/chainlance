@@ -1,15 +1,24 @@
 // components/TableWithSearchAndSort.tsx
 import React from "react";
 import { useState } from "react";
+import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface TableProps {
   data: any[];
   columns: string[];
   emptyTableMessage?: string;
+  helia: any;
+  heliaOnline: boolean;
 }
 
-const TableWithSearchAndSort: React.FC<TableProps> = ({ data, columns, emptyTableMessage = "Table is empty" }) => {
+const TableWithSearchAndSort: React.FC<TableProps> = ({
+  data,
+  columns,
+  emptyTableMessage = "Table is empty",
+  helia,
+  heliaOnline,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "ascending" });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
@@ -70,7 +79,11 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({ data, columns, emptyTabl
                 <tr>
                   {columns.map(column => (
                     <td key={column} className="border px-4 py-2">
-                      {row[column]}
+                      <ProjectTitleFromId
+                        projectId={row[column]}
+                        helia={helia}
+                        heliaOnline={heliaOnline}
+                      ></ProjectTitleFromId>
                     </td>
                   ))}
                   <td className="border px-4 py-2">

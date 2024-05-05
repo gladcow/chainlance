@@ -15,6 +15,7 @@ export const ProjectTitleFromId = ({ helia, heliaOnline, projectId }: ProjectTit
     const init = async () => {
       console.log("Initializing project title");
       console.log(heliaOnline);
+      console.log(projectId);
       if (title.length > 0) return;
       if (!heliaOnline) return;
       const j = json(helia);
