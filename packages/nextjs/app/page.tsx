@@ -1,6 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { noise } from "@chainsafe/libp2p-noise";
+import { yamux } from "@chainsafe/libp2p-yamux";
+import { mplex } from "@libp2p/mplex";
+import { IDBBlockstore } from "blockstore-idb";
+import { IDBDatastore } from "datastore-idb";
+import { createHelia } from "helia";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
 import { UserWorker } from "~~/components/User_Worker";
@@ -9,6 +15,11 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
+  const [nodeId, setId] = useState("");
+  const [helia, setHelia] = useState({});
+  const [heliaOnline, setHeliaOnline] = useState(false);
+  const [blockstore, setBlockstore] = useState({});
+  const [datastore, setDatastore] = useState({});
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -16,9 +27,59 @@ const Home: NextPage = () => {
     args: [0],
   });
 
+  useEffect(() => {
+    const init = async () => {
+      if (nodeId.length > 0) return;
+      const blockstore = new IDBBlockstore("/ipfs_test/blockstore");
+      await blockstore.open();
+      setBlockstore(blockstore);
+      const datastore = new IDBDatastore("/ipfs_test/datastore");
+      await datastore.open();
+      setDatastore(datastore);
+
+      const heliaNode = await createHelia({
+        libp2p: {
+          streamMuxers: [yamux(), mplex()],
+          connectionEncryption: [noise()],
+          connectionManager: {
+            maxConnections: 200,
+            minConnections: 4,
+            maxIncomingPendingConnections: 100,
+            inboundConnectionThreshold: 100,
+          },
+        },
+        datastore: datastore,
+        blockstore: blockstore,
+      });
+
+      const id = heliaNode.libp2p.peerId.toString();
+      const nodeIsOnline = heliaNode.libp2p.status === "started";
+
+      setHelia(heliaNode);
+      setId(id);
+      setHeliaOnline(nodeIsOnline);
+    };
+
+    init();
+
+    // return () => {
+    //   if (nodeId.length > 0) {
+    //     // @ts-ignore
+    //     helia.stop();
+    //     // @ts-ignore
+    //     datastore.close();
+    //     // @ts-ignore
+    //     blockstore.close();
+    //     setHeliaOnline(false);
+    //     setId("");
+    //   }
+    // };
+  }, [blockstore, datastore, helia, nodeId]);
+
   const data = projectlist
     ? projectlist.map(projectId => ({
         id: projectId,
+        //id: <ProjectTitleFromId projectId={projectId} helia={helia} heliaOnline={heliaOnline}></ProjectTitleFromId>,
       }))
     : [];
   const columns = ["id"];
@@ -57,13 +118,13 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker data={data} columns={columns}></UserWorker>
+            <UserWorker data={data} columns={columns} helia={helia} heliaOnline={heliaOnline}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer data={data} columns={columns}></UserEmployer>
+            <UserEmployer data={data} columns={columns} helia={helia} heliaOnline={heliaOnline}></UserEmployer>
           </>
         )}
       </div>

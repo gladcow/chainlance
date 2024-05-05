@@ -4,9 +4,11 @@ import TableWithSearchAndSort from "./table_daisy";
 interface UserWorkerProps {
   data: any;
   columns: any;
+  helia: any;
+  heliaOnline: boolean;
 }
 
-export const UserWorker = ({ data, columns }: UserWorkerProps) => {
+export const UserWorker = ({ data, columns, helia, heliaOnline }: UserWorkerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -21,10 +23,10 @@ export const UserWorker = ({ data, columns }: UserWorkerProps) => {
       </div>
 
       <div className="justify-end grow">
-        <TableWithSearchAndSort data={data} columns={columns} />
+        <TableWithSearchAndSort data={data} columns={columns} helia={helia} heliaOnline={heliaOnline} />
       </div>
       <div className="justify-end grow">
-        <TableWithSearchAndSort data={data} columns={columns} />
+        <TableWithSearchAndSort data={data} columns={columns} helia={helia} heliaOnline={heliaOnline} />
       </div>
     </div>
   );
