@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { noise } from "@chainsafe/libp2p-noise";
-import { yamux } from "@chainsafe/libp2p-yamux";
-import { mplex } from "@libp2p/mplex";
 import { IDBBlockstore } from "blockstore-idb";
 import { IDBDatastore } from "datastore-idb";
 import { createHelia } from "helia";
@@ -38,16 +35,6 @@ const Home: NextPage = () => {
       setDatastore(datastore);
 
       const heliaNode = await createHelia({
-        libp2p: {
-          streamMuxers: [yamux(), mplex()],
-          connectionEncryption: [noise()],
-          connectionManager: {
-            maxConnections: 200,
-            minConnections: 4,
-            maxIncomingPendingConnections: 100,
-            inboundConnectionThreshold: 100,
-          },
-        },
         datastore: datastore,
         blockstore: blockstore,
       });
