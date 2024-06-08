@@ -1,5 +1,5 @@
 // components/TableWithSearchAndSort.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
@@ -34,6 +34,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
       return sortConfig.direction === "ascending" ? -1 : 1;
     }
     if (a[sortConfig.key] > b[sortConfig.key]) {
+      console.log(a, b, sortConfig.key);
       return sortConfig.direction === "ascending" ? 1 : -1;
     }
     return 0;
@@ -42,6 +43,9 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   const filteredData = sortedData.filter(item =>
     Object.keys(item).some(key => item[key].toString().toLowerCase().includes(searchTerm.toLowerCase())),
   );
+  useEffect(() => {
+    console.log(infoFull);
+  }, [sortedData]);
 
   return (
     <div className="flex flex-col m-5 max-w-20">

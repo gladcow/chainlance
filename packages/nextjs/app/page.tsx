@@ -66,7 +66,7 @@ const Home: NextPage = () => {
   const data = projectlist
     ? projectlist.map(projectId => ({
         id: projectId,
-        //id: <ProjectTitleFromId projectId={projectId} helia={helia} heliaOnline={heliaOnline}></ProjectTitleFromId>,
+        // id: <ProjectTitleFromId projectId={projectId} helia={helia} heliaOnline={heliaOnline}></ProjectTitleFromId>,
       }))
     : [];
   const columns = ["id"];

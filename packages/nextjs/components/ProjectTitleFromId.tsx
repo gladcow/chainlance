@@ -13,17 +13,17 @@ export const ProjectTitleFromId = ({ helia, heliaOnline, projectId }: ProjectTit
 
   useEffect(() => {
     const init = async () => {
-      console.log("Initializing project title");
-      console.log(heliaOnline);
-      console.log(projectId);
+      // console.log("Initializing project title");
+      // console.log(heliaOnline);
+      // console.log(projectId);
       if (title.length > 0) return;
       if (!heliaOnline) return;
       const j = json(helia);
       const cid = CID.parse(projectId);
-      console.log("Before get");
+      // console.log("Before get");
       // @ts-ignore
       const data = await j.get(cid);
-      console.log("After:", data);
+      // console.log("After:", data);
       // @ts-ignore
       setTitle(data.title);
     };
