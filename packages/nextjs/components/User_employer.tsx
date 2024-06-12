@@ -1,22 +1,22 @@
 import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
+import { KuboRPCClient } from "kubo-rpc-client";
 
 interface UserEmployerProps {
   data: any;
   columns: any;
-  helia: any;
-  heliaOnline: boolean;
+  ipfsNode: KuboRPCClient | undefined;
 }
 
-export const UserEmployer = ({ data, columns, helia, heliaOnline }: UserEmployerProps) => {
+export const UserEmployer = ({ data, columns, ipfsNode }: UserEmployerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
-        <WriteCreateProject helia={helia} heliaOnline={heliaOnline}></WriteCreateProject>
+        <WriteCreateProject ipfsNode={ipfsNode}></WriteCreateProject>
       </div>
 
       <div className="justify-end grow">
-        <TableWithSearchAndSort data={data} columns={columns} helia={helia} heliaOnline={heliaOnline} />
+        <TableWithSearchAndSort data={data} columns={columns} ipfsNode={ipfsNode} />
       </div>
     </div>
   );

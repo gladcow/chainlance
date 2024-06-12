@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+// components/TableWithSearchAndSort.tsx
+import React from "react";
+import { useState } from "react";
 import { useFetchTitles } from "./GetTitlesFromIds";
+import { KuboRPCClient } from "kubo-rpc-client";
 import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
@@ -7,16 +10,14 @@ interface TableProps {
   data: any[];
   columns: string[];
   emptyTableMessage?: string;
-  helia: any;
-  heliaOnline: boolean;
+  ipfsNode: KuboRPCClient | undefined;
 }
 
 const TableWithSearchAndSort: React.FC<TableProps> = ({
   data,
   columns,
   emptyTableMessage = "Table is empty",
-  helia,
-  heliaOnline,
+  ipfsNode,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
@@ -25,7 +26,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
-  const titles = useFetchTitles(data, helia, heliaOnline);
+  const titles = useFetchTitles(data, ipfsNode);
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -59,7 +60,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      {heliaOnline ? (
+      {ipfsNode?.isOnline() ? (
         <table className="table-auto">
           <thead>
             <tr>
@@ -88,7 +89,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                     {columns.map(column => (
                       <td key={column} className="border px-4 py-2">
                         {titles[row[column]] || (
-                          <ProjectTitleFromId projectId={row[column]} helia={helia} heliaOnline={heliaOnline} />
+                          <ProjectTitleFromId projectId={row[column]} ipfsNode={ipfsNode}/>
                         )}
                       </td>
                     ))}

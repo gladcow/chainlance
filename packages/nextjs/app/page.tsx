@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IDBBlockstore } from "blockstore-idb";
-import { IDBDatastore } from "datastore-idb";
-import { createHelia } from "helia";
+import { KuboRPCClient, create } from "kubo-rpc-client";
 import type { NextPage } from "next";
 import { NavBarChain } from "~~/components/NavBarChain";
 import { UserWorker } from "~~/components/User_Worker";
@@ -12,11 +10,7 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
-  const [nodeId, setId] = useState("");
-  const [helia, setHelia] = useState({});
-  const [heliaOnline, setHeliaOnline] = useState(false);
-  const [blockstore, setBlockstore] = useState({});
-  const [datastore, setDatastore] = useState({});
+  const [ipfsNode, setIpfsNode] = useState<KuboRPCClient>();
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -25,43 +19,11 @@ const Home: NextPage = () => {
   }) as { data: any[] | undefined };
 
   useEffect(() => {
-    const init = async () => {
-      if (nodeId.length > 0) return;
-      const blockstore = new IDBBlockstore("/ipfs_test/blockstore");
-      await blockstore.open();
-      setBlockstore(blockstore);
-      const datastore = new IDBDatastore("/ipfs_test/datastore");
-      await datastore.open();
-      setDatastore(datastore);
-
-      const heliaNode = await createHelia({
-        datastore: datastore,
-        blockstore: blockstore,
-      });
-
-      const id = heliaNode.libp2p.peerId.toString();
-      const nodeIsOnline = heliaNode.libp2p.status === "started";
-
-      setHelia(heliaNode);
-      setId(id);
-      setHeliaOnline(nodeIsOnline);
-    };
-
-    init();
-
-    // return () => {
-    //   if (nodeId.length > 0) {
-    //     // @ts-ignore
-    //     helia.stop();
-    //     // @ts-ignore
-    //     datastore.close();
-    //     // @ts-ignore
-    //     blockstore.close();
-    //     setHeliaOnline(false);
-    //     setId("");
-    //   }
-    // };
-  }, [blockstore, datastore, helia, nodeId]);
+    if (ipfsNode === undefined) {
+      const ipfs = create(new URL("http://127.0.0.1:5001"));
+      setIpfsNode(ipfs);
+    }
+  }, [ipfsNode]);
 
   // Обрабатываем данные только после их загрузки
   const data = projectlist
@@ -106,13 +68,13 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker data={data} columns={columns} helia={helia} heliaOnline={heliaOnline}></UserWorker>
+            <UserWorker data={data} columns={columns} ipfsNode={ipfsNode}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer data={data} columns={columns} helia={helia} heliaOnline={heliaOnline}></UserEmployer>
+            <UserEmployer data={data} columns={columns} ipfsNode={ipfsNode}></UserEmployer>
           </>
         )}
       </div>
