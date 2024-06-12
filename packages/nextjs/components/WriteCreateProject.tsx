@@ -22,7 +22,7 @@ export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
       setIpfsOnline(online === undefined ? false : online);
     };
     init();
-  }, [ipfsOnline]);
+  }, [ipfsOnline, ipfsNode]);
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
