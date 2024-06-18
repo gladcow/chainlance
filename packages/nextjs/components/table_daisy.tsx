@@ -1,6 +1,5 @@
-// components/TableWithSearchAndSort.tsx
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useFetchTitles } from "./GetTitlesFromIds";
 import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
@@ -20,32 +19,36 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   heliaOnline,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "ascending" });
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
+    key: "",
+    direction: "ascending",
+  });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
-  const { data: infoFull } = useScaffoldContractRead({
+  const titles = useFetchTitles(data, helia, heliaOnline);
+
+  const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "projects",
     args: [project],
   }) as { data: any[] | undefined; isLoading: boolean };
 
-  const sortedData = data.sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
+  const sortedData = [...data].sort((a, b) => {
+    const aValue = titles[a.id] || "";
+    const bValue = titles[b.id] || "";
+    if (aValue < bValue) {
       return sortConfig.direction === "ascending" ? -1 : 1;
     }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      console.log(a, b, sortConfig.key);
+    if (aValue > bValue) {
       return sortConfig.direction === "ascending" ? 1 : -1;
     }
     return 0;
   });
 
-  const filteredData = sortedData.filter(item =>
-    Object.keys(item).some(key => item[key].toString().toLowerCase().includes(searchTerm.toLowerCase())),
-  );
-  useEffect(() => {
-    console.log(infoFull);
-  }, [sortedData]);
+  const filteredData = sortedData.filter(item => {
+    const title = titles[item.id] || "";
+    return title.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   return (
     <div className="flex flex-col m-5 max-w-20">
@@ -56,89 +59,94 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      <table className="table-auto">
-        <thead>
-          <tr>
-            {columns.map(column => (
-              <th
-                key={column}
-                className="px-4 py-2 cursor-pointer"
-                onClick={() =>
-                  setSortConfig({
-                    key: column,
-                    direction:
-                      sortConfig.key === column && sortConfig.direction === "ascending" ? "descending" : "ascending",
-                  })
-                }
-              >
-                {column}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.length > 0 ? (
-            filteredData.map((row, index) => (
-              <React.Fragment key={index}>
-                <tr>
-                  {columns.map(column => (
-                    <td key={column} className="border px-4 py-2">
-                      <ProjectTitleFromId
-                        projectId={row[column]}
-                        helia={helia}
-                        heliaOnline={heliaOnline}
-                      ></ProjectTitleFromId>
-                    </td>
-                  ))}
-                  <td className="border px-4 py-2">
-                    <button
-                      onClick={() => {
-                        setProject(row.id);
-                        console.log(row.id);
-                        setExpandedRow(expandedRow === index ? null : index);
-                      }}
-                    >
-                      {expandedRow === index ? "▲" : "▼"}
-                    </button>
-                  </td>
-                </tr>
-                {expandedRow === index && (
+      {heliaOnline ? (
+        <table className="table-auto">
+          <thead>
+            <tr>
+              {columns.map(column => (
+                <th
+                  key={column}
+                  className="px-4 py-2 cursor-pointer"
+                  onClick={() =>
+                    setSortConfig({
+                      key: column,
+                      direction:
+                        sortConfig.key === column && sortConfig.direction === "ascending" ? "descending" : "ascending",
+                    })
+                  }
+                >
+                  {column}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.length > 0 ? (
+              filteredData.map((row, index) => (
+                <React.Fragment key={index}>
                   <tr>
-                    <td colSpan={columns.length + 1} className="border px-4 py-2">
-                      {infoFull && (
-                        <div className="flex content-evenly">
-                          <div className="w-3/4">
-                            <h3>Project Details:</h3>
-                            <ul>
-                              {infoFull.map((detail, index) => (
-                                <li key={index} className="break-words">
-                                  {detail}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div className="w-1/4">
-                            <div className="flex flex-col space-y-4">
-                              <button className="btn btn-primary p-0">Button 1</button>
-                              <button className="btn btn-secondary p-0">Button 2</button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                    {columns.map(column => (
+                      <td key={column} className="border px-4 py-2">
+                        {titles[row[column]] || (
+                          <ProjectTitleFromId projectId={row[column]} helia={helia} heliaOnline={heliaOnline} />
+                        )}
+                      </td>
+                    ))}
+                    <td className="border px-4 py-2">
+                      <button
+                        onClick={() => {
+                          setProject(row.id);
+                          setExpandedRow(expandedRow === index ? null : index);
+                        }}
+                      >
+                        {expandedRow === index ? "▲" : "▼"}
+                      </button>
                     </td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={columns.length + 1} className="border px-4 py-2 text-center">
-                {emptyTableMessage}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+                  {expandedRow === index && (
+                    <tr>
+                      <td colSpan={columns.length + 1} className="border px-4 py-2">
+                        {infoFull && !isInfoFullLoading ? (
+                          <div className="flex content-evenly">
+                            <div className="w-3/4">
+                              <h3>Project Details:</h3>
+                              <ul>
+                                {infoFull.map((detail, detailIndex) => (
+                                  <li key={detailIndex} className="break-words">
+                                    {detail}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div className="w-1/4">
+                              <div className="flex flex-col space-y-4">
+                                <button className="btn btn-primary p-0">Button 1</button>
+                                <button className="btn btn-secondary p-0">Button 2</button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <p>Loading...</p>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length + 1} className="border px-4 py-2 text-center">
+                  {emptyTableMessage}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      ) : (
+        <div className="flex justify-center items-center h-64">
+          <span className="loading loading-spinner loading-sm"></span>
+        </div>
+      )}
     </div>
   );
 };

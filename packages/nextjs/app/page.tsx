@@ -22,7 +22,7 @@ const Home: NextPage = () => {
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
     args: [0],
-  });
+  }) as { data: any[] | undefined };
 
   useEffect(() => {
     const init = async () => {
@@ -63,6 +63,7 @@ const Home: NextPage = () => {
     // };
   }, [blockstore, datastore, helia, nodeId]);
 
+  // Обрабатываем данные только после их загрузки
   const data = projectlist
     ? projectlist.map(projectId => ({
         id: projectId,
