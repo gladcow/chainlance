@@ -20,7 +20,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (ipfsNode === undefined) {
-      const ipfs = create(new URL("http://127.0.0.1:5001"));
+      const ipfs = create(new URL("http://92.63.194.135:5001"));
       setIpfsNode(ipfs);
     }
   }, [ipfsNode]);
