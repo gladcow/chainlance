@@ -33,7 +33,7 @@ const useFetchTitles = (data: any[], helia: any, heliaOnline: boolean) => {
     if (heliaOnline) {
       fetchAllTitles();
     }
-  }, [data, helia, heliaOnline]);
+  }, [titles, data, helia, heliaOnline]);
 
   return titles;
 };
