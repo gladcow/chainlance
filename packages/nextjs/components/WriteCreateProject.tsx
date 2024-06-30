@@ -24,9 +24,10 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
       setReciept(txnReceipt.blockHash.toString());
     },
   });
+
   useEffect(() => {
     writeAsync();
-  }, [writeAsync, externalDiscription]);
+  }, [externalDiscription]);
   const writeProjectDetailsToIPFS = async function () {
     const j = json(helia);
     const cid = await j.add({ title: title, description: description, price: price, timeSpan: timeSpan });
