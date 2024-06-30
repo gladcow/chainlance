@@ -20,7 +20,11 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (ipfsNode === undefined) {
-      const ipfs = create(new URL("http://92.63.194.135:5001"));
+      const ipfs = create({
+        host: "92.63.194.135",
+        port: 5001,
+        protocol: "http",
+      });
       setIpfsNode(ipfs);
     }
   }, [ipfsNode]);
