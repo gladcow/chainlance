@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { json } from "@helia/json";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
@@ -24,8 +24,11 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
       setReciept(txnReceipt.blockHash.toString());
     },
   });
+  useEffect(() => {
+    writeAsync();
+  }, [writeAsync, externalDiscription]);
   const writeProjectDetailsToIPFS = async function () {
-    const j = await json(helia);
+    const j = json(helia);
     const cid = await j.add({ title: title, description: description, price: price, timeSpan: timeSpan });
     setExternalDiscription(cid.toString());
   };
@@ -78,10 +81,10 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
                 setShowProjects(false);
               }}
             >
-              Send to IPFS
+              {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
             </button>
           )}
-          <input
+          {/* <input
             type="text"
             placeholder="projectId"
             className="input border border-primary"
@@ -90,8 +93,8 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
               setShowProjects(false);
             }}
             value={externalDiscription}
-          />
-          <button
+          /> */}
+          {/* <button
             className="btn btn-primary"
             onClick={() => {
               writeAsync();
@@ -100,7 +103,7 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
             disabled={isLoading}
           >
             {isLoading ? <span className="loading loading-spinner loading-sm"></span> : <>Create Project</>}
-          </button>
+          </button> */}
 
           {!reciept || !showProjects ? (
             <></>
