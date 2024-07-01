@@ -38,7 +38,7 @@ const useFetchTitles = (data: any[], ipfsNode: KuboRPCClient | undefined) => {
     };
 
     fetchAllTitles();
-  }, [titles, data, ipfsNode]);
+  }, [ipfsNode]);
 
   return titles;
 };

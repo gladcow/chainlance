@@ -32,15 +32,14 @@ export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
       setReciept(txnReceipt.blockHash.toString());
     },
   });
-  useEffect(() => {
-    writeAsync();
-  }, [writeAsync, externalDiscription]);
+
   const writeProjectDetailsToIPFS = async function () {
     const res = await ipfsNode?.add(
       JSON.stringify({ title: title, description: description, price: price, timeSpan: timeSpan }),
     );
     const id = res?.cid.toString();
     setExternalDiscription(id === undefined ? "" : id);
+    await writeAsync();
   };
   return (
     <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
