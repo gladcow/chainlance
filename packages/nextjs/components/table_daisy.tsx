@@ -1,5 +1,5 @@
 // components/TableWithSearchAndSort.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useFetchTitles } from "./GetTitlesFromIds";
 import { KuboRPCClient } from "kubo-rpc-client";
@@ -26,6 +26,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
+  const [ipfsOnline, setIpfsOnline] = useState(false);
   const titles = useFetchTitles(data, ipfsNode);
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
@@ -51,6 +52,14 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
     return title.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  useEffect(() => {
+    const init = async () => {
+      const online = await ipfsNode?.isOnline();
+      setIpfsOnline(online === undefined ? false : online);
+    };
+    init();
+  }, [ipfsNode]);
+
   return (
     <div className="flex flex-col m-5 max-w-20">
       <input
@@ -60,7 +69,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      {ipfsNode?.isOnline() ? (
+      {ipfsOnline ? (
         <table className="table-auto">
           <thead>
             <tr>
@@ -88,9 +97,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                   <tr>
                     {columns.map(column => (
                       <td key={column} className="border px-4 py-2">
-                        {titles[row[column]] || (
-                          <ProjectTitleFromId projectId={row[column]} ipfsNode={ipfsNode}/>
-                        )}
+                        {titles[row[column]] || <ProjectTitleFromId projectId={row[column]} ipfsNode={ipfsNode} />}
                       </td>
                     ))}
                     <td className="border px-4 py-2">
