@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
-import { json } from "@helia/json";
-import { CID } from "multiformats";
+import { CID, KuboRPCClient } from "kubo-rpc-client";
 
-const useFetchTitles = (data: any[], helia: any, heliaOnline: boolean) => {
+const useFetchTitles = (data: any[], ipfsNode: KuboRPCClient | undefined) => {
   const [titles, setTitles] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const fetchTitle = async (projectId: string) => {
       if (titles[projectId]) return titles[projectId];
-      if (!heliaOnline) return "";
+      if (!(await ipfsNode?.isOnline())) return "";
 
-      const j = json(helia);
       const cid = CID.parse(projectId);
-      // @ts-ignore
-      const data = await j.get(cid);
-      // @ts-ignore
-      const title = data.title;
+      const data = ipfsNode?.get(cid);
+      if (data === undefined) {
+        return;
+      }
+      let resString = "";
+      for await (const x of data) {
+        const chunk = new TextDecoder().decode(x);
+        resString += chunk;
+      }
+      // dirty hack
+      const bodyString = resString.substring(resString.indexOf("{", 0), resString.lastIndexOf("}") + 1);
+      const parsedData = JSON.parse(bodyString);
+      const title = parsedData.title;
 
       setTitles(prevTitles => ({ ...prevTitles, [projectId]: title }));
       return title;
@@ -30,10 +37,8 @@ const useFetchTitles = (data: any[], helia: any, heliaOnline: boolean) => {
       setTitles(titlesTemp);
     };
 
-    if (heliaOnline) {
-      fetchAllTitles();
-    }
-  }, [titles, data, helia, heliaOnline]);
+    fetchAllTitles();
+  }, [data, ipfsNode, titles]);
 
   return titles;
 };

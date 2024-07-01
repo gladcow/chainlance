@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { json } from "@helia/json";
+import { KuboRPCClient } from "kubo-rpc-client";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 interface WriteCreateProjectProps {
-  helia: any;
-  heliaOnline: boolean;
+  ipfsNode: KuboRPCClient | undefined;
 }
 
-export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectProps) => {
+export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [externalDiscription, setExternalDiscription] = useState("");
@@ -15,6 +14,15 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
   const [timeSpan, setTimeSpan] = useState(0);
   const [showProjects, setShowProjects] = useState(false);
   const [reciept, setReciept] = useState("");
+  const [ipfsOnline, setIpfsOnline] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      const online = await ipfsNode?.isOnline();
+      setIpfsOnline(online === undefined ? false : online);
+    };
+    init();
+  }, [ipfsOnline, ipfsNode]);
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
@@ -24,13 +32,14 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
       setReciept(txnReceipt.blockHash.toString());
     },
   });
-  useEffect(() => {
-    writeAsync();
-  }, [writeAsync, externalDiscription]);
+
   const writeProjectDetailsToIPFS = async function () {
-    const j = json(helia);
-    const cid = await j.add({ title: title, description: description, price: price, timeSpan: timeSpan });
-    setExternalDiscription(cid.toString());
+    const res = await ipfsNode?.add(
+      JSON.stringify({ title: title, description: description, price: price, timeSpan: timeSpan }),
+    );
+    const id = res?.cid.toString();
+    setExternalDiscription(id === undefined ? "" : id);
+    await writeAsync();
   };
   return (
     <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
@@ -73,7 +82,7 @@ export const WriteCreateProject = ({ helia, heliaOnline }: WriteCreateProjectPro
               setShowProjects(false);
             }}
           />
-          {heliaOnline && (
+          {ipfsOnline && (
             <button
               className="btn btn-primary"
               onClick={() => {

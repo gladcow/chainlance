@@ -1,33 +1,35 @@
 import { useEffect, useState } from "react";
-import { json } from "@helia/json";
-import { CID } from "multiformats";
+import { CID, KuboRPCClient } from "kubo-rpc-client";
 
 interface ProjectTitleFromIdProps {
-  helia: any;
-  heliaOnline: boolean;
+  ipfsNode: KuboRPCClient | undefined;
   projectId: string;
 }
 
-export const ProjectTitleFromId = ({ helia, heliaOnline, projectId }: ProjectTitleFromIdProps) => {
+export const ProjectTitleFromId = ({ ipfsNode, projectId }: ProjectTitleFromIdProps) => {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
     const init = async () => {
-      // console.log("Initializing project title");
-      // console.log(heliaOnline);
-      // console.log(projectId);
       if (title.length > 0) return;
-      if (!heliaOnline) return;
-      const j = json(helia);
+      if (!(await ipfsNode?.isOnline())) return;
       const cid = CID.parse(projectId);
-      // console.log("Before get");
+      const data = ipfsNode?.get(cid);
+      if (data === undefined) {
+        return;
+      }
+      let resString = "";
+      for await (const x of data) {
+        const chunk = new TextDecoder().decode(x);
+        resString += chunk;
+      }
+      // dirty hack
+      const bodyString = resString.substring(resString.indexOf("{", 0), resString.lastIndexOf("}") + 1);
+      const parsedData = JSON.parse(bodyString);
       // @ts-ignore
-      const data = await j.get(cid);
-      // console.log("After:", data);
-      // @ts-ignore
-      setTitle(data.title);
+      setTitle(parsedData.title);
     };
     init();
-  }, [title, helia, heliaOnline, projectId]);
+  }, [title, ipfsNode, projectId]);
   return <span>{title}</span>;
 };
