@@ -31,5 +31,5 @@ export const ProjectTitleFromId = ({ ipfsNode, projectId }: ProjectTitleFromIdPr
     };
     init();
   }, [title, ipfsNode, projectId]);
-  return <span>{title}</span>;
+  return title;
 };

@@ -1,24 +1,22 @@
-// components/TableWithSearchAndSort.tsx
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFetchTitles } from "./GetTitlesFromIds";
 import { KuboRPCClient } from "kubo-rpc-client";
-import { ProjectTitleFromId } from "~~/components/ProjectTitleFromId";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface TableProps {
-  data: any[];
+  initialData: any[];
   columns: string[];
   emptyTableMessage?: string;
   ipfsNode: KuboRPCClient | undefined;
 }
 
 const TableWithSearchAndSort: React.FC<TableProps> = ({
-  data,
+  initialData,
   columns,
   emptyTableMessage = "Table is empty",
   ipfsNode,
 }) => {
+  const [data, setData] = useState(initialData);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
     key: "",
@@ -34,6 +32,10 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
     functionName: "projects",
     args: [project],
   }) as { data: any[] | undefined; isLoading: boolean };
+
+  useEffect(() => {
+    setData(initialData); // Update local state when initialData changes
+  }, [initialData]);
 
   const sortedData = [...data].sort((a, b) => {
     const aValue = titles[a.id] || "";
@@ -97,7 +99,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                   <tr>
                     {columns.map(column => (
                       <td key={column} className="border px-4 py-2">
-                        {titles[row[column]] || <ProjectTitleFromId projectId={row[column]} ipfsNode={ipfsNode} />}
+                        {titles[row[column]] || row[column]}
                       </td>
                     ))}
                     <td className="border px-4 py-2">
