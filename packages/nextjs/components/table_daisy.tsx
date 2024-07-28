@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFetchTitles } from "./GetTitlesFromIds";
+import { checkIpfsOnline, formatTableData } from "./utils";
 import { KuboRPCClient } from "kubo-rpc-client";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
@@ -16,7 +17,6 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   emptyTableMessage = "Table is empty",
   ipfsNode,
 }) => {
-  const [data, setData] = useState(initialData);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
     key: "",
@@ -25,7 +25,8 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
   const [ipfsOnline, setIpfsOnline] = useState(false);
-  const titles = useFetchTitles(data, ipfsNode);
+
+  const titles = useFetchTitles(initialData, ipfsNode);
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -33,31 +34,12 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
     args: [project],
   }) as { data: any[] | undefined; isLoading: boolean };
 
-  useEffect(() => {
-    setData(initialData); // Update local state when initialData changes
-  }, [initialData]);
-
-  const sortedData = [...data].sort((a, b) => {
-    const aValue = titles[a.id] || "";
-    const bValue = titles[b.id] || "";
-    if (aValue < bValue) {
-      return sortConfig.direction === "ascending" ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return sortConfig.direction === "ascending" ? 1 : -1;
-    }
-    return 0;
-  });
-
-  const filteredData = sortedData.filter(item => {
-    const title = titles[item.id] || "";
-    return title.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredData = formatTableData(initialData, titles, searchTerm, sortConfig);
 
   useEffect(() => {
     const init = async () => {
-      const online = await ipfsNode?.isOnline();
-      setIpfsOnline(online === undefined ? false : online);
+      const online = await checkIpfsOnline(ipfsNode); // Use the utility function
+      setIpfsOnline(online);
     };
     init();
   }, [ipfsNode]);
@@ -99,7 +81,11 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                   <tr>
                     {columns.map(column => (
                       <td key={column} className="border px-4 py-2">
-                        {titles[row[column]] || row[column]}
+                        {titles[row[column]] ? (
+                          titles[row[column]]
+                        ) : (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        )}
                       </td>
                     ))}
                     <td className="border px-4 py-2">

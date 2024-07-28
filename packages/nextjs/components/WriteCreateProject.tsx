@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
+import { checkIpfsOnline } from "./utils";
 import { KuboRPCClient } from "kubo-rpc-client";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 interface WriteCreateProjectProps {
   ipfsNode: KuboRPCClient | undefined;
-  onProjectCreated: (newProject: any) => void; // Add a callback prop
 }
 
-export const WriteCreateProject = ({ ipfsNode, onProjectCreated }: WriteCreateProjectProps) => {
+export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [externalDescription, setExternalDescription] = useState("");
@@ -16,14 +16,16 @@ export const WriteCreateProject = ({ ipfsNode, onProjectCreated }: WriteCreatePr
   const [showProjects, setShowProjects] = useState(false);
   const [receipt, setReceipt] = useState("");
   const [ipfsOnline, setIpfsOnline] = useState(false);
+  const [priceError, setPriceError] = useState("");
+  const [timeError, setTimeError] = useState("");
 
   useEffect(() => {
     const init = async () => {
-      const online = await ipfsNode?.isOnline();
-      setIpfsOnline(online === undefined ? false : online);
+      const online = await checkIpfsOnline(ipfsNode);
+      setIpfsOnline(online);
     };
     init();
-  }, [ipfsOnline, ipfsNode]);
+  }, [ipfsNode]);
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
@@ -31,14 +33,6 @@ export const WriteCreateProject = ({ ipfsNode, onProjectCreated }: WriteCreatePr
     args: [externalDescription, BigInt(price), timeSpan],
     onBlockConfirmation: txnReceipt => {
       setReceipt(txnReceipt.blockHash.toString());
-
-      onProjectCreated({
-        id: externalDescription,
-        title,
-        description,
-        price,
-        timeSpan,
-      });
     },
   });
 
@@ -49,6 +43,28 @@ export const WriteCreateProject = ({ ipfsNode, onProjectCreated }: WriteCreatePr
     const id = res?.cid.toString();
     setExternalDescription(id === undefined ? "" : id);
     writeAsync({ args: [id, BigInt(price), timeSpan] });
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setPrice(Number(value));
+      setPriceError("");
+    } else {
+      setPriceError("Price must be an integer.");
+    }
+    setShowProjects(false);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setTimeSpan(Number(value));
+      setTimeError("");
+    } else {
+      setTimeError("Time must be an integer.");
+    }
+    setShowProjects(false);
   };
 
   return (
@@ -74,30 +90,19 @@ export const WriteCreateProject = ({ ipfsNode, onProjectCreated }: WriteCreatePr
               setShowProjects(false);
             }}
           />
-          <input
-            type="text"
-            placeholder="Price"
-            className="input border border-primary"
-            onChange={e => {
-              setPrice(Number(e.target.value));
-              setShowProjects(false);
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Time"
-            className="input border border-primary"
-            onChange={e => {
-              setTimeSpan(Number(e.target.value));
-              setShowProjects(false);
-            }}
-          />
+          <input type="text" placeholder="Price" className="input border border-primary" onChange={handlePriceChange} />
+          {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
+          <input type="text" placeholder="Time" className="input border border-primary" onChange={handleTimeChange} />
+          {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
           {ipfsOnline && (
-            <button className="btn btn-primary" onClick={writeProjectDetailsToIPFS}>
+            <button
+              className="btn btn-primary"
+              onClick={writeProjectDetailsToIPFS}
+              disabled={!!priceError || !!timeError}
+            >
               {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
             </button>
           )}
-
           {!receipt || !showProjects ? (
             <></>
           ) : (
