@@ -23,10 +23,10 @@ export const UserWorker = ({ data, columns, ipfsNode }: UserWorkerProps) => {
       </div>
 
       <div className="justify-end grow">
-        <TableWithSearchAndSort data={data} columns={columns} ipfsNode={ipfsNode} />
+        <TableWithSearchAndSort initialData={data} columns={columns} ipfsNode={ipfsNode} />
       </div>
       <div className="justify-end grow">
-        <TableWithSearchAndSort data={data} columns={columns} ipfsNode={ipfsNode} />
+        <TableWithSearchAndSort initialData={data} columns={columns} ipfsNode={ipfsNode} />
       </div>
     </div>
   );
