@@ -81,10 +81,9 @@ export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
               setShowProjects(false);
             }}
           />
-          <input
-            type="text"
+          <textarea
             placeholder="Description"
-            className="input border border-primary"
+            className="textarea textarea-primary text-base"
             onChange={e => {
               setDescription(e.target.value);
               setShowProjects(false);
