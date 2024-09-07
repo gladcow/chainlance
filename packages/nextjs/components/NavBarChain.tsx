@@ -8,8 +8,8 @@ interface NavBarChainProps {
 
 export const NavBarChain = ({ tab, setTab }: NavBarChainProps) => {
   return (
-    <div className="navbar shadow-md bg-base-100 m-2 flex justify-between">
-      <div>
+    <div className="navbar shadow-md bg-base-100 p-2 mt-2 mb-2 flex justify-between">
+      <div className="gap-2">
         <button className={`btn ${tab === "main" ? "btn-primary" : "btn-ghost"}`} onClick={() => setTab("main")}>
           Main
         </button>
@@ -21,6 +21,12 @@ export const NavBarChain = ({ tab, setTab }: NavBarChainProps) => {
           onClick={() => setTab("employer")}
         >
           Employer
+        </button>
+        <button
+          className={`btn ${tab === "settings" ? "btn-primary" : "btn-ghost"}`}
+          onClick={() => setTab("settings")}
+        >
+          Ipfs Settings
         </button>
       </div>
       <div className="flex-none">
