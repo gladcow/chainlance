@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { KuboRPCClient, create } from "kubo-rpc-client";
 import type { NextPage } from "next";
+import { useAccount } from "wagmi";
 import { MainTab } from "~~/components/MainTab";
 import { NavBarChain } from "~~/components/NavBarChain";
 import { SettingsTab } from "~~/components/SettingsTab";
@@ -13,6 +14,13 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
   const [ipfsNode, setIpfsNode] = useState<KuboRPCClient>();
+  const { address: connectedAddress } = useAccount();
+
+  const { data: owner_projects } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "listOwnerProjects",
+    args: [connectedAddress],
+  }) as { data: any[] | undefined };
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -31,8 +39,14 @@ const Home: NextPage = () => {
     }
   }, [ipfsNode]);
 
-  const data = projectlist
+  const all_open_projects = projectlist
     ? projectlist.map(projectId => ({
+        id: projectId,
+      }))
+    : [];
+
+  const all_owner_projects = owner_projects
+    ? owner_projects.map(projectId => ({
         id: projectId,
       }))
     : [];
@@ -59,13 +73,13 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker data={data} columns={columns} ipfsNode={ipfsNode}></UserWorker>
+            <UserWorker data={all_open_projects} columns={columns} ipfsNode={ipfsNode}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer data={data} columns={columns} ipfsNode={ipfsNode}></UserEmployer>
+            <UserEmployer data={all_owner_projects} columns={columns} ipfsNode={ipfsNode}></UserEmployer>
           </>
         )}
 
