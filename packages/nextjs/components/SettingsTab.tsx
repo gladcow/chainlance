@@ -2,8 +2,8 @@ export const SettingsTab = () => {
   return (
     <div className="card bg-base-100 w-96 m-5 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title">Ipfs Settings</h2>
-        <p>Change ipfs url</p>
+        <h2 className="card-title">Storage Settings</h2>
+        <p>Change storage url</p>
         <input
           type="text"
           placeholder="Url"

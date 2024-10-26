@@ -26,7 +26,7 @@ export const WriteCreateProject = ({ storage }: WriteCreateProjectProps) => {
     },
   });
 
-  const writeProjectDetailsToIPFS = async function () {
+  const writeProjectDetailsToStorage = async function () {
     const res = await storage?.uploadData(
       "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
       JSON.stringify({ title: title, description: description, price: price, timeSpan: timeSpan }),
@@ -88,7 +88,7 @@ export const WriteCreateProject = ({ storage }: WriteCreateProjectProps) => {
           {true && (
             <button
               className="btn btn-primary"
-              onClick={writeProjectDetailsToIPFS}
+              onClick={writeProjectDetailsToStorage}
               disabled={!!priceError || !!timeError}
             >
               {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}

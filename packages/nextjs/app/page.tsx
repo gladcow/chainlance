@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Bee } from "@ethersphere/bee-js";
-import { KuboRPCClient, create } from "kubo-rpc-client";
 import type { NextPage } from "next";
 import { useEffectOnce } from "usehooks-ts";
 import { MainTab } from "~~/components/MainTab";
@@ -14,7 +13,6 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
-  const [ipfsNode, setIpfsNode] = useState<KuboRPCClient>();
   const [storage, setStorage] = useState<Bee>();
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -25,17 +23,6 @@ const Home: NextPage = () => {
   useEffectOnce(() => {
     setStorage(new Bee("http://92.63.194.135:3000"));
   });
-
-  useEffect(() => {
-    if (ipfsNode === undefined) {
-      const ipfs = create({
-        host: "92.63.194.135",
-        port: 5001,
-        protocol: "http",
-      });
-      setIpfsNode(ipfs);
-    }
-  }, [ipfsNode]);
 
   const data = projectlist
     ? projectlist.map(projectId => ({

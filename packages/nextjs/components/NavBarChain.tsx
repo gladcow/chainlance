@@ -1,5 +1,5 @@
 import React from "react";
-import { SettingsMenu } from "./SettingIpfsMenu";
+import { SettingsMenu } from "./SettingsMenu";
 
 interface NavBarChainProps {
   tab: string;
@@ -26,7 +26,7 @@ export const NavBarChain = ({ tab, setTab }: NavBarChainProps) => {
           className={`btn ${tab === "settings" ? "btn-primary" : "btn-ghost"}`}
           onClick={() => setTab("settings")}
         >
-          Ipfs Settings
+          Storage Settings
         </button>
       </div>
       <div className="flex-none">
