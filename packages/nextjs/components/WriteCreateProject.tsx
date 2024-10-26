@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { checkIpfsOnline } from "./utils";
-import { KuboRPCClient } from "kubo-rpc-client";
+import { useState } from "react";
+import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 interface WriteCreateProjectProps {
-  ipfsNode: KuboRPCClient | undefined;
+  storage: Bee | undefined;
 }
 
-export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
+export const WriteCreateProject = ({ storage }: WriteCreateProjectProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [externalDescription, setExternalDescription] = useState("");
@@ -15,17 +14,8 @@ export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
   const [timeSpan, setTimeSpan] = useState(0);
   const [showProjects, setShowProjects] = useState(false);
   const [receipt, setReceipt] = useState("");
-  const [ipfsOnline, setIpfsOnline] = useState(false);
   const [priceError, setPriceError] = useState("");
   const [timeError, setTimeError] = useState("");
-
-  useEffect(() => {
-    const init = async () => {
-      const online = await checkIpfsOnline(ipfsNode);
-      setIpfsOnline(online);
-    };
-    init();
-  }, [ipfsNode]);
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
@@ -37,10 +27,12 @@ export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
   });
 
   const writeProjectDetailsToIPFS = async function () {
-    const res = await ipfsNode?.add(
+    const res = await storage?.uploadData(
+      "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
       JSON.stringify({ title: title, description: description, price: price, timeSpan: timeSpan }),
     );
-    const id = res?.cid.toString();
+    console.log("res", res);
+    const id = res?.reference.toString();
     setExternalDescription(id === undefined ? "" : id);
     writeAsync({ args: [id, BigInt(price), timeSpan] });
   };
@@ -93,7 +85,7 @@ export const WriteCreateProject = ({ ipfsNode }: WriteCreateProjectProps) => {
           {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
           <input type="text" placeholder="Time" className="input border border-primary" onChange={handleTimeChange} />
           {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
-          {ipfsOnline && (
+          {true && (
             <button
               className="btn btn-primary"
               onClick={writeProjectDetailsToIPFS}

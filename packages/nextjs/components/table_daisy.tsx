@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFetchTitles } from "./GetTitlesFromIds";
-import { checkIpfsOnline, formatTableData } from "./utils";
-import { KuboRPCClient } from "kubo-rpc-client";
+import { formatTableData } from "./utils";
+import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface TableProps {
   initialData: any[];
   columns: string[];
   emptyTableMessage?: string;
-  ipfsNode: KuboRPCClient | undefined;
+  storage: Bee | undefined;
 }
 
 const TableWithSearchAndSort: React.FC<TableProps> = ({
   initialData,
   columns,
   emptyTableMessage = "Table is empty",
-  ipfsNode,
+  storage,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
@@ -24,9 +24,8 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
-  const [ipfsOnline, setIpfsOnline] = useState(false);
 
-  const titles = useFetchTitles(initialData, ipfsNode);
+  const titles = useFetchTitles(initialData, storage);
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -35,14 +34,6 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   }) as { data: any[] | undefined; isLoading: boolean };
 
   const filteredData = formatTableData(initialData, titles, searchTerm, sortConfig);
-
-  useEffect(() => {
-    const init = async () => {
-      const online = await checkIpfsOnline(ipfsNode); // Use the utility function
-      setIpfsOnline(online);
-    };
-    init();
-  }, [ipfsNode]);
 
   return (
     <div className="flex flex-col m-5 max-w-20">
@@ -53,7 +44,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      {ipfsOnline ? (
+      {true ? (
         <table className="table-auto">
           <thead>
             <tr>

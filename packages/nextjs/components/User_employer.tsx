@@ -1,22 +1,22 @@
 import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
-import { KuboRPCClient } from "kubo-rpc-client";
+import { Bee } from "@ethersphere/bee-js";
 
 interface UserEmployerProps {
   data: any[];
   columns: string[];
-  ipfsNode: KuboRPCClient | undefined;
+  storage: Bee | undefined;
 }
 
-export const UserEmployer = ({ data, columns, ipfsNode }: UserEmployerProps) => {
+export const UserEmployer = ({ data, columns, storage }: UserEmployerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
-        <WriteCreateProject ipfsNode={ipfsNode}></WriteCreateProject>
+        <WriteCreateProject storage={storage}></WriteCreateProject>
       </div>
 
       <div className="justify-end grow">
-        <TableWithSearchAndSort initialData={data} columns={columns} ipfsNode={ipfsNode} />
+        <TableWithSearchAndSort initialData={data} columns={columns} storage={storage} />
       </div>
     </div>
   );
