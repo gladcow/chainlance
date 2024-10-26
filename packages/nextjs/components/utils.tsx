@@ -1,10 +1,3 @@
-import { KuboRPCClient } from "kubo-rpc-client";
-
-export const checkIpfsOnline = async (ipfsNode: KuboRPCClient | undefined): Promise<boolean> => {
-  const online = await ipfsNode?.isOnline();
-  return online === undefined ? false : online;
-};
-
 export const formatTableData = (
   initialData: any[],
   titles: { [key: string]: string },
