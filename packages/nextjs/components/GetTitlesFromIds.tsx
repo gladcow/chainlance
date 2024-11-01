@@ -8,8 +8,7 @@ interface ParsedData {
   timeSpan: number;
 }
 
-const fetchProjectTitleFromId = async (storage: Bee | undefined, projectId: string, field: keyof ParsedData) => {
-  // const field = 'title'
+const fetchProjectFieldFromId = async (storage: Bee | undefined, projectId: string, field: keyof ParsedData) => {
   if (!storage) return "";
   const data = await storage?.downloadData(projectId);
   if (data === undefined) {
@@ -18,27 +17,25 @@ const fetchProjectTitleFromId = async (storage: Bee | undefined, projectId: stri
   const parsedData = data.json() as unknown as ParsedData;
 
   return parsedData[`${field}`] ? parsedData[`${field}`].toString() : "";
-
-  // return parsedData.title ? parsedData.title.toString() : "";
 };
 
-const useFetchTitles = (data: any[], storage: Bee | undefined, field: keyof ParsedData) => {
-  const [titles, setTitles] = useState<{ [key: string]: string }>({});
+const useFetchFields = (data: any[], storage: Bee | undefined, this_field: keyof ParsedData) => {
+  const [fields, setFields] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const fetchAllTitles = async () => {
-      const titlesTemp: { [key: string]: string } = {};
+      const fieldsTemp: { [key: string]: string } = {};
       for (const row of data) {
-        const title = await fetchProjectTitleFromId(storage, row.id, field);
-        titlesTemp[row.id] = title;
+        const field = await fetchProjectFieldFromId(storage, row.id, this_field);
+        fieldsTemp[row.id] = field;
       }
-      setTitles(titlesTemp);
+      setFields(fieldsTemp);
     };
 
     fetchAllTitles();
   }, [data, storage]);
 
-  return titles;
+  return fields;
 };
 
-export { useFetchTitles };
+export { useFetchFields };
