@@ -25,7 +25,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
 
-  const titles = useFetchTitles(initialData, storage);
+  const titles = useFetchTitles(initialData, storage, "title");
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
