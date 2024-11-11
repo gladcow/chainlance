@@ -1,14 +1,14 @@
 import { WriteSubmitWork } from "./WriteSubmitWork";
 import TableWithSearchAndSort from "./table_daisy";
-import { KuboRPCClient } from "kubo-rpc-client";
+import { Bee } from "@ethersphere/bee-js";
 
 interface UserWorkerProps {
   data: any;
   columns: any;
-  ipfsNode: KuboRPCClient | undefined;
+  storage: Bee | undefined;
 }
 
-export const UserWorker = ({ data, columns, ipfsNode }: UserWorkerProps) => {
+export const UserWorker = ({ data, columns, storage }: UserWorkerProps) => {
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -23,7 +23,7 @@ export const UserWorker = ({ data, columns, ipfsNode }: UserWorkerProps) => {
       </div>
 
       <div className="justify-end grow">
-        <TableWithSearchAndSort initialData={data} columns={columns} ipfsNode={ipfsNode} />
+        <TableWithSearchAndSort initialData={data} columns={columns} storage={storage} />
       </div>
     </div>
   );
