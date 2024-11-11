@@ -33,7 +33,7 @@ const useFetchFields = (data: any[], storage: Bee | undefined, this_field: keyof
     };
 
     fetchAllTitles();
-  }, [data, storage]);
+  }, [data, storage, this_field]);
 
   return fields;
 };

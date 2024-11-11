@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useFetchFields } from "./GetTitlesFromIds";
+import { useFetchFields } from "./GetFieldsFromIds";
 import { formatTableData } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
