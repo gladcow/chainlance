@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useFetchTitles } from "./GetTitlesFromIds";
+import { useFetchFields } from "./GetFieldsFromIds";
 import { formatTableData } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
@@ -25,7 +25,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
 
-  const titles = useFetchTitles(initialData, storage);
+  const titles = useFetchFields(initialData, storage, "title");
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
