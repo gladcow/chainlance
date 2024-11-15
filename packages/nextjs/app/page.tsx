@@ -15,39 +15,14 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
   const { address: connectedAddress } = useAccount();
-
-  const { data: owner_projects } = useScaffoldContractRead({
-    contractName: "ChainLance",
-    functionName: "listOwnerProjects",
-    args: [connectedAddress],
-  }) as { data: any[] | undefined };
-
   const [storage, setStorage] = useState<Bee>();
-  const { data: projectlist } = useScaffoldContractRead({
-    contractName: "ChainLance",
-    functionName: "listProjectsWithState",
-    args: [0],
-  }) as { data: any[] | undefined };
 
   useEffectOnce(() => {
     setStorage(new Bee("http://92.63.194.135:3000"));
   });
 
-  const all_open_projects = projectlist
-    ? projectlist.map(projectId => ({
-        id: projectId,
-      }))
-    : [];
-
-  const all_owner_projects = owner_projects
-    ? owner_projects.map(projectId => ({
-        id: projectId,
-      }))
-    : [];
   const columns = ["id"];
-
   const [projectId] = useState("");
-
   const {} = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "projects",
@@ -67,13 +42,13 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker data={all_open_projects} columns={columns} storage={storage}></UserWorker>
+            <UserWorker columns={columns} storage={storage}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer data={all_owner_projects} columns={columns} storage={storage}></UserEmployer>
+            <UserEmployer address={connectedAddress} columns={columns} storage={storage}></UserEmployer>
           </>
         )}
 

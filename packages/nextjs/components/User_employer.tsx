@@ -1,14 +1,25 @@
 import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
 import { Bee } from "@ethersphere/bee-js";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface UserEmployerProps {
-  data: any[];
+  address: string | undefined;
   columns: string[];
   storage: Bee | undefined;
 }
 
-export const UserEmployer = ({ data, columns, storage }: UserEmployerProps) => {
+export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) => {
+  const { data: owner_projects } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "listOwnerProjects",
+    args: [address],
+  }) as { data: any[] | undefined };
+  const all_owner_projects = owner_projects
+    ? owner_projects.map(projectId => ({
+        id: projectId,
+      }))
+    : [];
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -16,7 +27,7 @@ export const UserEmployer = ({ data, columns, storage }: UserEmployerProps) => {
       </div>
 
       <div className="justify-end grow">
-        <TableWithSearchAndSort initialData={data} columns={columns} storage={storage} />
+        <TableWithSearchAndSort initialData={all_owner_projects} columns={columns} storage={storage} />
       </div>
     </div>
   );
