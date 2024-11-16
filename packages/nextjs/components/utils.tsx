@@ -1,12 +1,12 @@
 export const formatTableData = (
   initialData: any[],
-  titles: { [key: string]: string },
+  fields: { [key: string]: string },
   searchTerm: string,
   sortConfig: { key: string; direction: "ascending" | "descending" },
 ) => {
   const sortedData = [...initialData].sort((a, b) => {
-    const aValue = titles[a.id] || "";
-    const bValue = titles[b.id] || "";
+    const aValue = fields[a.id] || "";
+    const bValue = fields[b.id] || "";
     if (aValue < bValue) {
       return sortConfig.direction === "ascending" ? -1 : 1;
     }
@@ -17,7 +17,7 @@ export const formatTableData = (
   });
 
   return sortedData.filter(item => {
-    const title = titles[item.id] || "";
-    return title.toLowerCase().includes(searchTerm.toLowerCase());
+    const field = fields[item.id] || "";
+    return field.toLowerCase().includes(searchTerm.toLowerCase());
   });
 };

@@ -26,6 +26,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   const [project, setProject] = useState("");
 
   const titles = useFetchFields(initialData, storage, "title");
+  const descriptions = useFetchFields(initialData, storage, "description");
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -34,6 +35,19 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   }) as { data: any[] | undefined; isLoading: boolean };
 
   const filteredData = formatTableData(initialData, titles, searchTerm, sortConfig);
+
+  const renderCellContent = (row: any, column: string) => {
+    switch (column) {
+      case "title":
+        console.log(titles[row.id]);
+        return titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "description":
+        console.log(descriptions[row.id]);
+        return descriptions[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      default:
+        return row[column];
+    }
+  };
 
   return (
     <div className="flex flex-col m-5 max-w-20">
@@ -44,96 +58,87 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      {true ? (
-        <table className="table-auto">
-          <thead>
-            <tr>
-              {columns.map(column => (
-                <th
-                  key={column}
-                  className="px-4 py-2 cursor-pointer"
-                  onClick={() =>
-                    setSortConfig({
-                      key: column,
-                      direction:
-                        sortConfig.key === column && sortConfig.direction === "ascending" ? "descending" : "ascending",
-                    })
-                  }
-                >
-                  {column}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((row, index) => (
-                <React.Fragment key={index}>
-                  <tr>
-                    {columns.map(column => (
-                      <td key={column} className="border px-4 py-2">
-                        {titles[row[column]] ? (
-                          titles[row[column]]
-                        ) : (
-                          <span className="loading loading-spinner loading-sm"></span>
-                        )}
-                      </td>
-                    ))}
-                    <td className="border px-4 py-2">
-                      <button
-                        onClick={() => {
-                          setProject(row.id);
-                          setExpandedRow(expandedRow === index ? null : index);
-                        }}
-                      >
-                        {expandedRow === index ? "▲" : "▼"}
-                      </button>
+      <table className="table-auto">
+        <thead>
+          <tr>
+            {columns.map(column => (
+              <th
+                key={column}
+                className="px-4 py-2 cursor-pointer"
+                onClick={() =>
+                  setSortConfig({
+                    key: column,
+                    direction:
+                      sortConfig.key === column && sortConfig.direction === "ascending" ? "descending" : "ascending",
+                  })
+                }
+              >
+                {column}
+              </th>
+            ))}
+            <th className="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredData.length > 0 ? (
+            filteredData.map((row, index) => (
+              <React.Fragment key={index}>
+                <tr>
+                  {columns.map(column => (
+                    <td key={column} className="border px-4 py-2">
+                      {renderCellContent(row, column)}
                     </td>
-                  </tr>
-                  {expandedRow === index && (
-                    <tr>
-                      <td colSpan={columns.length + 1} className="border px-4 py-2">
-                        {infoFull && !isInfoFullLoading ? (
-                          <div className="flex content-evenly">
-                            <div className="w-3/4">
-                              <h3>Project Details:</h3>
-                              <ul>
-                                {infoFull.map((detail, detailIndex) => (
-                                  <li key={detailIndex} className="break-words">
-                                    {detail}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            <div className="w-1/4">
-                              <div className="flex flex-col space-y-4">
-                                <button className="btn btn-primary p-0">Button 1</button>
-                                <button className="btn btn-secondary p-0">Button 2</button>
-                              </div>
+                  ))}
+                  <td className="border px-4 py-2">
+                    <button
+                      onClick={() => {
+                        setProject(row.id);
+                        setExpandedRow(expandedRow === index ? null : index);
+                      }}
+                    >
+                      {expandedRow === index ? "▲" : "▼"}
+                    </button>
+                  </td>
+                </tr>
+                {expandedRow === index && (
+                  <tr>
+                    <td colSpan={columns.length + 1} className="border px-4 py-2">
+                      {infoFull && !isInfoFullLoading ? (
+                        <div className="flex content-evenly">
+                          <div className="w-3/4">
+                            <h3>Project Details:</h3>
+                            <ul>
+                              {infoFull.map((detail, detailIndex) => (
+                                <li key={detailIndex} className="break-words">
+                                  {detail}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="w-1/4">
+                            <div className="flex flex-col space-y-4">
+                              <button className="btn btn-primary p-0">Button 1</button>
+                              <button className="btn btn-secondary p-0">Button 2</button>
                             </div>
                           </div>
-                        ) : (
-                          <p>Loading...</p>
-                        )}
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={columns.length + 1} className="border px-4 py-2 text-center">
-                  {emptyTableMessage}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      ) : (
-        <div className="flex justify-center items-center h-64">
-          <span className="loading loading-spinner loading-sm"></span>
-        </div>
-      )}
+                        </div>
+                      ) : (
+                        <p>Loading...</p>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={columns.length + 1} className="border px-4 py-2 text-center">
+                {emptyTableMessage}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
