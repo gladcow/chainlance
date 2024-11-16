@@ -21,7 +21,7 @@ const Home: NextPage = () => {
     setStorage(new Bee("http://92.63.194.135:3000"));
   });
 
-  const columns = ["id"];
+  const columns = ["title", "description"];
   const [projectId] = useState("");
   const {} = useScaffoldContractRead({
     contractName: "ChainLance",
