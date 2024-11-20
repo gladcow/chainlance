@@ -54,20 +54,60 @@ describe("ChainLance: work on project", function () {
     ///////////////////////////////////////////////////////////////////
     // Submit work
     ///////////////////////////////////////////////////////////////////
-    // TODO
-
+    const txSubmitWork = await chainLance.connect(worker).submitWork(projectId);
+    const receiptSubmitWork = await txSubmitWork.wait();
+    expect(receiptSubmitWork?.status).is.equal(1, "Work submition failed");
     ///////////////////////////////////////////////////////////////////
     // Accept Work
     ///////////////////////////////////////////////////////////////////
-    // TODO
-    // Additional note: we should check that worker receives his balance here
-    // Use ethers.provider.getBalance(user.address) to get user balance
-    // Worker balance after project completion should be greater than it was before
-    // on the (projectPrice - receipt.usedGas)
+    const txAcceptWork = await chainLance.connect(employer).acceptWork(projectId);
+    const receiptAcceptWork = await txAcceptWork.wait();
+    expect(receiptAcceptWork?.status).is.equal(1, "Work acception failed");
+    if (receiptAcceptWork) {
+      expect(await ethers.provider.getBalance(worker.address)).is.greaterThanOrEqual(
+        BigInt(projectPrice) - receiptAcceptWork.gasPrice * receiptAcceptWork.gasUsed,
+        "Worker did not recieve payment",
+      );
+    }
+
+    // Worker has 0 balance edge case accounted with gtThanOrEq
   });
 
   it("Should allow cancelling/rejecting during the work on the project", async function () {
-    // TODO
+    const [employer, worker] = await ethers.getSigners();
+
+    const projectId = "id2";
+    const projectPrice = 200000;
+    const timeSpanToCancel = 100;
+    const txCreateProject = await chainLance.connect(employer).createProject(projectId, projectPrice, timeSpanToCancel);
+    const receiptCreateProject = await txCreateProject.wait();
+
+    expect(receiptCreateProject).is.not.null;
+    expect(receiptCreateProject?.status).is.equal(1, "project creation failed");
+
+    const bidId = "bid2";
+    await chainLance.connect(worker).bidProject(projectId, bidId, projectPrice, timeSpanToCancel - 1); // timespan on project is for bidding?
+
+    await chainLance.connect(employer).acceptBid(projectId, bidId, { value: projectPrice });
+
+    await chainLance.connect(worker).submitWork(projectId);
+
+    ///////////////////////////////////////////////////////////////////
+    // Reject work submition
+    ///////////////////////////////////////////////////////////////////
+    const txRejectWork = await chainLance.connect(employer).rejectWork(projectId);
+    const receiptRejectWork = await txRejectWork.wait();
+    expect(receiptRejectWork?.status).is.equal(1, "work rejection failed");
+
+    ///////////////////////////////////////////////////////////////////
+    // Cancel work
+    ///////////////////////////////////////////////////////////////////
+
+    await ethers.provider.send("evm_increaseTime", [timeSpanToCancel + 1]); // Changing block timestamp
+    await ethers.provider.send("evm_mine", []); // Mine block
+    const txCancelWork = await chainLance.connect(employer).cancelWork(projectId);
+    const receiptCancelWork = await txCancelWork.wait();
+    expect(receiptCancelWork?.status).is.equal(1, "work cancellation failed");
   });
 });
 
@@ -80,12 +120,112 @@ describe("ChainLance: query info on project", function () {
     const chainLanceFactory = await ethers.getContractFactory("ChainLance");
     chainLance = (await chainLanceFactory.deploy()) as ChainLance;
     await chainLance.waitForDeployment();
-    // TODO: create some projects in different states and several bids on them to check different
-    // they can be used in all "it" sections
+
+    const [employer1, employer2, employer3, worker1, worker2, worker3] = await ethers.getSigners(); // can i do that?
+    ///////////////////////////////////////////////////////////////////
+    // Work with state: Open
+    const noBidsProjectId = "id42";
+    const noBidsProjectPrice = 1000;
+    const txCreateNoBidsProject = await chainLance
+      .connect(employer1)
+      .createProject(noBidsProjectId, noBidsProjectPrice, 100);
+    await txCreateNoBidsProject.wait();
+    ///////////////////////////////////////////////////////////////////
+    // Work with state: InWork
+    const oneBidProjectId = "id3";
+    const oneBidProjectPrice = 350000;
+    const txCreateOneBidProject = await chainLance
+      .connect(employer1)
+      .createProject(oneBidProjectId, oneBidProjectPrice, 100);
+    await txCreateOneBidProject.wait();
+
+    const bidId1 = "bidid1";
+    await chainLance.connect(worker1).bidProject(oneBidProjectId, bidId1, oneBidProjectPrice, 1);
+
+    const txAcceptBid1 = await chainLance
+      .connect(employer2)
+      .acceptBid(oneBidProjectId, bidId1, { value: oneBidProjectPrice });
+    await txAcceptBid1.wait();
+    ///////////////////////////////////////////////////////////////////
+    // Work with state: InReview
+    const twoBidsProjectId = "id4";
+    const twoBidsProjectPrice = 40000;
+    const txCreateTwoBidsProject = await chainLance
+      .connect(employer2)
+      .createProject(twoBidsProjectId, twoBidsProjectPrice, 100);
+    await txCreateTwoBidsProject.wait();
+
+    const bidId2 = "bidid2";
+    await chainLance.connect(worker2).bidProject(twoBidsProjectId, bidId2, twoBidsProjectPrice, 1);
+
+    const bidId3 = "bidid3";
+    await chainLance.connect(worker3).bidProject(twoBidsProjectId, bidId3, twoBidsProjectPrice, 1);
+
+    const txAcceptBid2 = await chainLance
+      .connect(employer2)
+      .acceptBid(twoBidsProjectId, bidId2, { value: twoBidsProjectPrice });
+    await txAcceptBid2.wait();
+
+    const txSubmitWork2 = await chainLance.connect(worker2).submitWork(twoBidsProjectId);
+    await txSubmitWork2.wait();
+    ///////////////////////////////////////////////////////////////////
+    // Work with state: Completed
+    const completedProjectId = "id5";
+    const completedProjectPrice = 12000;
+    const txCreateCompletedProject = await chainLance
+      .connect(employer3)
+      .createProject(completedProjectId, completedProjectPrice, 100);
+    await txCreateCompletedProject.wait();
+
+    const bidId4 = "bidid4";
+    await chainLance.connect(worker1).bidProject(completedProjectId, bidId4, completedProjectPrice, 1);
+
+    const txAcceptBid4 = await chainLance
+      .connect(employer3)
+      .acceptBid(completedProjectId, bidId4, { value: completedProjectPrice });
+    await txAcceptBid4.wait();
+
+    const txSubmitWork4 = await chainLance.connect(worker1).submitWork(completedProjectId);
+    await txSubmitWork4.wait();
+
+    const txAcceptWork = await chainLance.connect(employer3).acceptWork(completedProjectId);
+    await txAcceptWork.wait();
+    ///////////////////////////////////////////////////////////////////
+    // Work with state: Canceled
+    const canceledProjectId = "id6";
+    const canceledProjectPrice = 313131;
+    const txCreateCanceledProject = await chainLance
+      .connect(employer2)
+      .createProject(canceledProjectId, canceledProjectPrice, 100);
+    await txCreateCanceledProject.wait();
+
+    const bidId5 = "bidid5";
+    await chainLance.connect(worker1).bidProject(canceledProjectId, bidId5, canceledProjectPrice, 1);
+
+    const bidId6 = "bidid6";
+    await chainLance.connect(worker2).bidProject(canceledProjectId, bidId6, canceledProjectPrice, 1);
+
+    const bidId7 = "bidid7";
+    await chainLance.connect(worker3).bidProject(canceledProjectId, bidId7, canceledProjectPrice, 1);
+
+    await chainLance.connect(employer2).cancelProject(canceledProjectId);
   });
 
   it("Should list projects in different states", async function () {
-    // TODO
+    const openProjects = await chainLance.listProjectsWithState(0);
+    expect(openProjects).to.include("id42");
+
+    const inWorkProjects = await chainLance.listProjectsWithState(1);
+    expect(inWorkProjects).to.include("id3");
+
+    const inReviewProjects = await chainLance.listProjectsWithState(2);
+    expect(inReviewProjects).to.include("id4");
+
+    const completedProjects = await chainLance.listProjectsWithState(3);
+    expect(completedProjects).to.include("id5");
+
+    const canceledProjects = await chainLance.listProjectsWithState(4);
+    expect(canceledProjects).to.include("id6");
   });
 });
 
