@@ -278,7 +278,7 @@ contract ChainLance {
         require(projectList.contains(projectId), "unknown project");
         require(projects[projectId].state == ProjectState.Open, "not open");
         require(projects[projectId].owner == msg.sender, "not owner");
-        projects[projectId].state = ProjectState.Canceled; // fix ("=" and not "==")
+        projects[projectId].state = ProjectState.Canceled;
         emit ProjectCanceled(projectId);
     }
 
