@@ -217,6 +217,7 @@ contract ChainLance {
 
     function acceptBid(string calldata projectId, string calldata bidId) external payable {
         require(projectList.contains(projectId), "unknown project");
+        require(projects[projectId].owner == msg.sender, "not owner");
         require(projects[projectId].state == ProjectState.Open, "not open");
         require(bidList.contains(bidId), "unknown bid");
         require(msg.value >= bids[bidId].price, "not enough value"); // TODO: fee processing

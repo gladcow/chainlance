@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ChainLance } from "../typechain-types";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 describe("ChainLance: work on project", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -81,7 +82,7 @@ describe("ChainLance: work on project", function () {
 
     const projectId = "id2";
     const projectPrice = 200000;
-    const timeSpanToCancel = 100;
+    const timeSpanToCancel = 2;
     const txCreateProject = await chainLance.connect(employer).createProject(projectId, projectPrice, timeSpanToCancel);
     const receiptCreateProject = await txCreateProject.wait();
 
@@ -89,7 +90,7 @@ describe("ChainLance: work on project", function () {
     expect(receiptCreateProject?.status).is.equal(1, "project creation failed");
 
     const bidId = "bid2";
-    await chainLance.connect(worker).bidProject(projectId, bidId, projectPrice, timeSpanToCancel - 1); // timespan on project is for bidding?
+    await chainLance.connect(worker).bidProject(projectId, bidId, projectPrice, timeSpanToCancel - 1);
 
     await chainLance.connect(employer).acceptBid(projectId, bidId, { value: projectPrice });
 
@@ -106,8 +107,8 @@ describe("ChainLance: work on project", function () {
     // Cancel work
     ///////////////////////////////////////////////////////////////////
 
-    await ethers.provider.send("evm_increaseTime", [timeSpanToCancel + 1]); // Changing block timestamp
-    await ethers.provider.send("evm_mine", []); // Mine block
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    await delay((timeSpanToCancel + 1) * 1000);
 
     const txCancelWork = await chainLance.connect(employer).cancelWork(projectId);
     const receiptCancelWork = await txCancelWork.wait();
@@ -144,9 +145,10 @@ describe("ChainLance: query info on project", function () {
     await chainLance.connect(worker1).bidProject(oneBidProjectId, bidId1, oneBidProjectPrice, 1);
 
     const txAcceptBid1 = await chainLance
-      .connect(employer2)
+      .connect(employer1)
       .acceptBid(oneBidProjectId, bidId1, { value: oneBidProjectPrice });
     await txAcceptBid1.wait();
+    // expect(val1?.status).is.to.be.equal(2, "contract call should fail")
     ///////////////////////////////////////////////////////////////////
     // Work with state: InReview
     const twoBidsProjectId = "id4";
@@ -237,12 +239,19 @@ describe("ChainLance: query info on project", function () {
 
 describe("ChainLance: check access rights", function () {
   let chainLance: ChainLance;
+  let employer1: SignerWithAddress;
+  let employer2: SignerWithAddress;
+  let employer3: SignerWithAddress;
+  let worker1: SignerWithAddress;
+  let worker2: SignerWithAddress;
+
   before(async () => {
     const chainLanceFactory = await ethers.getContractFactory("ChainLance");
     chainLance = (await chainLanceFactory.deploy()) as ChainLance;
     await chainLance.waitForDeployment();
 
-    const [employer1, employer2, employer3, worker1, worker2, worker3] = await ethers.getSigners();
+    [employer1, employer2, employer3, worker1, worker2] = await ethers.getSigners();
+
     ///////////////////////////////////////////////////////////////////
     // Work with state: Open
     const noBidsProjectId = "id42";
@@ -251,6 +260,7 @@ describe("ChainLance: check access rights", function () {
       .connect(employer1)
       .createProject(noBidsProjectId, noBidsProjectPrice, 100);
     await txCreateNoBidsProject.wait();
+
     ///////////////////////////////////////////////////////////////////
     // Work with state: InWork
     const oneBidProjectId = "id3";
@@ -264,9 +274,10 @@ describe("ChainLance: check access rights", function () {
     await chainLance.connect(worker1).bidProject(oneBidProjectId, bidId1, oneBidProjectPrice, 1);
 
     const txAcceptBid1 = await chainLance
-      .connect(employer2)
+      .connect(employer1)
       .acceptBid(oneBidProjectId, bidId1, { value: oneBidProjectPrice });
     await txAcceptBid1.wait();
+
     ///////////////////////////////////////////////////////////////////
     // Work with state: InReview
     const twoBidsProjectId = "id4";
@@ -279,9 +290,6 @@ describe("ChainLance: check access rights", function () {
     const bidId2 = "bidid2";
     await chainLance.connect(worker2).bidProject(twoBidsProjectId, bidId2, twoBidsProjectPrice, 1);
 
-    const bidId3 = "bidid3";
-    await chainLance.connect(worker3).bidProject(twoBidsProjectId, bidId3, twoBidsProjectPrice, 1);
-
     const txAcceptBid2 = await chainLance
       .connect(employer2)
       .acceptBid(twoBidsProjectId, bidId2, { value: twoBidsProjectPrice });
@@ -289,6 +297,7 @@ describe("ChainLance: check access rights", function () {
 
     const txSubmitWork2 = await chainLance.connect(worker2).submitWork(twoBidsProjectId);
     await txSubmitWork2.wait();
+
     ///////////////////////////////////////////////////////////////////
     // Work with state: Completed
     const completedProjectId = "id5";
@@ -311,32 +320,34 @@ describe("ChainLance: check access rights", function () {
 
     const txAcceptWork = await chainLance.connect(employer3).acceptWork(completedProjectId);
     await txAcceptWork.wait();
-    ///////////////////////////////////////////////////////////////////
-    // Work with state: Canceled
-    const canceledProjectId = "id6";
-    const canceledProjectPrice = 313131;
-    const txCreateCanceledProject = await chainLance
-      .connect(employer2)
-      .createProject(canceledProjectId, canceledProjectPrice, 100);
-    await txCreateCanceledProject.wait();
-
-    const bidId5 = "bidid5";
-    await chainLance.connect(worker1).bidProject(canceledProjectId, bidId5, canceledProjectPrice, 1);
-
-    const bidId6 = "bidid6";
-    await chainLance.connect(worker2).bidProject(canceledProjectId, bidId6, canceledProjectPrice, 1);
-
-    const bidId7 = "bidid7";
-    await chainLance.connect(worker3).bidProject(canceledProjectId, bidId7, canceledProjectPrice, 1);
-
-    await chainLance.connect(employer2).cancelProject(canceledProjectId);
   });
 
   it("Should allow to change project state to employer only", async function () {
-    // TODO
+    const projectId1 = "id42"; //Open employer1 to In Work
+    const projectId2 = "id4"; // inReview employer2 to Complete
+    const bidId = "bidid1";
+    const bidPrice = 1000;
+
+    await expect(chainLance.connect(worker1).acceptBid(projectId1, bidId, { value: bidPrice })).to.be.revertedWith(
+      "not owner",
+    );
+
+    await expect(chainLance.connect(employer2).acceptBid(projectId1, bidId, { value: bidPrice })).to.be.revertedWith(
+      "not owner",
+    );
+
+    await expect(chainLance.connect(employer1).acceptBid(projectId1, bidId, { value: bidPrice })).to.be.revertedWith(
+      "unknown bid",
+    );
+
+    await expect(chainLance.connect(employer1).acceptWork(projectId2)).to.be.revertedWith("not owner");
   });
 
   it("Should allow to change work state to worker only", async function () {
-    // TODO
+    const projectId1 = "id3"; // InWork
+
+    await expect(chainLance.connect(employer1).submitWork(projectId1)).to.be.revertedWith("not worker");
+
+    await expect(chainLance.connect(worker2).submitWork(projectId1)).to.be.revertedWith("not worker");
   });
 });
