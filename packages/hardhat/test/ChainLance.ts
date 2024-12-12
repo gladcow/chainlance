@@ -247,7 +247,7 @@ describe("ChainLance: check access rights", function () {
 
   before(async () => {
     const chainLanceFactory = await ethers.getContractFactory("ChainLance");
-    chainLance = (await chainLanceFactory.deploy()) as ChainLance;
+    chainLance = await chainLanceFactory.deploy();
     await chainLance.waitForDeployment();
 
     [employer1, employer2, employer3, worker1, worker2] = await ethers.getSigners();
@@ -323,8 +323,8 @@ describe("ChainLance: check access rights", function () {
   });
 
   it("Should allow to change project state to employer only", async function () {
-    const projectId1 = "id42"; //Open employer1 to In Work
-    const projectId2 = "id4"; // inReview employer2 to Complete
+    const projectId1 = "id42"; // Open (employer1)
+    const projectId2 = "id4"; // InReview (employer2)
     const bidId = "bidid1";
     const bidPrice = 1000;
 
@@ -341,13 +341,24 @@ describe("ChainLance: check access rights", function () {
     );
 
     await expect(chainLance.connect(employer1).acceptWork(projectId2)).to.be.revertedWith("not owner");
+
+    await expect(chainLance.connect(employer3).acceptWork(projectId2)).to.be.revertedWith("not owner");
   });
 
   it("Should allow to change work state to worker only", async function () {
     const projectId1 = "id3"; // InWork
+    const projectId2 = "id5"; // Completed
+    const projectId3 = "id42"; // Open
+    const projectId4 = "id4"; // InReview
 
     await expect(chainLance.connect(employer1).submitWork(projectId1)).to.be.revertedWith("not worker");
 
     await expect(chainLance.connect(worker2).submitWork(projectId1)).to.be.revertedWith("not worker");
+
+    await expect(chainLance.connect(worker1).submitWork(projectId3)).to.be.revertedWith("not in work");
+
+    await expect(chainLance.connect(worker2).submitWork(projectId4)).to.be.revertedWith("not in work");
+
+    await expect(chainLance.connect(worker1).submitWork(projectId2)).to.be.revertedWith("not in work");
   });
 });
