@@ -21,7 +21,7 @@ const Home: NextPage = () => {
     setStorage(new Bee("http://92.63.194.135:3000"));
   });
 
-  const columns = ["title", "description"];
+  const table_columns = ["title", "timeSpan", "price"];
   const [projectId] = useState("");
   const {} = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -42,13 +42,13 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker columns={columns} storage={storage}></UserWorker>
+            <UserWorker columns={table_columns} storage={storage}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer address={connectedAddress} columns={columns} storage={storage}></UserEmployer>
+            <UserEmployer address={connectedAddress} columns={table_columns} storage={storage}></UserEmployer>
           </>
         )}
 
