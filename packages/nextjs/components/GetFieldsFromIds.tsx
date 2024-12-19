@@ -38,4 +38,4 @@ const useFetchFields = (data: any[], storage: Bee | undefined, this_field: keyof
   return fields;
 };
 
-export { useFetchFields };
+export { useFetchFields, fetchProjectFieldFromId };
