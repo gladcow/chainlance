@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { useFetchFields } from "./GetFieldsFromIds";
+import React, { useEffect, useState } from "react";
+import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
+import { placeBid } from "./placeBid";
 import { formatTableData } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 interface TableProps {
   initialData: any[];
@@ -24,9 +25,31 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   });
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [project, setProject] = useState("");
+  const [changeDescriptionFromId, setChangeDescriptionFromId] = useState("");
+  const [description, setDescription] = useState("");
+  const [waitingDes, setWaitingDes] = useState(true);
+  const [bidIsBidded, setBidIsBidded] = useState(false);
+
+  useEffect(() => {
+    const fetchDescription = async () => {
+      try {
+        setWaitingDes(false);
+        const description = await fetchProjectFieldFromId(storage, changeDescriptionFromId, "description");
+        setDescription(description);
+        setWaitingDes(true);
+      } catch (error) {
+        console.error("Failed to fetch description:", error);
+      }
+    };
+
+    if (changeDescriptionFromId) {
+      fetchDescription();
+    }
+  }, [changeDescriptionFromId, storage]);
 
   const titles = useFetchFields(initialData, storage, "title");
-  const descriptions = useFetchFields(initialData, storage, "description");
+  const timeSpans = useFetchFields(initialData, storage, "timeSpan");
+  const prices = useFetchFields(initialData, storage, "price");
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -34,16 +57,22 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
     args: [project],
   }) as { data: any[] | undefined; isLoading: boolean };
 
+  const { writeAsync } = useScaffoldContractWrite({
+    contractName: "ChainLance",
+    functionName: "bidProject",
+    args: [] as unknown as [string, string, bigint, number],
+  });
+
   const filteredData = formatTableData(initialData, titles, searchTerm, sortConfig);
 
   const renderCellContent = (row: any, column: string) => {
     switch (column) {
       case "title":
-        console.log(titles[row.id]);
         return titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
-      case "description":
-        console.log(descriptions[row.id]);
-        return descriptions[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "timeSpan":
+        return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "price":
+        return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       default:
         return row[column];
     }
@@ -94,6 +123,8 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                       onClick={() => {
                         setProject(row.id);
                         setExpandedRow(expandedRow === index ? null : index);
+                        setChangeDescriptionFromId(row.id);
+                        setBidIsBidded(false);
                       }}
                     >
                       {expandedRow === index ? "▲" : "▼"}
@@ -104,26 +135,40 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                   <tr>
                     <td colSpan={columns.length + 1} className="border px-4 py-2">
                       {infoFull && !isInfoFullLoading ? (
-                        <div className="flex content-evenly">
-                          <div className="w-3/4">
-                            <h3>Project Details:</h3>
-                            <ul>
-                              {infoFull.map((detail, detailIndex) => (
-                                <li key={detailIndex} className="break-words">
-                                  {detail}
-                                </li>
-                              ))}
-                            </ul>
+                        <div className="flex flex-row justify-between items-start space-x-4">
+                          <div className="w-3/4 space-y-2">
+                            <h4 className="break-words leading-relaxed">
+                              {waitingDes ? description : <span className="loading loading-spinner loading-sm"></span>}
+                            </h4>
                           </div>
-                          <div className="w-1/4">
-                            <div className="flex flex-col space-y-4">
-                              <button className="btn btn-primary p-0">Button 1</button>
-                              <button className="btn btn-secondary p-0">Button 2</button>
-                            </div>
+                          <div className="flex flex-col items-end space-y-4">
+                            {!bidIsBidded ? (
+                              <button
+                                className="btn btn-primary p-2 w-20"
+                                onClick={() => {
+                                  placeBid(
+                                    infoFull[0],
+                                    titles[row.id],
+                                    infoFull[7],
+                                    infoFull[3],
+                                    writeAsync,
+                                    setBidIsBidded,
+                                  );
+                                  setBidIsBidded(true);
+                                }}
+                              >
+                                Place Bid
+                              </button>
+                            ) : (
+                              <button disabled className="btn btn-primary p-2 w-20">
+                                Bid is placed
+                              </button>
+                            )}
+                            <button className="btn btn-secondary p-2 w-20">Button 2</button>
                           </div>
                         </div>
                       ) : (
-                        <p>Loading...</p>
+                        <span className="loading loading-spinner loading-sm"></span>
                       )}
                     </td>
                   </tr>
