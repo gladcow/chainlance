@@ -5,6 +5,582 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
+  100: {
+    ChainLance: {
+      address: "0xA1Bb810a67a10c3d0830644b3Ad055Ec6B6eABa1",
+      abi: [
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "bidId",
+              type: "string",
+            },
+          ],
+          name: "BidAccepted",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "id",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "project",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "bidder",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint32",
+              name: "timespan",
+              type: "uint32",
+            },
+          ],
+          name: "BidCreated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "ProjectCanceled",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "id",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+          ],
+          name: "ProjectCreated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "WorkAccepted",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "WorkCanceled",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "WorkRejected",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "WorkSubmitted",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "bidId",
+              type: "string",
+            },
+          ],
+          name: "acceptBid",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "acceptWork",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "external_description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint32",
+              name: "_timespan",
+              type: "uint32",
+            },
+          ],
+          name: "bidProject",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "bids",
+          outputs: [
+            {
+              internalType: "string",
+              name: "id",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "bidder",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "timespan",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "cancelProject",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "cancelWork",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "external_description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint32",
+              name: "_timespan",
+              type: "uint32",
+            },
+          ],
+          name: "createProject",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "parentId",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "external_description",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_price",
+              type: "uint256",
+            },
+            {
+              internalType: "uint32",
+              name: "_timespan",
+              type: "uint32",
+            },
+          ],
+          name: "createSubproject",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+          ],
+          name: "listOwnerProjects",
+          outputs: [
+            {
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "listProjectBids",
+          outputs: [
+            {
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "listProjects",
+          outputs: [
+            {
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "enum ChainLance.ProjectState",
+              name: "state",
+              type: "uint8",
+            },
+          ],
+          name: "listProjectsWithState",
+          outputs: [
+            {
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "worker",
+              type: "address",
+            },
+          ],
+          name: "listWorkerBids",
+          outputs: [
+            {
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "worker",
+              type: "address",
+            },
+          ],
+          name: "listWorkerProjects",
+          outputs: [
+            {
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "projects",
+          outputs: [
+            {
+              internalType: "string",
+              name: "id",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "parentId",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "price",
+              type: "uint256",
+            },
+            {
+              internalType: "enum ChainLance.ProjectState",
+              name: "state",
+              type: "uint8",
+            },
+            {
+              internalType: "address",
+              name: "worker",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "startedAt",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "timespan",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "ownerRated",
+              type: "bool",
+            },
+            {
+              internalType: "bool",
+              name: "workerRated",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+            {
+              internalType: "bool",
+              name: "rate",
+              type: "bool",
+            },
+          ],
+          name: "rateOwner",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+            {
+              internalType: "bool",
+              name: "rate",
+              type: "bool",
+            },
+          ],
+          name: "rateWorker",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "rates",
+          outputs: [
+            {
+              internalType: "uint32",
+              name: "",
+              type: "uint32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "rejectWork",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "projectId",
+              type: "string",
+            },
+          ],
+          name: "submitWork",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {},
+    },
+  },
   31337: {
     ChainLance: {
       address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
