@@ -31,7 +31,6 @@ export const WriteCreateProject = ({ storage }: WriteCreateProjectProps) => {
       "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
       JSON.stringify({ title: title, description: description, price: price, timeSpan: timeSpan }),
     );
-    console.log("res", res);
     const id = res?.reference.toString();
     setExternalDescription(id === undefined ? "" : id);
     writeAsync({ args: [id, BigInt(price), timeSpan] });
