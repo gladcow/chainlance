@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
+import BidMenu from "./BidMenu";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
-import { placeBid } from "./placeBid";
 import { formatTableData } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface TableProps {
   initialData: any[];
   columns: string[];
   emptyTableMessage?: string;
   storage: Bee | undefined;
+  buttons: string[];
 }
 
 const TableWithSearchAndSort: React.FC<TableProps> = ({
@@ -17,6 +18,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   columns,
   emptyTableMessage = "Table is empty",
   storage,
+  buttons,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
@@ -57,12 +59,6 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
     args: [project],
   }) as { data: any[] | undefined; isLoading: boolean };
 
-  const { writeAsync } = useScaffoldContractWrite({
-    contractName: "ChainLance",
-    functionName: "bidProject",
-    args: [] as unknown as [string, string, bigint, number],
-  });
-
   const filteredData = formatTableData(initialData, titles, searchTerm, sortConfig);
 
   const renderCellContent = (row: any, column: string) => {
@@ -77,7 +73,16 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         return row[column];
     }
   };
+  const [isBidMenuOpen, setIsBidMenuOpen] = useState(false);
 
+  const handleBidClick = () => {
+    bidIsBidded;
+    setIsBidMenuOpen(true);
+  };
+
+  const closeMenu = () => {
+    setIsBidMenuOpen(false);
+  };
   return (
     <div className="flex flex-col m-5 max-w-20">
       <input
@@ -87,7 +92,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      <table className="table-auto">
+      <table className="table-auto w-100">
         <thead>
           <tr>
             {columns.map(column => (
@@ -105,7 +110,6 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                 {column}
               </th>
             ))}
-            <th className="px-4 py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -118,7 +122,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                       {renderCellContent(row, column)}
                     </td>
                   ))}
-                  <td className="border px-4 py-2">
+                  <td className="border px-4 py-2 text-right w-px">
                     <button
                       onClick={() => {
                         setProject(row.id);
@@ -126,6 +130,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                         setChangeDescriptionFromId(row.id);
                         setBidIsBidded(false);
                       }}
+                      className="text-sm"
                     >
                       {expandedRow === index ? "▲" : "▼"}
                     </button>
@@ -133,7 +138,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                 </tr>
                 {expandedRow === index && (
                   <tr>
-                    <td colSpan={columns.length + 1} className="border px-4 py-2">
+                    <td colSpan={columns.length} className="border px-4 py-2">
                       {infoFull && !isInfoFullLoading ? (
                         <div className="flex flex-row justify-between items-start space-x-4">
                           <div className="w-3/4 space-y-2">
@@ -142,29 +147,13 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
                             </h4>
                           </div>
                           <div className="flex flex-col items-end space-y-4">
-                            {!bidIsBidded ? (
-                              <button
-                                className="btn btn-primary p-2 w-20"
-                                onClick={() => {
-                                  placeBid(
-                                    infoFull[0],
-                                    titles[row.id],
-                                    infoFull[7],
-                                    infoFull[3],
-                                    writeAsync,
-                                    setBidIsBidded,
-                                  );
-                                  setBidIsBidded(true);
-                                }}
-                              >
+                            {buttons.includes("bid") ? (
+                              <button className="btn btn-primary p-2 w-20" onClick={handleBidClick}>
                                 Place Bid
                               </button>
                             ) : (
-                              <button disabled className="btn btn-primary p-2 w-20">
-                                Bid is placed
-                              </button>
+                              <></>
                             )}
-                            <button className="btn btn-secondary p-2 w-20">Button 2</button>
                           </div>
                         </div>
                       ) : (
@@ -177,13 +166,16 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length + 1} className="border px-4 py-2 text-center">
+              <td colSpan={columns.length} className="border px-4 py-2 text-center">
                 {emptyTableMessage}
               </td>
             </tr>
           )}
         </tbody>
       </table>
+      {isBidMenuOpen && (
+        <BidMenu onClose={closeMenu} project_id={project} setBidIsBidded={setBidIsBidded} storage={storage} />
+      )}
     </div>
   );
 };

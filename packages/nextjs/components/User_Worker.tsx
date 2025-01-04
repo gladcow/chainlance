@@ -32,8 +32,8 @@ export const UserWorker = ({ columns, storage }: UserWorkerProps) => {
         <WriteSubmitWork></WriteSubmitWork>
       </div>
 
-      <div className="justify-end grow">
-        <TableWithSearchAndSort initialData={all_open_projects} columns={columns} storage={storage} />
+      <div className="w-full">
+        <TableWithSearchAndSort initialData={all_open_projects} columns={columns} storage={storage} buttons={["bid"]} />
       </div>
     </div>
   );

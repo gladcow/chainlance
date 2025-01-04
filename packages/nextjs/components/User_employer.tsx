@@ -26,8 +26,8 @@ export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) =
         <WriteCreateProject storage={storage}></WriteCreateProject>
       </div>
 
-      <div className="justify-end grow">
-        <TableWithSearchAndSort initialData={all_owner_projects} columns={columns} storage={storage} />
+      <div className="w-full">
+        <TableWithSearchAndSort initialData={all_owner_projects} columns={columns} storage={storage} buttons={[]} />
       </div>
     </div>
   );
