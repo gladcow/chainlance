@@ -37,7 +37,6 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
         setColumns(["project_id", "timeSpan", "price"]);
         break;
     }
-    console.log(dataToSendToTable);
   }, [selectTable, workerBids, projectlist]);
 
   return (
