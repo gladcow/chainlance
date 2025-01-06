@@ -6,34 +6,66 @@ interface ParsedData {
   description: string;
   price: number;
   timeSpan: number;
+  project_id: string;
 }
 
-const fetchProjectFieldFromId = async (storage: Bee | undefined, projectId: string, field: keyof ParsedData) => {
-  if (!storage) return "";
-  const data = await storage?.downloadData(projectId);
-  if (data === undefined) {
-    return "";
-  }
-  const parsedData = data.json() as unknown as ParsedData;
-
-  return parsedData[`${field}`] ? parsedData[`${field}`].toString() : "";
+const isValidProjectId = (projectId: string): boolean => {
+  const isHex = /^[0-9a-fA-F]{64}$/.test(projectId);
+  const isEns = /^[a-zA-Z0-9-]+\.eth$/.test(projectId);
+  return isHex || isEns;
 };
 
-const useFetchFields = (data: any[], storage: Bee | undefined, this_field: keyof ParsedData) => {
+const fetchProjectFieldFromId = async (storage: Bee | undefined, projectId: string, field: keyof ParsedData) => {
+  if (!storage || !isValidProjectId(projectId)) return "";
+
+  try {
+    const data = await storage.downloadData(projectId);
+    if (!data) return "";
+
+    const parsedData = data.json() as unknown as ParsedData;
+    return parsedData[field]?.toString() || "";
+  } catch (error) {
+    console.error(`Error fetching project field for projectId "${projectId}":`, error);
+    return "";
+  }
+};
+
+const useFetchFields = (
+  data: any[] | undefined,
+  storage: Bee | undefined,
+  field: keyof ParsedData,
+): { [key: string]: string } => {
   const [fields, setFields] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    const fetchAllTitles = async () => {
+    if (!data || !storage) return;
+
+    let isCancelled = false;
+
+    const fetchAllFields = async () => {
       const fieldsTemp: { [key: string]: string } = {};
-      for (const row of data) {
-        const field = await fetchProjectFieldFromId(storage, row.id, this_field);
-        fieldsTemp[row.id] = field;
+
+      // Запускаем все запросы параллельно для ускорения
+      await Promise.all(
+        data.map(async projectId => {
+          const value = await fetchProjectFieldFromId(storage, projectId, field);
+          if (value) {
+            fieldsTemp[projectId] = value;
+          }
+        }),
+      );
+
+      if (!isCancelled) {
+        setFields(fieldsTemp);
       }
-      setFields(fieldsTemp);
     };
 
-    fetchAllTitles();
-  }, [data, storage, this_field]);
+    fetchAllFields();
+
+    return () => {
+      isCancelled = true; // Отменяем обновление состояния при размонтировании
+    };
+  }, [data, storage, field]);
 
   return fields;
 };

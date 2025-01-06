@@ -1,24 +1,45 @@
+import { useEffect, useState } from "react";
 import { WriteSubmitWork } from "./WriteSubmitWork";
 import TableWithSearchAndSort from "./table_daisy";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface UserWorkerProps {
+  address: string | undefined;
   columns: any;
   storage: Bee | undefined;
 }
 
-export const UserWorker = ({ columns, storage }: UserWorkerProps) => {
+export const UserWorker = ({ address, storage }: UserWorkerProps) => {
+  const [selectTable, setSelectTable] = useState("Open projects");
+  const [dataToSendToTable, setDataToSendToTable] = useState<any[] | undefined>();
+  const [columns, setColumns] = useState<any[""]>(["title", "timeSpan", "price"]);
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
     args: [0],
   }) as { data: any[] | undefined };
-  const all_open_projects = projectlist
-    ? projectlist.map(projectId => ({
-        id: projectId,
-      }))
-    : [];
+
+  const { data: workerBids } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "listWorkerBids",
+    args: [address],
+  }) as { data: any[] | undefined };
+
+  useEffect(() => {
+    switch (selectTable) {
+      case "Open projects":
+        setDataToSendToTable(projectlist);
+        setColumns(["title", "timeSpan", "price"]);
+        break;
+      case "Worker bids":
+        setDataToSendToTable(workerBids);
+        setColumns(["project_id", "timeSpan", "price"]);
+        break;
+    }
+    console.log(dataToSendToTable);
+  }, [selectTable, workerBids, projectlist]);
+
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -33,7 +54,19 @@ export const UserWorker = ({ columns, storage }: UserWorkerProps) => {
       </div>
 
       <div className="w-full">
-        <TableWithSearchAndSort initialData={all_open_projects} columns={columns} storage={storage} buttons={["bid"]} />
+        <select
+          className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
+          defaultValue={"Open projects"}
+          value={selectTable}
+          onChange={e => setSelectTable(e.target.value)}
+        >
+          <option disabled selected>
+            Choose table
+          </option>
+          <option value={"Open projects"}>Open projects</option>
+          <option value={"Worker bids"}>My bids</option>
+        </select>
+        <TableWithSearchAndSort initialData={dataToSendToTable} columns={columns} storage={storage} buttons={["bid"]} />
       </div>
     </div>
   );

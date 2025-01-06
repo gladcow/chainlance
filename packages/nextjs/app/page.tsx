@@ -42,7 +42,7 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker columns={table_columns} storage={storage}></UserWorker>
+            <UserWorker address={connectedAddress} columns={table_columns} storage={storage}></UserWorker>
           </>
         )}
 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { WriteCreateProject } from "./WriteCreateProject";
 import TableWithSearchAndSort from "./table_daisy";
 import { Bee } from "@ethersphere/bee-js";
@@ -10,16 +11,19 @@ interface UserEmployerProps {
 }
 
 export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) => {
-  const { data: owner_projects } = useScaffoldContractRead({
+  const [selectTable, setSelectTable] = useState("Open projects");
+
+  const { data: ownerProjects } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listOwnerProjects",
     args: [address],
   }) as { data: any[] | undefined };
-  const all_owner_projects = owner_projects
-    ? owner_projects.map(projectId => ({
-        id: projectId,
-      }))
-    : [];
+  // const { data: projectBids } = useScaffoldContractRead({
+  //   contractName: "ChainLance",
+  //   functionName: "listOwnerProjects",
+  //   args: [address],
+  // }) as { data: any[] | undefined };
+
   return (
     <div className="flex flex-row grow">
       <div className="flex flex-col w-1/2">
@@ -27,7 +31,17 @@ export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) =
       </div>
 
       <div className="w-full">
-        <TableWithSearchAndSort initialData={all_owner_projects} columns={columns} storage={storage} buttons={[]} />
+        <select
+          className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
+          value={selectTable}
+          onChange={e => setSelectTable(e.target.value)}
+        >
+          <option disabled selected>
+            Choose table
+          </option>
+          <option value={"My projects"}>My projects</option>
+        </select>
+        <TableWithSearchAndSort initialData={ownerProjects} columns={columns} storage={storage} buttons={[]} />
       </div>
     </div>
   );
