@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import OpenProjectsTable from "./OpenProjectsTable";
+import WorkerBidsTable from "./WorkerBidsTable";
 import { WriteSubmitWork } from "./WriteSubmitWork";
-import TableWithSearchAndSort from "./table_daisy";
 import { Bee } from "@ethersphere/bee-js";
+import { useEffectOnce } from "usehooks-ts";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface UserWorkerProps {
@@ -13,7 +15,10 @@ interface UserWorkerProps {
 export const UserWorker = ({ address, storage }: UserWorkerProps) => {
   const [selectTable, setSelectTable] = useState("Open projects");
   const [dataToSendToTable, setDataToSendToTable] = useState<any[] | undefined>();
-  const [columns, setColumns] = useState<any[""]>(["title", "timeSpan", "price"]);
+  const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
+    <OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>,
+  );
+
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
@@ -25,19 +30,23 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
     functionName: "listWorkerBids",
     args: [address],
   }) as { data: any[] | undefined };
-
+  useEffectOnce(() => {
+    setDataToSendToTable(projectlist);
+  });
   useEffect(() => {
     switch (selectTable) {
       case "Open projects":
         setDataToSendToTable(projectlist);
-        setColumns(["title", "timeSpan", "price"]);
+        console.log(dataToSendToTable);
+        setTableComponent(<OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>);
         break;
       case "Worker bids":
         setDataToSendToTable(workerBids);
-        setColumns(["project_id", "timeSpan", "price"]);
+        console.log(dataToSendToTable);
+        setTableComponent(<WorkerBidsTable data={dataToSendToTable} storage={storage}></WorkerBidsTable>);
         break;
     }
-  }, [selectTable, workerBids, projectlist]);
+  }, [selectTable, workerBids, projectlist, dataToSendToTable, storage]);
 
   return (
     <div className="flex flex-row grow">
@@ -65,7 +74,7 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
           <option value={"Open projects"}>Open projects</option>
           <option value={"Worker bids"}>My bids</option>
         </select>
-        <TableWithSearchAndSort initialData={dataToSendToTable} columns={columns} storage={storage} buttons={["bid"]} />
+        {tableComponent}
       </div>
     </div>
   );

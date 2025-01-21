@@ -175,9 +175,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
           )}
         </tbody>
       </table>
-      {isBidMenuOpen && (
-        <BidMenu onClose={closeMenu} project_id={project} setBidIsBidded={setBidIsBidded} storage={storage} />
-      )}
+      {isBidMenuOpen && <BidMenu onClose={closeMenu} project_id={project} storage={storage} />}
     </div>
   );
 };

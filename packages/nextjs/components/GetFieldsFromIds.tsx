@@ -45,7 +45,6 @@ const useFetchFields = (
     const fetchAllFields = async () => {
       const fieldsTemp: { [key: string]: string } = {};
 
-      // Запускаем все запросы параллельно для ускорения
       await Promise.all(
         data.map(async projectId => {
           const value = await fetchProjectFieldFromId(storage, projectId, field);
@@ -63,7 +62,7 @@ const useFetchFields = (
     fetchAllFields();
 
     return () => {
-      isCancelled = true; // Отменяем обновление состояния при размонтировании
+      isCancelled = true;
     };
   }, [data, storage, field]);
 

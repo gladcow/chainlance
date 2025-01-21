@@ -7,11 +7,11 @@ import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth/useScaffoldContr
 interface BidMenuProps {
   onClose: () => void;
   project_id: string;
-  setBidIsBidded: React.Dispatch<React.SetStateAction<boolean>>;
+  // setBidIsBidded: React.Dispatch<React.SetStateAction<boolean>>;
   storage: Bee | undefined;
 }
 
-const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, setBidIsBidded, storage }) => {
+const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
   const [projectDescription, setProjectDescription] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
   const [price, setPrice] = useState(0);
@@ -27,7 +27,7 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, setBidIsBidded, 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(project_id);
-    placeBid(project_id, projectDescription, timeSpan, BigInt(price), writeAsync, setBidIsBidded, storage);
+    placeBid(project_id, projectDescription, timeSpan, BigInt(price), writeAsync, storage);
     onClose();
   };
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {

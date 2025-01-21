@@ -2,13 +2,11 @@ import { Bee } from "@ethersphere/bee-js";
 import { ContractFunctionExecutionError } from "viem";
 
 export const placeBid = async (
-  // Shoud do a data array
   project_id: string,
   description: string,
   timeSpan: number,
   price: bigint,
   writeAsync: any,
-  setBidIsBidded: React.Dispatch<React.SetStateAction<boolean>>,
   storage: Bee | undefined,
 ) => {
   const writeProjectDetailsToStorage = async function () {
@@ -24,7 +22,7 @@ export const placeBid = async (
       await writeProjectDetailsToStorage();
     } catch (error) {
       if (error instanceof ContractFunctionExecutionError) {
-        setBidIsBidded(true);
+        //
       } else {
         console.error("An unexpected error occurred:", error);
       }
