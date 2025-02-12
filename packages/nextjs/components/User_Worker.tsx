@@ -73,7 +73,7 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
         );
         break;
     }
-  }, [selectTable, workerBids, projectlist, dataToSendToTable, storage]);
+  }, [projectsWithWorker, selectTable, workerBids, projectlist, dataToSendToTable, storage]);
 
   return (
     <div className="flex flex-row grow">

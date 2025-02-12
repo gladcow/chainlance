@@ -9,7 +9,7 @@ interface TableProps {
   columns: string[];
   description: string;
   emptyTableMessage?: string;
-  buttons: { id: string; name: string; onClick: (row: any) => void }[] | any[];
+  buttons?: { id: string; name: string; onClick: (row: any) => void }[] | any[];
 }
 
 const BaseTable: React.FC<TableProps> = ({
@@ -89,16 +89,20 @@ const BaseTable: React.FC<TableProps> = ({
                             </h4>
                           </div>
                           <div className="flex flex-col items-end space-y-4">
-                            {buttons.map(button => (
-                              <button
-                                disabled={button.disabled ? button.disabled() : false}
-                                key={button.id}
-                                className="btn btn-primary p-2"
-                                onClick={() => button.onClick(row)}
-                              >
-                                {button.disabled && button.disabled() ? "In Review" : button.name}
-                              </button>
-                            ))}
+                            {buttons ? (
+                              buttons.map(button => (
+                                <button
+                                  disabled={button.disabled ? button.disabled() : false}
+                                  key={button.id}
+                                  className="btn btn-primary p-2"
+                                  onClick={() => button.onClick(row)}
+                                >
+                                  {button.disabled && button.disabled() ? "In Review" : button.name}
+                                </button>
+                              ))
+                            ) : (
+                              <></>
+                            )}
                           </div>
                         </div>
                       ) : (

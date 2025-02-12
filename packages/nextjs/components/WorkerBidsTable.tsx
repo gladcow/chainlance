@@ -15,7 +15,6 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
   const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
-  const buttons = [""];
 
   const filteredData = formatTableData(data, project_ids, searchTerm, sortConfig);
 
@@ -51,7 +50,6 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
       <BaseTable
         renderFunction={renderCellContent}
         sortRow={filteredData}
-        buttons={buttons}
         columns={["project_id", "timeSpan", "price"]}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
