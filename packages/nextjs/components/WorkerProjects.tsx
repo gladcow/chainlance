@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "./BaseTable";
-import BidMenu from "./BidMenu";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
+import SubmitWorkMenu from "./SubmitWorkMenu";
 import { formatTableData } from "./utils";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
-const OpenProjectsTable: React.FC<any> = ({ data, storage }) => {
+const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
     key: "",
@@ -13,34 +14,38 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage }) => {
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleBidClick = () => {
-    setIsBidMenuOpen(true);
+  const handleSubmitClick = () => {
+    setIsSubmitMenuOpen(true);
   };
 
   const closeMenu = () => {
-    setIsBidMenuOpen(false);
+    setIsSubmitMenuOpen(false);
   };
-
+  const { data: projectInfo } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "projects",
+    args: [project],
+  }) as { data: any[] | undefined };
   const titles = useFetchFields(data, storage, "title");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
   const buttons = [
     {
-      id: "bid",
-      name: "Bid",
+      id: "submit",
+      name: "Submit Work",
       onClick: () => {
-        handleBidClick();
+        handleSubmitClick();
       },
       onClose: () => {
         closeMenu;
       },
-      disabled: (row: any) => {
-        return 0 * row;
+      disabled: () => {
+        return projectInfo ? projectInfo[5] != 1 : 0;
       },
     },
   ];
 
-  const [isBidMenuOpen, setIsBidMenuOpen] = useState(false);
+  const [isSubmitMenuOpen, setIsSubmitMenuOpen] = useState(false);
 
   const filteredData = formatTableData(data, titles, searchTerm, sortConfig);
 
@@ -83,9 +88,9 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage }) => {
         sortConfigPair={[sortConfig, setSortConfig]}
         description={description}
       ></BaseTable>
-      {isBidMenuOpen && <BidMenu onClose={closeMenu} project_id={project} storage={storage}></BidMenu>}
+      {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeMenu} project_id={project}></SubmitWorkMenu>}
     </>
   );
 };
 
-export default OpenProjectsTable;
+export default ProjectsWithAcceptedBids;

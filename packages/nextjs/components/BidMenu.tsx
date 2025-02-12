@@ -7,7 +7,6 @@ import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth/useScaffoldContr
 interface BidMenuProps {
   onClose: () => void;
   project_id: string;
-  // setBidIsBidded: React.Dispatch<React.SetStateAction<boolean>>;
   storage: Bee | undefined;
 }
 

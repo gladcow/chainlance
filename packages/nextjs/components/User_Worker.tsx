@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import OpenProjectsTable from "./OpenProjectsTable";
 import WorkerBidsTable from "./WorkerBidsTable";
+import ProjectsWithAcceptedBids from "./WorkerProjects";
 import { WriteSubmitWork } from "./WriteSubmitWork";
 import { Bee } from "@ethersphere/bee-js";
 import { useEffectOnce } from "usehooks-ts";
@@ -18,7 +19,21 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
   const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
     <OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>,
   );
+  //   function findCommonElements(arr1: any[] | undefined, arr2: any[] | undefined): any[] {
+  //     const set1 = new Set(arr1);
+  //     const commonElements = [];
+  //     if (arr1 == undefined || arr2 == undefined){
+  //       return ['']
+  //     }
+  //       for (let num of arr2) {
+  //           if (set1.has(num)) {
+  //               commonElements.push(num);
+  //               set1.delete(num);
+  //           }
+  //       }
 
+  //     return commonElements;
+  // }
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
@@ -33,17 +48,29 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
   useEffectOnce(() => {
     setDataToSendToTable(projectlist);
   });
+
+  const { data: projectsWithWorker } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "listWorkerProjects",
+    args: [address],
+  }) as { data: any[] | undefined };
+
   useEffect(() => {
     switch (selectTable) {
       case "Open projects":
         setDataToSendToTable(projectlist);
-        console.log(dataToSendToTable);
         setTableComponent(<OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>);
         break;
       case "Worker bids":
         setDataToSendToTable(workerBids);
         console.log(dataToSendToTable);
         setTableComponent(<WorkerBidsTable data={dataToSendToTable} storage={storage}></WorkerBidsTable>);
+        break;
+      case "Worker projects":
+        setDataToSendToTable(projectsWithWorker);
+        setTableComponent(
+          <ProjectsWithAcceptedBids data={dataToSendToTable} storage={storage}></ProjectsWithAcceptedBids>,
+        );
         break;
     }
   }, [selectTable, workerBids, projectlist, dataToSendToTable, storage]);
@@ -73,6 +100,7 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
           </option>
           <option value={"Open projects"}>Open projects</option>
           <option value={"Worker bids"}>My bids</option>
+          <option value={"Worker projects"}>Accepted projects</option>
         </select>
         {tableComponent}
       </div>

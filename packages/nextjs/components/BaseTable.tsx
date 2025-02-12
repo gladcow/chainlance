@@ -91,11 +91,12 @@ const BaseTable: React.FC<TableProps> = ({
                           <div className="flex flex-col items-end space-y-4">
                             {buttons.map(button => (
                               <button
+                                disabled={button.disabled ? button.disabled() : false}
                                 key={button.id}
                                 className="btn btn-primary p-2"
                                 onClick={() => button.onClick(row)}
                               >
-                                {button.name}
+                                {button.disabled && button.disabled() ? "In Review" : button.name}
                               </button>
                             ))}
                           </div>
