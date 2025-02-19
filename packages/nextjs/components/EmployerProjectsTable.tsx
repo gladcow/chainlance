@@ -67,7 +67,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage }) => {
     if (project) {
       fetchDescription();
     }
-  }, [project, storage]);
+  }, [project, bidsOnProject, storage]);
 
   return (
     <>
