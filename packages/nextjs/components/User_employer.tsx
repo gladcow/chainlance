@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import EmployerProjectsTable from "./EmployerProjectsTable";
 import { WriteCreateProject } from "./WriteCreateProject";
-import TableWithSearchAndSort from "./table_daisy";
 import { Bee } from "@ethersphere/bee-js";
+import { useEffectOnce } from "usehooks-ts";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface UserEmployerProps {
@@ -10,19 +11,32 @@ interface UserEmployerProps {
   storage: Bee | undefined;
 }
 
-export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) => {
-  const [selectTable, setSelectTable] = useState("Open projects");
+export const UserEmployer = ({ address, storage }: UserEmployerProps) => {
+  const [selectTable, setSelectTable] = useState("My projects");
+  const [dataToSendToTable, setDataToSendToTable] = useState<any[] | undefined>();
+  const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
+    <EmployerProjectsTable data={dataToSendToTable} storage={storage}></EmployerProjectsTable>,
+  );
 
   const { data: ownerProjects } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listOwnerProjects",
     args: [address],
   }) as { data: any[] | undefined };
-  // const { data: projectBids } = useScaffoldContractRead({
-  //   contractName: "ChainLance",
-  //   functionName: "listOwnerProjects",
-  //   args: [address],
-  // }) as { data: any[] | undefined };
+
+  useEffectOnce(() => {
+    setDataToSendToTable(ownerProjects);
+  });
+
+  useEffect(() => {
+    switch (selectTable) {
+      case "My projects":
+        console.log(ownerProjects);
+        setDataToSendToTable(ownerProjects);
+        setTableComponent(<EmployerProjectsTable data={dataToSendToTable} storage={storage}></EmployerProjectsTable>);
+        break;
+    }
+  }, [ownerProjects, selectTable, dataToSendToTable, storage]);
 
   return (
     <div className="flex flex-row grow">
@@ -33,6 +47,7 @@ export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) =
       <div className="w-full">
         <select
           className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
+          defaultValue={"My projects"}
           value={selectTable}
           onChange={e => setSelectTable(e.target.value)}
         >
@@ -40,8 +55,9 @@ export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) =
             Choose table
           </option>
           <option value={"My projects"}>My projects</option>
+          <option value={"his projects"}>his projects</option>
         </select>
-        <TableWithSearchAndSort initialData={ownerProjects} columns={columns} storage={storage} buttons={[]} />
+        {tableComponent}
       </div>
     </div>
   );

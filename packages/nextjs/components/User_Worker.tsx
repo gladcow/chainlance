@@ -19,21 +19,7 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
   const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
     <OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>,
   );
-  //   function findCommonElements(arr1: any[] | undefined, arr2: any[] | undefined): any[] {
-  //     const set1 = new Set(arr1);
-  //     const commonElements = [];
-  //     if (arr1 == undefined || arr2 == undefined){
-  //       return ['']
-  //     }
-  //       for (let num of arr2) {
-  //           if (set1.has(num)) {
-  //               commonElements.push(num);
-  //               set1.delete(num);
-  //           }
-  //       }
 
-  //     return commonElements;
-  // }
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
@@ -45,15 +31,17 @@ export const UserWorker = ({ address, storage }: UserWorkerProps) => {
     functionName: "listWorkerBids",
     args: [address],
   }) as { data: any[] | undefined };
-  useEffectOnce(() => {
-    setDataToSendToTable(projectlist);
-  });
 
   const { data: projectsWithWorker } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listWorkerProjects",
     args: [address],
   }) as { data: any[] | undefined };
+
+  useEffectOnce(() => {
+    setDataToSendToTable(projectlist);
+    console.log(projectlist);
+  });
 
   useEffect(() => {
     switch (selectTable) {
