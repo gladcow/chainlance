@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import EmployerProjectsTable from "./EmployerProjectsTable";
 import { WriteCreateProject } from "./WriteCreateProject";
 import { Bee } from "@ethersphere/bee-js";
@@ -9,14 +9,16 @@ interface UserEmployerProps {
   address: string | undefined;
   columns: string[];
   storage: Bee | undefined;
+  setTab: Dispatch<SetStateAction<string>>;
 }
 
-export const UserEmployer = ({ address, storage }: UserEmployerProps) => {
+export const UserEmployer = ({ address, storage, setTab }: UserEmployerProps) => {
   const [selectTable, setSelectTable] = useState("My projects");
   const [dataToSendToTable, setDataToSendToTable] = useState<any[] | undefined>();
   const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
     <EmployerProjectsTable data={dataToSendToTable} storage={storage}></EmployerProjectsTable>,
   );
+  const [createMenu, setCreateMenu] = useState(false);
 
   const { data: ownerProjects } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -31,19 +33,16 @@ export const UserEmployer = ({ address, storage }: UserEmployerProps) => {
   useEffect(() => {
     switch (selectTable) {
       case "My projects":
-        console.log(ownerProjects);
         setDataToSendToTable(ownerProjects);
-        setTableComponent(<EmployerProjectsTable data={dataToSendToTable} storage={storage}></EmployerProjectsTable>);
+        setTableComponent(
+          <EmployerProjectsTable data={dataToSendToTable} storage={storage} setTab={setTab}></EmployerProjectsTable>,
+        );
         break;
     }
-  }, [ownerProjects, selectTable, dataToSendToTable, storage]);
+  }, [ownerProjects, selectTable, dataToSendToTable, storage, setTab]);
 
   return (
     <div className="flex flex-row grow">
-      <div className="flex flex-col w-1/2">
-        <WriteCreateProject storage={storage}></WriteCreateProject>
-      </div>
-
       <div className="w-full">
         <select
           className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
@@ -55,9 +54,25 @@ export const UserEmployer = ({ address, storage }: UserEmployerProps) => {
             Choose table
           </option>
           <option value={"My projects"}>My projects</option>
-          <option value={"his projects"}>his projects</option>
         </select>
+        <label
+          onClick={() => {
+            setCreateMenu(true);
+          }}
+          className="btn btn-ghost btn-circle"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </label>
         {tableComponent}
+        {createMenu ? <WriteCreateProject storage={storage} setCreateMenu={setCreateMenu}></WriteCreateProject> : <></>}
       </div>
     </div>
   );

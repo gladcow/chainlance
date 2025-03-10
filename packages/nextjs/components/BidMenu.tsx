@@ -25,7 +25,6 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(project_id);
     placeBid(project_id, projectDescription, timeSpan, BigInt(price), writeAsync, storage);
     onClose();
   };

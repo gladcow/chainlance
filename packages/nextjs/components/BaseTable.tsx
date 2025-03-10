@@ -10,6 +10,7 @@ interface TableProps {
   description: string;
   emptyTableMessage?: string;
   buttons?: { id: string; name: string; onClick: (row: any) => void }[] | any[];
+  status?: { bids_amount: number; state: string };
 }
 
 const BaseTable: React.FC<TableProps> = ({
@@ -22,8 +23,10 @@ const BaseTable: React.FC<TableProps> = ({
   searchTermPair,
   sortConfigPair,
   description,
+  status,
 }) => {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const tranc_description = description.substring(0, 300) + "...";
 
   return (
     <div className="flex flex-col m-5 max-w-20">
@@ -34,7 +37,7 @@ const BaseTable: React.FC<TableProps> = ({
         value={searchTermPair[0]}
         onChange={e => searchTermPair[1](e.target.value)}
       />
-      <table className="table-auto w-100">
+      <table className="table-auto w-100 border-separate border-spacing-2">
         <thead>
           <tr>
             {columns.map(column => (
@@ -85,24 +88,40 @@ const BaseTable: React.FC<TableProps> = ({
                         <div className="flex flex-row justify-between items-start space-x-4">
                           <div className="w-3/4 space-y-2">
                             <h4 className="break-words leading-relaxed">
-                              {description ? description : <span className="loading loading-spinner loading-sm"></span>}
+                              {description ? (
+                                tranc_description
+                              ) : (
+                                <span className="loading loading-spinner loading-sm"></span>
+                              )}
                             </h4>
                           </div>
-                          <div className="flex flex-col items-end space-y-4">
-                            {buttons ? (
-                              buttons.map(button => (
-                                <button
-                                  disabled={button.disabled ? button.disabled() : false}
-                                  key={button.id}
-                                  className="btn btn-primary p-2"
-                                  onClick={() => button.onClick(row)}
-                                >
-                                  {button.disabled && button.disabled() ? "In Review" : button.name}
-                                </button>
-                              ))
-                            ) : (
-                              <></>
-                            )}
+                          <div className="flex flex-col">
+                            <div className="flex flex-col items-end">
+                              {status ? (
+                                <div className="flex flex-col items-end">
+                                  <h4>Amount of bids: {status.bids_amount}</h4>
+                                  <h4>State: {status.state}</h4>
+                                </div>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                            <div className="flex flex-row items-end space-x-4 justify-end">
+                              {buttons ? (
+                                buttons.map(button => (
+                                  <button
+                                    disabled={button.disabled ? button.disabled() : false}
+                                    key={button.id}
+                                    className="btn btn-primary p-2"
+                                    onClick={() => button.onClick(row)}
+                                  >
+                                    {button.disabled && button.disabled() ? "In Review" : button.name}
+                                  </button>
+                                ))
+                              ) : (
+                                <></>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ) : (

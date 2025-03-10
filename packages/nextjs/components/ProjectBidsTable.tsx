@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "./BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
-import SubmitWorkMenu from "./SubmitWorkMenu";
 import { formatTableData } from "./utils";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
-const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
+const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
     key: "",
@@ -14,46 +13,36 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmitClick = () => {
-    setIsSubmitMenuOpen(true);
-  };
-
-  const closeMenu = () => {
-    setIsSubmitMenuOpen(false);
-  };
-  const { data: projectInfo } = useScaffoldContractRead({
+  const { writeAsync } = useScaffoldContractWrite({
     contractName: "ChainLance",
-    functionName: "projects",
-    args: [project],
-  }) as { data: any[] | undefined };
+    functionName: "acceptBid",
+    args: [] as unknown as [string, string],
+  });
 
-  const titles = useFetchFields(data, storage, "title");
+  const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
   const buttons = [
     {
-      id: "submit",
-      name: "Submit Work",
-      onClick: () => {
-        handleSubmitClick();
+      id: "accept",
+      name: "Accept",
+      onClick: (project: any) => {
+        writeAsync({ args: [String(project_ids[project.id]), String(project.id)] });
       },
       onClose: () => {
-        closeMenu;
+        true;
       },
-      disabled: () => {
-        return projectInfo ? projectInfo[4] != 1 : 0;
+      disabled: (row: any) => {
+        return 0 * row;
       },
     },
   ];
 
-  const [isSubmitMenuOpen, setIsSubmitMenuOpen] = useState(false);
-
-  const filteredData = formatTableData(data, titles, searchTerm, sortConfig);
-
+  const filteredData = formatTableData(data, project_ids, searchTerm, sortConfig);
   const renderCellContent = (row: any, column: string) => {
     switch (column) {
-      case "title":
-        return titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "project_id":
+        return project_ids[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "timeSpan":
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
@@ -67,7 +56,7 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
     const fetchDescription = async () => {
       try {
         const description = await fetchProjectFieldFromId(storage, project, "description");
-        setDescription(description);
+        setDescription("My description:" + "\n" + description);
       } catch (error) {
         console.error("Failed to fetch description:", error);
       }
@@ -83,15 +72,14 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
-        columns={["title", "timeSpan", "price"]}
+        columns={["project_id", "timeSpan", "price"]}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
         sortConfigPair={[sortConfig, setSortConfig]}
         description={description}
       ></BaseTable>
-      {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeMenu} project_id={project}></SubmitWorkMenu>}
     </>
   );
 };
 
-export default ProjectsWithAcceptedBids;
+export default ProjectBidsTable;
