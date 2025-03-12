@@ -1,39 +1,91 @@
-import { WriteSubmitWork } from "./WriteSubmitWork";
-import TableWithSearchAndSort from "./table_daisy";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import OpenProjectsTable from "./OpenProjectsTable";
+import WorkerBidsTable from "./WorkerBidsTable";
+import ProjectsWithAcceptedBids from "./WorkerProjects";
 import { Bee } from "@ethersphere/bee-js";
+import { useEffectOnce } from "usehooks-ts";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface UserWorkerProps {
+  address: string | undefined;
   columns: any;
   storage: Bee | undefined;
+  setTab: Dispatch<SetStateAction<string>>;
 }
 
-export const UserWorker = ({ columns, storage }: UserWorkerProps) => {
+export const UserWorker = ({ address, storage, setTab }: UserWorkerProps) => {
+  const [selectTable, setSelectTable] = useState("Open projects");
+  const [dataToSendToTable, setDataToSendToTable] = useState<any[] | undefined>();
+  const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
+    <OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>,
+  );
+
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
     args: [0],
   }) as { data: any[] | undefined };
-  const all_open_projects = projectlist
-    ? projectlist.map(projectId => ({
-        id: projectId,
-      }))
-    : [];
+
+  const { data: workerBids } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "listWorkerBids",
+    args: [address],
+  }) as { data: any[] | undefined };
+
+  const { data: projectsWithWorker } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "listWorkerProjects",
+    args: [address],
+  }) as { data: any[] | undefined };
+
+  useEffectOnce(() => {
+    setDataToSendToTable(projectlist);
+  });
+
+  useEffect(() => {
+    switch (selectTable) {
+      case "Open projects":
+        setDataToSendToTable(projectlist);
+        setTableComponent(
+          <OpenProjectsTable data={dataToSendToTable} storage={storage} setTab={setTab}></OpenProjectsTable>,
+        );
+        break;
+      case "Worker bids":
+        setDataToSendToTable(workerBids);
+        setTableComponent(
+          <WorkerBidsTable data={dataToSendToTable} storage={storage} setTab={setTab}></WorkerBidsTable>,
+        );
+        break;
+      case "Worker projects":
+        setDataToSendToTable(projectsWithWorker);
+        setTableComponent(
+          <ProjectsWithAcceptedBids
+            data={dataToSendToTable}
+            storage={storage}
+            setTab={setTab}
+          ></ProjectsWithAcceptedBids>,
+        );
+        break;
+    }
+  }, [projectsWithWorker, selectTable, workerBids, projectlist, dataToSendToTable, storage, setTab]);
+
   return (
     <div className="flex flex-row grow">
-      <div className="flex flex-col w-1/2">
-        <div className="self-start card w-5/6 bg-base-100 shadow-xl m-5">
-          <div className="card-body">
-            <h2 className="card-title">Hello</h2>
-            <p>For a worker</p>
-          </div>
-        </div>
-
-        <WriteSubmitWork></WriteSubmitWork>
-      </div>
-
       <div className="w-full">
-        <TableWithSearchAndSort initialData={all_open_projects} columns={columns} storage={storage} buttons={["bid"]} />
+        <select
+          className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
+          defaultValue={"Open projects"}
+          value={selectTable}
+          onChange={e => setSelectTable(e.target.value)}
+        >
+          <option disabled selected>
+            Choose table
+          </option>
+          <option value={"Open projects"}>Open projects</option>
+          <option value={"Worker bids"}>My bids</option>
+          <option value={"Worker projects"}>Accepted projects</option>
+        </select>
+        {tableComponent}
       </div>
     </div>
   );

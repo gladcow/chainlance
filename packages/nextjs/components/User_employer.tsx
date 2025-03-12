@@ -1,33 +1,78 @@
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import EmployerProjectsTable from "./EmployerProjectsTable";
 import { WriteCreateProject } from "./WriteCreateProject";
-import TableWithSearchAndSort from "./table_daisy";
 import { Bee } from "@ethersphere/bee-js";
+import { useEffectOnce } from "usehooks-ts";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface UserEmployerProps {
   address: string | undefined;
   columns: string[];
   storage: Bee | undefined;
+  setTab: Dispatch<SetStateAction<string>>;
 }
 
-export const UserEmployer = ({ address, columns, storage }: UserEmployerProps) => {
-  const { data: owner_projects } = useScaffoldContractRead({
+export const UserEmployer = ({ address, storage, setTab }: UserEmployerProps) => {
+  const [selectTable, setSelectTable] = useState("My projects");
+  const [dataToSendToTable, setDataToSendToTable] = useState<any[] | undefined>();
+  const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
+    <EmployerProjectsTable data={dataToSendToTable} storage={storage}></EmployerProjectsTable>,
+  );
+  const [createMenu, setCreateMenu] = useState(false);
+
+  const { data: ownerProjects } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listOwnerProjects",
     args: [address],
   }) as { data: any[] | undefined };
-  const all_owner_projects = owner_projects
-    ? owner_projects.map(projectId => ({
-        id: projectId,
-      }))
-    : [];
+
+  useEffectOnce(() => {
+    setDataToSendToTable(ownerProjects);
+  });
+
+  useEffect(() => {
+    switch (selectTable) {
+      case "My projects":
+        setDataToSendToTable(ownerProjects);
+        setTableComponent(
+          <EmployerProjectsTable data={dataToSendToTable} storage={storage} setTab={setTab}></EmployerProjectsTable>,
+        );
+        break;
+    }
+  }, [ownerProjects, selectTable, dataToSendToTable, storage, setTab]);
+
   return (
     <div className="flex flex-row grow">
-      <div className="flex flex-col w-1/2">
-        <WriteCreateProject storage={storage}></WriteCreateProject>
-      </div>
-
       <div className="w-full">
-        <TableWithSearchAndSort initialData={all_owner_projects} columns={columns} storage={storage} buttons={[]} />
+        <select
+          className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
+          defaultValue={"My projects"}
+          value={selectTable}
+          onChange={e => setSelectTable(e.target.value)}
+        >
+          <option disabled selected>
+            Choose table
+          </option>
+          <option value={"My projects"}>My projects</option>
+        </select>
+        <label
+          onClick={() => {
+            setCreateMenu(true);
+          }}
+          className="btn btn-ghost btn-circle"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </label>
+        {tableComponent}
+        {createMenu ? <WriteCreateProject storage={storage} setCreateMenu={setCreateMenu}></WriteCreateProject> : <></>}
       </div>
     </div>
   );

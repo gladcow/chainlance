@@ -6,7 +6,7 @@ import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 interface TableProps {
-  initialData: any[];
+  initialData: any[] | undefined;
   columns: string[];
   emptyTableMessage?: string;
   storage: Bee | undefined;
@@ -43,7 +43,6 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         console.error("Failed to fetch description:", error);
       }
     };
-
     if (changeDescriptionFromId) {
       fetchDescription();
     }
@@ -52,6 +51,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
   const titles = useFetchFields(initialData, storage, "title");
   const timeSpans = useFetchFields(initialData, storage, "timeSpan");
   const prices = useFetchFields(initialData, storage, "price");
+  const project_ids = useFetchFields(initialData, storage, "project_id");
 
   const { data: infoFull, isLoading: isInfoFullLoading } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -69,6 +69,8 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
         return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "project_id":
+        return project_ids[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       default:
         return row[column];
     }
@@ -173,9 +175,7 @@ const TableWithSearchAndSort: React.FC<TableProps> = ({
           )}
         </tbody>
       </table>
-      {isBidMenuOpen && (
-        <BidMenu onClose={closeMenu} project_id={project} setBidIsBidded={setBidIsBidded} storage={storage} />
-      )}
+      {isBidMenuOpen && <BidMenu onClose={closeMenu} project_id={project} storage={storage} />}
     </div>
   );
 };

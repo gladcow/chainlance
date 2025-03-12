@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 interface WriteCreateProjectProps {
   storage: Bee | undefined;
+  setCreateMenu: Dispatch<SetStateAction<boolean>>;
 }
 
-export const WriteCreateProject = ({ storage }: WriteCreateProjectProps) => {
+export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjectProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [externalDescription, setExternalDescription] = useState("");
@@ -59,50 +60,80 @@ export const WriteCreateProject = ({ storage }: WriteCreateProjectProps) => {
   };
 
   return (
-    <div className="self-start card w-96 bg-base-100 shadow-xl m-5">
-      <div className="card-body items-center">
-        <h2 className="card-title">Create Project</h2>
-        <div className="card-actions justify-center">
-          <input
-            type="text"
-            placeholder="Title"
-            className="input border border-primary"
-            onChange={e => {
-              setTitle(e.target.value);
-              setShowProjects(false);
-            }}
-          />
-          <textarea
-            placeholder="Description"
-            className="textarea textarea-primary text-base"
-            onChange={e => {
-              setDescription(e.target.value);
-              setShowProjects(false);
-            }}
-          />
-          <input type="text" placeholder="Price" className="input border border-primary" onChange={handlePriceChange} />
-          {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
-          <input type="text" placeholder="Time" className="input border border-primary" onChange={handleTimeChange} />
-          {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
-          {true && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="card bg-base-100 w-96 shadow-xl">
+        <div className="card-body">
+          <div className="flex justify-between">
+            <h2 className="card-title">Create Project</h2>
             <button
-              className="btn btn-primary"
-              onClick={writeProjectDetailsToStorage}
-              disabled={!!priceError || !!timeError}
+              className="btn btn-square"
+              onClick={() => {
+                setCreateMenu(false);
+              }}
             >
-              {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
-          )}
-          {!receipt || !showProjects ? (
-            <></>
-          ) : (
-            <div className="transition ease-in-out delay-50 card w-30 bg-primary text-primary-content">
-              <div className="card-body">
-                <h2 className="card-title">Project Created!</h2>
-                <p className="break-all"> {receipt ? receipt : <></>}</p>
+          </div>
+          <div className="card-actions justify-end">
+            <input
+              type="text"
+              placeholder="Title"
+              className="input w-full border border-primary"
+              onChange={e => {
+                setTitle(e.target.value);
+                setShowProjects(false);
+              }}
+            />
+            <textarea
+              placeholder="Description"
+              className="textarea w-full textarea-primary text-base"
+              onChange={e => {
+                setDescription(e.target.value);
+                setShowProjects(false);
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Price"
+              className="input w-full border border-primary"
+              onChange={handlePriceChange}
+            />
+            {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
+            <input
+              type="text"
+              placeholder="Time"
+              className="input w-full border border-primary"
+              onChange={handleTimeChange}
+            />
+            {timeError && <p className="relative text-red-500 text-sm">{timeError}</p>}
+            {true && (
+              <button
+                className="btn btn-primary"
+                onClick={writeProjectDetailsToStorage}
+                disabled={!!priceError || !!timeError}
+              >
+                {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
+              </button>
+            )}
+            {!receipt || !showProjects ? (
+              <></>
+            ) : (
+              <div className="transition ease-in-out delay-50 card w-30 bg-primary text-primary-content">
+                <div className="card-body">
+                  <h2 className="card-title">Project Created!</h2>
+                  <p className="break-all"> {receipt ? receipt : <></>}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

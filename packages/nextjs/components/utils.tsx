@@ -1,10 +1,16 @@
 export const formatTableData = (
-  initialData: any[],
+  initialData: any[] | undefined,
   fields: { [key: string]: string },
   searchTerm: string,
   sortConfig: { key: string; direction: "ascending" | "descending" },
 ) => {
-  const sortedData = [...initialData].sort((a, b) => {
+  const dataFormat = initialData
+    ? initialData.map(projectId => ({
+        id: projectId,
+      }))
+    : [];
+
+  const sortedData = [...dataFormat].sort((a, b) => {
     const aValue = fields[a.id] || "";
     const bValue = fields[b.id] || "";
     if (aValue < bValue) {

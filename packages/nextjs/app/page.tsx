@@ -7,6 +7,7 @@ import { useEffectOnce } from "usehooks-ts";
 import { useAccount } from "wagmi";
 import { MainTab } from "~~/components/MainTab";
 import { NavBarChain } from "~~/components/NavBarChain";
+import ProjectPage from "~~/components/ProjectPage";
 import { SettingsTab } from "~~/components/SettingsTab";
 import { UserWorker } from "~~/components/User_Worker";
 import { UserEmployer } from "~~/components/User_employer";
@@ -42,19 +43,34 @@ const Home: NextPage = () => {
 
         {tab === "worker" && (
           <>
-            <UserWorker columns={table_columns} storage={storage}></UserWorker>
+            <UserWorker
+              address={connectedAddress}
+              columns={table_columns}
+              storage={storage}
+              setTab={setTab}
+            ></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer address={connectedAddress} columns={table_columns} storage={storage}></UserEmployer>
+            <UserEmployer
+              address={connectedAddress}
+              columns={table_columns}
+              storage={storage}
+              setTab={setTab}
+            ></UserEmployer>
           </>
         )}
 
         {tab === "settings" && (
           <>
             <SettingsTab></SettingsTab>
+          </>
+        )}
+        {tab != "main" && tab != "worker" && tab != "employer" && tab != "settings" && (
+          <>
+            <ProjectPage project={tab} storage={storage}></ProjectPage>
           </>
         )}
       </div>
