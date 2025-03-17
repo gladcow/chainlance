@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "./BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
-import { formatTableData } from "./utils";
+import { formatTableData, mapBidsToTitles } from "./utils";
 
 const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,13 +15,14 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
   const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
-
+  const title_projects = useFetchFields(Object.values(project_ids), storage, "title");
+  const bids_titles = mapBidsToTitles(title_projects, project_ids);
   const filteredData = formatTableData(data, project_ids, searchTerm, sortConfig);
 
   const renderCellContent = (row: any, column: string) => {
     switch (column) {
-      case "project_id":
-        return project_ids[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "Title of a project":
+        return bids_titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "timeSpan":
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
@@ -50,7 +51,7 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
       <BaseTable
         renderFunction={renderCellContent}
         sortRow={filteredData}
-        columns={["project_id", "timeSpan", "price"]}
+        columns={["Title of a project", "timeSpan", "price"]}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
         sortConfigPair={[sortConfig, setSortConfig]}

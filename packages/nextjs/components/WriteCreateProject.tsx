@@ -43,7 +43,7 @@ export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjec
       setPrice(Number(value));
       setPriceError("");
     } else {
-      setPriceError("Price must be an integer.");
+      setPriceError("Price must be an number.");
     }
     setShowProjects(false);
   };
