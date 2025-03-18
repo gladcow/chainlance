@@ -59,7 +59,9 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage }) => {
       </div>
 
       <div className="w-full">
-        {project.from === "employer" && <ProjectBidsTable data={projectBids} storage={storage}></ProjectBidsTable>}
+        {project.from != "employer" || project.state
+          ? project.state == 0
+          : true && <ProjectBidsTable data={projectBids} storage={storage}></ProjectBidsTable>}
       </div>
     </div>
   );

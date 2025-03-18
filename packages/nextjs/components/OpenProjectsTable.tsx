@@ -4,7 +4,7 @@ import BidMenu from "./BidMenu";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
 import { formatTableData } from "./utils";
 
-const OpenProjectsTable: React.FC<any> = ({ data, storage }) => {
+const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
     key: "",
@@ -25,6 +25,19 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage }) => {
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
   const buttons = [
+    {
+      id: "open",
+      name: "Open",
+      onClick: (project: any) => {
+        setTab({ id: project.id, from: "worker" });
+      },
+      onClose: () => {
+        true;
+      },
+      disabled: (row: any) => {
+        return 0 * row;
+      },
+    },
     {
       id: "bid",
       name: "Bid",

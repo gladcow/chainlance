@@ -76,7 +76,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
             id: "open",
             name: "Open",
             onClick: (project: any) => {
-              setTab({ id: project.id, from: "employer" });
+              setTab({ id: project.id, from: "employer", state: projectInfo[4] });
             },
             onClose: () => {
               true;
@@ -105,7 +105,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
             id: "open",
             name: "Open",
             onClick: (id: any) => {
-              setTab({ id: id.id, from: "employer" });
+              setTab({ id: id.id, from: "employer", state: projectInfo[4] });
             },
             onClose: () => {
               true;

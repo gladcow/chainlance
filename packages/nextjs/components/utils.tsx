@@ -27,3 +27,25 @@ export const formatTableData = (
     return field.toLowerCase().includes(searchTerm.toLowerCase());
   });
 };
+
+interface Projects {
+  [projectId: string]: string;
+}
+
+interface Bids {
+  [bidId: string]: string;
+}
+
+interface Result {
+  [bidId: string]: string;
+}
+
+export function mapBidsToTitles(projects: Projects, bids: Bids): Result {
+  return Object.entries(bids).reduce((acc, [bidId, projectId]) => {
+    const title = projects[projectId];
+    if (title) {
+      acc[bidId] = title;
+    }
+    return acc;
+  }, {} as Result);
+}
