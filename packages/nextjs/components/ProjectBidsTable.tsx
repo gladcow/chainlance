@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import BaseTable from "./BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
 import { formatTableData } from "./utils";
+import { parseEther } from "viem";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
-    key: "",
-    direction: "ascending",
-  });
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
 
@@ -27,7 +24,10 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
       id: "accept",
       name: "Accept",
       onClick: (project: any) => {
-        writeAsync({ args: [String(project_ids[project.id]), String(project.id)] });
+        writeAsync({
+          args: [String(project_ids[project.id]), String(project.id)],
+          value: parseEther(prices[project.id]),
+        });
       },
       onClose: () => {
         true;
@@ -38,7 +38,7 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
     },
   ];
 
-  const filteredData = formatTableData(data, project_ids, searchTerm, sortConfig);
+  const filteredData = formatTableData(data, project_ids, searchTerm);
   const renderCellContent = (row: any, column: string) => {
     switch (column) {
       case "timeSpan":
@@ -70,10 +70,8 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
-        columns={["timeSpan", "price"]}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
-        sortConfigPair={[sortConfig, setSortConfig]}
         description={description}
       ></BaseTable>
     </>

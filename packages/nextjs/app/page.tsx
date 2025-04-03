@@ -40,7 +40,6 @@ const Home: NextPage = () => {
             <MainTab></MainTab>
           </>
         )}
-
         {tab === "worker" && (
           <>
             <UserWorker

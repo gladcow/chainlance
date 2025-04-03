@@ -1,5 +1,8 @@
 import { Dispatch, SetStateAction, useState } from "react";
+import { DescriptionField, PriceField, TimeField, TitleField } from "./InputFields";
+import { timeDecider } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
+import { parseEther } from "viem";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 interface WriteCreateProjectProps {
@@ -10,42 +13,47 @@ interface WriteCreateProjectProps {
 export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjectProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [externalDescription, setExternalDescription] = useState("");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
-  const [showProjects, setShowProjects] = useState(false);
-  const [receipt, setReceipt] = useState("");
   const [priceError, setPriceError] = useState("");
   const [timeError, setTimeError] = useState("");
+  const [timeMult, setTimeMult] = useState("hours");
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
     functionName: "createProject",
-    args: [externalDescription, BigInt(price), timeSpan],
-    onBlockConfirmation: txnReceipt => {
-      setReceipt(txnReceipt.blockHash.toString());
-    },
+    args: [] as unknown as [string, bigint, number],
   });
 
   const writeProjectDetailsToStorage = async function () {
+    const calculatedTime = timeDecider(timeMult, timeSpan);
+
     const res = await storage?.uploadData(
       "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
-      JSON.stringify({ title: title, description: description, price: price, timeSpan: timeSpan }),
+      JSON.stringify({
+        title,
+        description,
+        short_description: description.slice(0, 500),
+        price,
+        timeSpan: calculatedTime,
+      }),
     );
+
     const id = res?.reference.toString();
-    setExternalDescription(id === undefined ? "" : id);
-    writeAsync({ args: [id, BigInt(price), timeSpan] });
+    writeAsync({
+      args: [id, parseEther(price), Math.round(calculatedTime)],
+    });
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      setPrice(Number(value));
+    if (/^\d*\.?\d*$/.test(value)) {
+      setPrice(value);
+      Number(value);
       setPriceError("");
     } else {
-      setPriceError("Price must be an number.");
+      setPriceError("Price must be an number");
     }
-    setShowProjects(false);
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,9 +62,8 @@ export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjec
       setTimeSpan(Number(value));
       setTimeError("");
     } else {
-      setTimeError("Time must be an integer.");
+      setTimeError("Time must be an integer");
     }
-    setShowProjects(false);
   };
 
   return (
@@ -83,55 +90,29 @@ export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjec
             </button>
           </div>
           <div className="card-actions justify-end">
-            <input
-              type="text"
-              placeholder="Title"
-              className="input w-full border border-primary"
-              onChange={e => {
-                setTitle(e.target.value);
-                setShowProjects(false);
-              }}
-            />
-            <textarea
-              placeholder="Description"
-              className="textarea w-full textarea-primary text-base"
-              onChange={e => {
-                setDescription(e.target.value);
-                setShowProjects(false);
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Price"
-              className="input w-full border border-primary"
-              onChange={handlePriceChange}
-            />
-            {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
-            <input
-              type="text"
-              placeholder="Time"
-              className="input w-full border border-primary"
-              onChange={handleTimeChange}
-            />
-            {timeError && <p className="relative text-red-500 text-sm">{timeError}</p>}
+            <TitleField setTitle={setTitle}></TitleField>
+
+            <DescriptionField setDescription={setDescription}></DescriptionField>
+
+            <PriceField handlePriceChange={handlePriceChange} priceError={priceError}></PriceField>
+
+            <TimeField
+              handleTimeChange={handleTimeChange}
+              setTimeMult={setTimeMult}
+              timeMult={timeMult}
+              timeError={timeError}
+            ></TimeField>
             {true && (
               <button
                 className="btn btn-primary"
-                onClick={writeProjectDetailsToStorage}
+                onClick={() => {
+                  writeProjectDetailsToStorage;
+                  setCreateMenu(false);
+                }}
                 disabled={!!priceError || !!timeError}
               >
                 {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
               </button>
-            )}
-            {!receipt || !showProjects ? (
-              <></>
-            ) : (
-              <div className="transition ease-in-out delay-50 card w-30 bg-primary text-primary-content">
-                <div className="card-body">
-                  <h2 className="card-title">Project Created!</h2>
-                  <p className="break-all"> {receipt ? receipt : <></>}</p>
-                </div>
-              </div>
             )}
           </div>
         </div>

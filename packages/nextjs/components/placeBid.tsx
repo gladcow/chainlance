@@ -1,11 +1,12 @@
 import { Bee } from "@ethersphere/bee-js";
 import { ContractFunctionExecutionError } from "viem";
+import { parseEther } from "viem";
 
 export const placeBid = async (
   project_id: string,
   description: string,
   timeSpan: number,
-  price: bigint,
+  price: string,
   writeAsync: any,
   storage: Bee | undefined,
 ) => {
@@ -15,7 +16,9 @@ export const placeBid = async (
       JSON.stringify({ project_id: project_id, description: description, price: Number(price), timeSpan: timeSpan }),
     );
     const id = res?.reference.toString();
-    writeAsync({ args: [project_id, id, BigInt(price), timeSpan] });
+
+    const price_to_contract = parseEther(price);
+    writeAsync({ args: [project_id, id, price_to_contract, timeSpan] });
   };
   if (writeAsync) {
     try {

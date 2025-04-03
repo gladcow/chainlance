@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ClockIcon, CurrencyDollarIcon } from "./BaseTableParts";
 import { fetchProjectFieldFromId } from "./GetFieldsFromIds";
 import ProjectBidsTable from "./ProjectBidsTable";
 import { Bee } from "@ethersphere/bee-js";
@@ -42,28 +43,54 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage }) => {
   }, [project, storage]);
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="card w-full">
-        <div className="card-body">
-          <div className="flex flex-row bg-primary p-5 justify-between w-full">
-            <div className="flex self-center">
-              <p className="text-[32px]">Project name: {title}</p>
-            </div>
-            <div className="flex flex-col bg-base-100 p-2 w-1/5 items-left">
-              <p className="text-[28px]">time: {timespan} days</p>
-              <p className="text-[28px]">price: {price}</p>
+    <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn">
+      <div className="bg-primary rounded-2xl shadow-xl overflow-hidden border border-primary/20">
+        {/* Project Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-green-600 p-8 relative">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-gradient-to-r from-white/20 to-transparent" />
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 relative">
+            <h1 className="text-3xl font-bold text-white drop-shadow-md">{title}</h1>
+            <div className="bg-white/15 backdrop-blur-lg rounded-xl p-4 min-w-[240px] transition-transform hover:scale-[1.02]">
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-center space-x-3">
+                  <ClockIcon className="w-6 h-6 text-green-200" />
+                  <span className="text-green-50 font-medium text-lg">{timespan} days</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CurrencyDollarIcon className="w-6 h-6 text-green-200" />
+                  <span className="text-green-50 font-medium text-lg">${price}</span>
+                </div>
+              </div>
             </div>
           </div>
-          <p className="bg-primary p-5 text-lg">{description}</p>
         </div>
-      </div>
 
-      <div className="w-full">
-        {project.from != "employer" || project.state
-          ? project.state == 0
-          : true && <ProjectBidsTable data={projectBids} storage={storage}></ProjectBidsTable>}
+        {/* Project Description */}
+        <div className="p-8 bg-primary border-b border-primary/30">
+          <h2 className="text-xl font-semibold mb-4 text-primary-content">Project Description</h2>
+          <p className="leading-relaxed whitespace-pre-line text-primary-content/90">{description}</p>
+        </div>
+
+        {/* Bids Section */}
+        {project.from == "employer" && project.state == 0 && (
+          <div className="p-8 bg-secondary">
+            <h2 className="text-2xl font-bold text-primary mb-6 flex items-center space-x-3">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                />
+              </svg>
+              <h2 className="text-primary-content">Project Bids</h2>
+            </h2>
+            <ProjectBidsTable data={projectBids} storage={storage} />
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
 export default ProjectPage;

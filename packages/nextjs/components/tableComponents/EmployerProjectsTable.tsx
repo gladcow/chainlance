@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
-import BaseTable from "./BaseTable";
-import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
-import { formatTableData } from "./utils";
+import BaseTable from "../BaseTable";
+import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
+import { formatTableData } from "../utils";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ascending" | "descending" }>({
-    key: "",
-    direction: "ascending",
-  });
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState({ bids_amount: 0, state: "0" });
@@ -40,6 +36,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
     functionName: "listProjectBids",
     args: [project],
   }) as { data: any[] | undefined };
+
   const { writeAsync } = useScaffoldContractWrite({
     contractName: "ChainLance",
     functionName: "acceptWork",
@@ -49,8 +46,9 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   const titles = useFetchFields(data, storage, "title");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
+  const short_descriptions = useFetchFields(data, storage, "short_description");
 
-  const filteredData = formatTableData(data, titles, searchTerm, sortConfig);
+  const filteredData = formatTableData(data, titles, searchTerm);
 
   const renderCellContent = (row: any, column: string) => {
     switch (column) {
@@ -60,6 +58,8 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
         return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "short description":
+        return short_descriptions[row.id] || "";
       default:
         return row[column];
     }
@@ -138,11 +138,10 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
       <BaseTable
         renderFunction={renderCellContent}
         sortRow={filteredData}
+        ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         buttons={allButtons}
-        columns={["title", "timeSpan", "price"]}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
-        sortConfigPair={[sortConfig, setSortConfig]}
         description={description}
         status={status}
       ></BaseTable>

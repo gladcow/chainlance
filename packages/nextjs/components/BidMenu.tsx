@@ -1,6 +1,8 @@
 import React from "react";
 import { useState } from "react";
+import { DescriptionField, PriceField, TimeField } from "./InputFields";
 import { placeBid } from "./placeBid";
+import { timeDecider } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth/useScaffoldContractWrite";
 
@@ -13,9 +15,10 @@ interface BidMenuProps {
 const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
   const [projectDescription, setProjectDescription] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState("");
   const [priceError, setPriceError] = useState("");
   const [timeError, setTimeError] = useState("");
+  const [timeMult, setTimeMult] = useState("hours");
 
   const { writeAsync } = useScaffoldContractWrite({
     contractName: "ChainLance",
@@ -25,16 +28,18 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    placeBid(project_id, projectDescription, timeSpan, BigInt(price), writeAsync, storage);
+    const calculatedTime = timeDecider(timeMult, timeSpan);
+    placeBid(project_id, projectDescription, calculatedTime, price, writeAsync, storage);
     onClose();
   };
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      setPrice(Number(value));
+    if (/^\d*\.?\d*$/.test(value)) {
+      setPrice(value);
+      Number(value);
       setPriceError("");
     } else {
-      setPriceError("Price must be an integer.");
+      setPriceError("Price must be an number.");
     }
   };
 
@@ -67,22 +72,16 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
           </div>
           <p>You can write a message to this employer</p>
           <div className="card-actions justify-end">
-            <textarea
-              placeholder="Description"
-              className="textarea textarea-primary text-base"
-              onChange={e => {
-                setProjectDescription(e.target.value);
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Price"
-              className="input border border-primary"
-              onChange={handlePriceChange}
-            />
-            {priceError && <p className="text-red-500 text-sm">{priceError}</p>}
-            <input type="text" placeholder="Time" className="input border border-primary" onChange={handleTimeChange} />
-            {timeError && <p className="text-red-500 text-sm">{timeError}</p>}
+            <DescriptionField setDescription={setProjectDescription}></DescriptionField>
+
+            <PriceField handlePriceChange={handlePriceChange} priceError={priceError}></PriceField>
+
+            <TimeField
+              handleTimeChange={handleTimeChange}
+              setTimeMult={setTimeMult}
+              timeMult={timeMult}
+              timeError={timeError}
+            ></TimeField>
             <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
               Submit bid
             </button>
