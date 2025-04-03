@@ -117,7 +117,8 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
         ]);
       }
     }
-  }, [projectInfo, bidsOnProject, setTab, writeAsync]);
+    // eslint-disable-next-line
+  }, [projectInfo, bidsOnProject, setTab]);
 
   useEffect(() => {
     const fetchDescription = async () => {

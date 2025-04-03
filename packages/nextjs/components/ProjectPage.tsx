@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ClockIcon, CurrencyDollarIcon } from "./BaseTableParts";
 import { fetchProjectFieldFromId } from "./GetFieldsFromIds";
 import ProjectBidsTable from "./ProjectBidsTable";
+import { timeRetrive } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
@@ -43,7 +44,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage }) => {
   }, [project, storage]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn">
+    <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn min-w-[600px]">
       <div className="bg-primary rounded-2xl shadow-xl overflow-hidden border border-primary/20">
         {/* Project Header */}
         <div className="bg-gradient-to-r from-blue-600 to-green-600 p-8 relative">
@@ -54,11 +55,11 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage }) => {
               <div className="flex flex-col space-y-3">
                 <div className="flex items-center space-x-3">
                   <ClockIcon className="w-6 h-6 text-green-200" />
-                  <span className="text-green-50 font-medium text-lg">{timespan} days</span>
+                  <span className="text-green-50 font-medium text-lg">{timeRetrive(Number(timespan))}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <CurrencyDollarIcon className="w-6 h-6 text-green-200" />
-                  <span className="text-green-50 font-medium text-lg">${price}</span>
+                  <span className="text-green-50 font-medium text-lg">{price}xDai</span>
                 </div>
               </div>
             </div>

@@ -3,7 +3,7 @@ import BaseTable from "./BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
 import { formatTableData } from "./utils";
 import { parseEther } from "viem";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +15,11 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
     functionName: "acceptBid",
     args: [] as unknown as [string, string],
   });
+  const { data: bidInfo } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "bids",
+    args: [project],
+  }) as { data: any[] | undefined };
 
   const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
@@ -70,6 +75,7 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
+        ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}

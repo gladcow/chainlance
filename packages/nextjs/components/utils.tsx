@@ -67,7 +67,7 @@ export function timeDecider(timeMult: string, timeSpan: number): number {
       calculatedTime = (timeSpan * 12 * 30 * 24 * 60 * 60) / blockLenInSeconds;
       break;
     default:
-      calculatedTime = 0;
+      calculatedTime = timeSpan;
   }
   return calculatedTime;
 }
