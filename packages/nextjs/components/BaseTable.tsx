@@ -133,7 +133,10 @@ const BaseTable: React.FC<TableProps> = ({
                                 className={`btn btn-sm ${button.disabled?.() ? "btn-disabled" : "btn-secondary"}`}
                                 onClick={() => button.onClick(row)}
                               >
-                                {button.disabled?.() ? "In Review" : button.name}
+                                {button.state?.() === 3 && "Completed"}
+                                {button.state?.() === 2 && "In Review"}
+                                {button.state?.() === 1 && button.name}
+                                {button.state ? "" : button.name}
                               </button>
                             ))}
                           </div>

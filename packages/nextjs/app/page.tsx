@@ -7,10 +7,10 @@ import { useEffectOnce } from "usehooks-ts";
 import { useAccount } from "wagmi";
 import { MainTab } from "~~/components/MainTab";
 import { NavBarChain } from "~~/components/NavBarChain";
-import ProjectPage from "~~/components/ProjectPage";
 import { SettingsTab } from "~~/components/SettingsTab";
 import { UserWorker } from "~~/components/User_Worker";
 import { UserEmployer } from "~~/components/User_employer";
+import ProjectPage from "~~/components/tableComponents/ProjectPage";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {

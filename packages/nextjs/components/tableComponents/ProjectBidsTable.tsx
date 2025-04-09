@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import BaseTable from "./BaseTable";
-import { fetchProjectFieldFromId, useFetchFields } from "./GetFieldsFromIds";
-import { formatTableData } from "./utils";
+import BaseTable from "../BaseTable";
+import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
+import { formatTableData } from "../utils";
 import { parseEther } from "viem";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
@@ -24,6 +24,8 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
   const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
+  const short_descriptions = useFetchFields(data, storage, "short_description");
+
   const buttons = [
     {
       id: "accept",
@@ -50,6 +52,8 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
         return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "short description":
+        return short_descriptions[row.id] || "";
       default:
         return row[column];
     }

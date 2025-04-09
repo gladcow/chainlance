@@ -27,7 +27,6 @@ export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjec
 
   const writeProjectDetailsToStorage = async function () {
     const calculatedTime = timeDecider(timeMult, timeSpan);
-    // console.log(calculatedTime)
     const res = await storage?.uploadData(
       "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
       JSON.stringify({

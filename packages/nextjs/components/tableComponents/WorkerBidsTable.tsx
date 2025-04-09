@@ -15,6 +15,7 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
   const title_projects = useFetchFields(Object.values(project_ids), storage, "title");
   const bids_titles = mapBidsToTitles(title_projects, project_ids);
   const filteredData = formatTableData(data, bids_titles, searchTerm);
+  const short_descriptions = useFetchFields(data, storage, "short_description");
 
   const { data: bidInfo } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -30,6 +31,8 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
         return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
+      case "short description":
+        return short_descriptions[row.id] || "";
       default:
         return row[column];
     }

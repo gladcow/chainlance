@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { ClockIcon, CurrencyDollarIcon } from "./BaseTableParts";
-import { fetchProjectFieldFromId } from "./GetFieldsFromIds";
+import { ClockIcon, CurrencyDollarIcon } from "../BaseTableParts";
+import { fetchProjectFieldFromId } from "../GetFieldsFromIds";
+import { timeRetrive } from "../utils";
 import ProjectBidsTable from "./ProjectBidsTable";
-import { timeRetrive } from "./utils";
 import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 

@@ -13,7 +13,13 @@ export const placeBid = async (
   const writeProjectDetailsToStorage = async function () {
     const res = await storage?.uploadData(
       "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
-      JSON.stringify({ project_id: project_id, description: description, price: Number(price), timeSpan: timeSpan }),
+      JSON.stringify({
+        project_id: project_id,
+        description: description,
+        short_description: description.slice(0, 500),
+        price: Number(price),
+        timeSpan: timeSpan,
+      }),
     );
     const id = res?.reference.toString();
 

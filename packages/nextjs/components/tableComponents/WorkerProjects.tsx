@@ -40,6 +40,9 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
       disabled: () => {
         return projectInfo ? projectInfo[4] != 1 : 0;
       },
+      state: () => {
+        return projectInfo ? projectInfo[4] : 0;
+      },
     },
   ];
 
