@@ -3,12 +3,13 @@ import BaseTable from "../BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
 import SubmitWorkMenu from "../SubmitWorkMenu";
 import { formatTableData } from "../utils";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
+  const [ratingButtons, setRatingButtons] = useState<any[]>([]);
 
   const handleSubmitClick = () => {
     setIsSubmitMenuOpen(true);
@@ -22,6 +23,18 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
     functionName: "projects",
     args: [project],
   }) as { data: any[] | undefined };
+
+  const { writeAsync: rateEmployer } = useScaffoldContractWrite({
+    contractName: "ChainLance",
+    functionName: "rateOwner",
+    args: [] as unknown as [string, boolean],
+  });
+
+  const { data: employerRating } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "rates",
+    args: [projectInfo && projectInfo[2]],
+  });
 
   const titles = useFetchFields(data, storage, "title");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
@@ -64,6 +77,29 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
         return row[column];
     }
   };
+  useEffect(() => {
+    if (projectInfo) {
+      const all_states = ["Open", "In work", "In review", "Completed", "Canceled"];
+      const currentState = all_states[Number(projectInfo[4])];
+      const ownerRated = projectInfo[8];
+      if (currentState === "Completed" && !ownerRated) {
+        setRatingButtons([
+          {
+            id: "rate-good",
+            color: "text-success hover:text-success/80",
+            onClick: () => rateEmployer({ args: [project, true] }),
+          },
+          {
+            id: "rate-bad",
+            color: "text-error hover:text-error/80",
+            onClick: () => rateEmployer({ args: [project, false] }),
+          },
+        ]);
+      } else {
+        setRatingButtons([]);
+      }
+    }
+  }, [projectInfo]);
 
   useEffect(() => {
     const fetchDescription = async () => {
@@ -85,9 +121,11 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
+        currentRating={employerRating}
         ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
+        ratingButtons={ratingButtons}
         description={description}
       ></BaseTable>
       {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeMenu} project_id={project}></SubmitWorkMenu>}

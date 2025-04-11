@@ -16,6 +16,12 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
     args: [project],
   }) as { data: any[] | undefined };
 
+  const { data: ownerRating } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "rates",
+    args: [projectInfo && projectInfo[2]],
+  });
+
   const handleBidClick = () => {
     setIsBidMenuOpen(true);
   };
@@ -97,6 +103,7 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
+        currentRating={ownerRating}
         ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}

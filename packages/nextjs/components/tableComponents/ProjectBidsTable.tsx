@@ -21,6 +21,12 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
     args: [project],
   }) as { data: any[] | undefined };
 
+  const { data: workerRating } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "rates",
+    args: [bidInfo && bidInfo[2]],
+  });
+
   const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
@@ -79,6 +85,7 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
+        currentRating={workerRating}
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}

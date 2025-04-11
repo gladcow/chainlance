@@ -1,5 +1,4 @@
 import React from "react";
-import { SettingsMenu } from "./SettingsMenu";
 import { TabButton } from "./TabButton";
 
 interface NavBarChainProps {
@@ -18,9 +17,6 @@ export const NavBarChain = ({ tab, setTab }: NavBarChainProps) => {
         <TabButton tab={tab} setTab={setTab} name={"employer"} readName={"Employer"}></TabButton>
 
         <TabButton tab={tab} setTab={setTab} name={"settings"} readName={"Storage settings"}></TabButton>
-      </div>
-      <div className="flex-none">
-        <SettingsMenu />
       </div>
     </div>
   );

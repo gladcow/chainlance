@@ -9,6 +9,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState({ bids_amount: 0, state: "0" });
+  const [ratingButtons, setRatingButtons] = useState<any[]>([]);
   const [allButtons, setAllButtons] = useState([
     {
       id: "open",
@@ -43,6 +44,18 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
     args: [] as unknown as [string],
   });
 
+  const { writeAsync: rateWorker } = useScaffoldContractWrite({
+    contractName: "ChainLance",
+    functionName: "rateWorker",
+    args: [] as unknown as [string, boolean],
+  });
+
+  const { data: workerRating } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "rates",
+    args: [projectInfo && projectInfo[2]],
+  });
+
   const titles = useFetchFields(data, storage, "title");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
@@ -66,6 +79,28 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   };
 
   useEffect(() => {
+    if (projectInfo) {
+      const all_states = ["Open", "In work", "In review", "Completed", "Canceled"];
+      const currentState = all_states[Number(projectInfo[4])];
+      const workerRated = projectInfo[9];
+
+      if (currentState === "Completed" && !workerRated) {
+        setRatingButtons([
+          {
+            id: "rate-good",
+            color: "text-success hover:text-success/80",
+            onClick: () => rateWorker({ args: [project, true] }),
+          },
+          {
+            id: "rate-bad",
+            color: "text-error hover:text-error/80",
+            onClick: () => rateWorker({ args: [project, false] }),
+          },
+        ]);
+      } else {
+        setRatingButtons([]);
+      }
+    }
     if (bidsOnProject && projectInfo) {
       const all_states = ["Open", "In work", "In review", "Completed", "Canceled"];
 
@@ -138,10 +173,12 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
     <>
       <BaseTable
         renderFunction={renderCellContent}
+        currentRating={workerRating}
         sortRow={filteredData}
         ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         buttons={allButtons}
         projectSetter={setProject}
+        ratingButtons={ratingButtons}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
         status={status}
