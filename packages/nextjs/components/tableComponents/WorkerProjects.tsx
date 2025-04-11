@@ -99,7 +99,8 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
         setRatingButtons([]);
       }
     }
-  }, [projectInfo]);
+    // eslint-disable-next-line
+  }, [projectInfo, project]);
 
   useEffect(() => {
     const fetchDescription = async () => {
