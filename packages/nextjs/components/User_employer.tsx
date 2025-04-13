@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import EmployerProjectsTable from "./EmployerProjectsTable";
 import { WriteCreateProject } from "./WriteCreateProject";
+import EmployerProjectsTable from "./tableComponents/EmployerProjectsTable";
 import { Bee } from "@ethersphere/bee-js";
 import { useEffectOnce } from "usehooks-ts";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
@@ -44,33 +44,35 @@ export const UserEmployer = ({ address, storage, setTab }: UserEmployerProps) =>
   return (
     <div className="flex flex-row grow">
       <div className="w-full">
-        <select
-          className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
-          defaultValue={"My projects"}
-          value={selectTable}
-          onChange={e => setSelectTable(e.target.value)}
-        >
-          <option disabled selected>
-            Choose table
-          </option>
-          <option value={"My projects"}>My projects</option>
-        </select>
-        <label
-          onClick={() => {
-            setCreateMenu(true);
-          }}
-          className="btn btn-ghost btn-circle"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        <div className="flex flex-row">
+          <select
+            className="select select-bordered m-5 max-w-20"
+            defaultValue={"My projects"}
+            value={selectTable}
+            onChange={e => setSelectTable(e.target.value)}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-          </svg>
-        </label>
+            <option disabled selected>
+              Choose table
+            </option>
+            <option value={"My projects"}>My projects</option>
+          </select>
+          <label
+            onClick={() => {
+              setCreateMenu(true);
+            }}
+            className="btn btn-ghost btn-circle self-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </label>
+        </div>
         {tableComponent}
         {createMenu ? <WriteCreateProject storage={storage} setCreateMenu={setCreateMenu}></WriteCreateProject> : <></>}
       </div>

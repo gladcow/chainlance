@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import OpenProjectsTable from "./OpenProjectsTable";
-import WorkerBidsTable from "./WorkerBidsTable";
-import ProjectsWithAcceptedBids from "./WorkerProjects";
+import OpenProjectsTable from "./tableComponents/OpenProjectsTable";
+import WorkerBidsTable from "./tableComponents/WorkerBidsTable";
+import ProjectsWithAcceptedBids from "./tableComponents/WorkerProjects";
 import { Bee } from "@ethersphere/bee-js";
 import { useEffectOnce } from "usehooks-ts";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
@@ -73,7 +73,7 @@ export const UserWorker = ({ address, storage, setTab }: UserWorkerProps) => {
     <div className="flex flex-row grow">
       <div className="w-full">
         <select
-          className="select select-bordered mr-5 ml-5 mt-5 max-w-20"
+          className="select select-bordered mr-5 ml-5 mt-5 mb-5 max-w-20"
           defaultValue={"Open projects"}
           value={selectTable}
           onChange={e => setSelectTable(e.target.value)}

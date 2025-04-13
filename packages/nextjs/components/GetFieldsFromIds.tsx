@@ -7,6 +7,7 @@ interface ParsedData {
   price: number;
   timeSpan: number;
   project_id: string;
+  short_description: string;
 }
 
 const isValidProjectId = (projectId: string): boolean => {
