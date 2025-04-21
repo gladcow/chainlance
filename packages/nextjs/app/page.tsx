@@ -69,7 +69,7 @@ const Home: NextPage = () => {
         )}
         {tab != "main" && tab != "worker" && tab != "employer" && tab != "settings" && (
           <>
-            <ProjectPage project={tab} storage={storage}></ProjectPage>
+            <ProjectPage project={tab} storage={storage} setTab={setTab}></ProjectPage>
           </>
         )}
       </div>

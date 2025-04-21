@@ -109,7 +109,15 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
       ></BaseTable>
-      {isBidMenuOpen && <BidMenu onClose={closeMenu} project_id={project} storage={storage}></BidMenu>}
+      {isBidMenuOpen && (
+        <BidMenu
+          onClose={closeMenu}
+          project_id={project}
+          storage={storage}
+          original_price={prices[project]}
+          original_time={timeSpans[project]}
+        ></BidMenu>
+      )}
     </>
   );
 };

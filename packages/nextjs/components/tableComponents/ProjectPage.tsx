@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ClockIcon, CurrencyDollarIcon } from "../BaseTableParts";
 import { fetchProjectFieldFromId } from "../GetFieldsFromIds";
 import { timeRetrive } from "../utils";
@@ -9,9 +9,10 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 interface ProjectPageProps {
   project: any;
   storage: Bee | undefined;
+  setTab: Dispatch<SetStateAction<string>>;
 }
 
-const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage }) => {
+const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) => {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [timespan, setTimespan] = useState("");
@@ -48,6 +49,22 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage }) => {
       <div className="bg-primary rounded-2xl shadow-xl overflow-hidden border border-primary/20">
         {/* Project Header */}
         <div className="bg-gradient-to-r from-blue-600 to-green-600 p-8 relative">
+          {/* Back Button */}
+          <button
+            onClick={() => setTab(project.from)}
+            className="absolute top-4 left-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors backdrop-blur-sm shadow-sm z-20"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6 text-white"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+          </button>
           <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-gradient-to-r from-white/20 to-transparent" />
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 relative">
             <h1 className="text-3xl font-bold text-white drop-shadow-md">{title}</h1>
