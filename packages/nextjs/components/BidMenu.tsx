@@ -10,9 +10,11 @@ interface BidMenuProps {
   onClose: () => void;
   project_id: string;
   storage: Bee | undefined;
+  original_price: string;
+  original_time: string;
 }
 
-const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
+const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, original_price, original_time }) => {
   const [projectDescription, setProjectDescription] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
   const [price, setPrice] = useState("");
@@ -25,7 +27,6 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
     functionName: "bidProject",
     args: [] as unknown as [string, string, bigint, number],
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const calculatedTime = timeDecider(timeMult, timeSpan);
@@ -57,7 +58,7 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
       <div className="card bg-base-100 w-96 shadow-xl">
         <div className="card-body">
           <div className="flex justify-between">
-            <h2 className="card-title">Place your bid</h2>
+            <h2 className="card-title">Place Your Bid</h2>
             <button className="btn btn-square" onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,13 +75,18 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage }) => {
           <div className="card-actions justify-end">
             <DescriptionField setDescription={setProjectDescription}></DescriptionField>
 
-            <PriceField handlePriceChange={handlePriceChange} priceError={priceError}></PriceField>
+            <PriceField
+              handlePriceChange={handlePriceChange}
+              priceError={priceError}
+              value={original_price}
+            ></PriceField>
 
             <TimeField
               handleTimeChange={handleTimeChange}
               setTimeMult={setTimeMult}
               timeMult={timeMult}
               timeError={timeError}
+              value={original_time}
             ></TimeField>
             <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
               Submit bid
