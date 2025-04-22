@@ -19,7 +19,7 @@ export const UserWorker = ({ address, storage, setTab }: UserWorkerProps) => {
   const [tableComponent, setTableComponent] = useState<React.JSX.Element>(
     <OpenProjectsTable data={dataToSendToTable} storage={storage}></OpenProjectsTable>,
   );
-
+  // const [stateToCheck, setStateToCheck] = useState<string[] | undefined>([''])
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "listProjectsWithState",
@@ -38,10 +38,20 @@ export const UserWorker = ({ address, storage, setTab }: UserWorkerProps) => {
     args: [address],
   }) as { data: any[] | undefined };
 
+  // const { data: statesGetter } = useScaffoldContractRead({
+  //   contractName: "ChainLance",
+  //   functionName: "getProjectStates",
+  //   args: [stateToCheck] as unknown as any
+
+  // })
+
   useEffectOnce(() => {
     setDataToSendToTable(projectlist);
   });
-
+  // useEffect(()=>{
+  //   setStateToCheck(projectsWithWorker)
+  //   console.log(statesGetter)
+  // },[projectsWithWorker])
   useEffect(() => {
     switch (selectTable) {
       case "Open projects":
