@@ -5,7 +5,7 @@ import SubmitWorkMenu from "../SubmitWorkMenu";
 import { formatTableData } from "../utils";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
-const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
+const WorkerProjects: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -134,4 +134,4 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
   );
 };
 
-export default ProjectsWithAcceptedBids;
+export default WorkerProjects;
