@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { WriteCreateProject } from "./WriteCreateProject";
 import EmployerProjectsTable from "./tableComponents/EmployerProjectsTable";
 import { Bee } from "@ethersphere/bee-js";
@@ -11,11 +11,12 @@ interface UserEmployerProps {
   setTab: Dispatch<SetStateAction<string>>;
 }
 
-type TableKey = "Open" | "WorkInProgress" | "Completed";
+type TableKey = "Open" | "WorkInProgress" | "ToReview" | "Completed";
 
 export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, setTab }) => {
   const [selectTable, setSelectTable] = useState<TableKey>("Open");
   const [showCreate, setShowCreate] = useState(false);
+  const [projectsToGetter, setProjectsToGetter] = useState({});
 
   const { data: ownerProjects } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -26,7 +27,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
   const { data: statesGetter } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "getProjectStates",
-    args: [ownerProjects?.map(proj => proj.id) || []] as unknown as any,
+    args: [projectsToGetter] as unknown as any,
     enabled: selectTable !== "Open" && !!ownerProjects,
   }) as { data?: number[] };
 
@@ -34,11 +35,18 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
     setSelectTable("Open");
   });
 
+  useEffect(() => {
+    setProjectsToGetter(ownerProjects ? ownerProjects : {});
+  }, [ownerProjects]);
+
   const dataToSend = useMemo(() => {
     switch (selectTable) {
       case "Open":
         return ownerProjects ?? [];
       case "WorkInProgress":
+        if (!ownerProjects || !statesGetter) return [];
+        return ownerProjects.filter((_, idx) => statesGetter[idx] === 1);
+      case "ToReview":
         if (!ownerProjects || !statesGetter) return [];
         return ownerProjects.filter((_, idx) => statesGetter[idx] === 2);
       case "Completed":
@@ -53,13 +61,17 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
     switch (selectTable) {
       case "Open":
       case "WorkInProgress":
+      case "ToReview":
       case "Completed":
       default:
         return EmployerProjectsTable;
     }
   }, [selectTable]);
 
-  if ((selectTable === "WorkInProgress" || selectTable === "Completed") && (!ownerProjects || !statesGetter)) {
+  if (
+    (selectTable === "WorkInProgress" || selectTable === "ToReview" || selectTable === "Completed") &&
+    (!ownerProjects || !statesGetter)
+  ) {
     return (
       <div className="flex flex-row grow">
         <div className="w-full p-5 text-center">Loading projects…</div>
@@ -78,6 +90,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
           >
             <option value="Open">Open projects</option>
             <option value="WorkInProgress">Work in progress</option>
+            <option value="ToReview">Waiting Review</option>
             <option value="Completed">Completed</option>
           </select>
           <button className="btn btn-ghost btn-circle" onClick={() => setShowCreate(true)}>

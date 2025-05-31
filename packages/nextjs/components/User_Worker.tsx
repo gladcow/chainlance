@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import OpenProjectsTable from "./tableComponents/OpenProjectsTable";
 import WorkerBidsTable from "./tableComponents/WorkerBidsTable";
 import WorkerProjects from "./tableComponents/WorkerProjects";
@@ -15,6 +15,7 @@ type TableKey = "Open" | "Bids" | "WorkInProgress" | "InReview" | "Completed";
 
 export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab }) => {
   const [selectTable, setSelectTable] = useState<TableKey>("Open");
+  const [projectsToGetter, setProjectsToGetter] = useState({});
 
   const { data: projectlist } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -37,7 +38,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
   const { data: statesGetter } = useScaffoldContractRead({
     contractName: "ChainLance",
     functionName: "getProjectStates",
-    args: [projectsWithWorker?.map(proj => proj.id) || []] as unknown as any,
+    args: [projectsToGetter] as unknown as any,
     enabled:
       selectTable === "Completed" ||
       selectTable === "WorkInProgress" ||
@@ -47,6 +48,10 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
   useEffectOnce(() => {
     setSelectTable("Open");
   });
+
+  useEffect(() => {
+    setProjectsToGetter(projectsWithWorker ? projectsWithWorker : {});
+  }, [projectsWithWorker]);
 
   const dataToSend = useMemo(() => {
     switch (selectTable) {

@@ -57,6 +57,25 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         return projectInfo ? projectInfo[4] : 0;
       },
     },
+    {
+      id: "subproject",
+      name: "Create Subproject",
+      onClick: () => {
+        handleSubmitClick();
+      },
+      onClose: () => {
+        closeMenu;
+      },
+      disabled: () => {
+        return projectInfo ? projectInfo[4] != 1 : 0;
+      },
+      state: () => {
+        return projectInfo ? projectInfo[4] : 0;
+      },
+      gone: () => {
+        return projectInfo ? projectInfo[4] != 1 : true;
+      },
+    },
   ];
 
   const [isSubmitMenuOpen, setIsSubmitMenuOpen] = useState(false);

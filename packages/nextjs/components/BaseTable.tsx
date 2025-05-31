@@ -70,7 +70,7 @@ const BaseTable: React.FC<TableProps> = ({
                           ? renderFunction(row, "title")
                           : renderFunction(row, "Title of a project")}
                       </h2>
-                      <p className="text-primary-content/80">
+                      <p className="text-primary-content/80 break-all">
                         {renderFunction(row, "short description")
                           ? renderFunction(row, "short description")
                           : "No short description"}
@@ -172,19 +172,22 @@ const BaseTable: React.FC<TableProps> = ({
                           </div>
 
                           <div className="flex flex-wrap gap-2">
-                            {buttons?.map(button => (
-                              <button
-                                key={button.id}
-                                disabled={button.disabled?.()}
-                                className={`btn btn-sm ${button.disabled?.() ? "btn-disabled" : "btn-secondary"}`}
-                                onClick={() => button.onClick(row)}
-                              >
-                                {button.state?.() === 3 && "Completed"}
-                                {button.state?.() === 2 && "In Review"}
-                                {button.state?.() === 1 && button.name}
-                                {button.state ? "" : button.name}
-                              </button>
-                            ))}
+                            {buttons?.map(button => {
+                              if (button.gone?.() === true) return null;
+                              return (
+                                <button
+                                  key={button.id}
+                                  disabled={!!button.disabled?.()}
+                                  className={`btn btn-sm ${button.disabled?.() ? "btn-disabled" : "btn-secondary"}`}
+                                  onClick={() => button.onClick(row)}
+                                >
+                                  {button.state?.() === 3 && "Completed"}
+                                  {button.state?.() === 2 && "In Review"}
+                                  {button.state?.() === 1 && button.name}
+                                  {button.state === undefined && button.name}
+                                </button>
+                              );
+                            })}
                           </div>
 
                           {status && (
@@ -216,7 +219,9 @@ const BaseTable: React.FC<TableProps> = ({
 
                         {/* Right Column - Full Description */}
                         <div className="flex-1">
-                          <p className="text-base-content leading-relaxed whitespace-pre-line">{description}</p>
+                          <p className="text-base-content leading-relaxed break-all whitespace-pre-line">
+                            {description}
+                          </p>
                         </div>
                       </div>
                     </div>

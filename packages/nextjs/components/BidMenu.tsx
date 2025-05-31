@@ -16,8 +16,8 @@ interface BidMenuProps {
 
 const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, original_price, original_time }) => {
   const [projectDescription, setProjectDescription] = useState("");
-  const [timeSpan, setTimeSpan] = useState(0);
-  const [price, setPrice] = useState("");
+  const [timeSpan, setTimeSpan] = useState(Number(original_time));
+  const [price, setPrice] = useState(original_price);
   const [priceError, setPriceError] = useState("");
   const [timeError, setTimeError] = useState("");
   const [timeMult, setTimeMult] = useState("hours");
@@ -29,8 +29,7 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, origina
   });
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const calculatedTime = timeDecider(timeMult, timeSpan);
-    placeBid(project_id, projectDescription, calculatedTime, price, writeAsync, storage);
+    placeBid(project_id, projectDescription, timeDecider(timeMult, timeSpan), price, writeAsync, storage);
     onClose();
   };
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
