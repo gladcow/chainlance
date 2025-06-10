@@ -23,6 +23,12 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
     args: [project],
   }) as { data: any[] | undefined };
 
+  const { data: workerRating } = useScaffoldContractRead({
+    contractName: "ChainLance",
+    functionName: "rates",
+    args: [bidInfo && bidInfo[2]],
+  });
+
   const renderCellContent = (row: any, column: string) => {
     switch (column) {
       case "Title of a project":
@@ -59,6 +65,7 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
         sortRow={filteredData}
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
+        currentRating={workerRating}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
       ></BaseTable>

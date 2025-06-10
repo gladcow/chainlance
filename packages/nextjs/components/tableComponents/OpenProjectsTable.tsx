@@ -9,6 +9,8 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
+  const [original_price, setOriginal_price] = useState("");
+  const [original_time, setOriginal_time] = useState("");
 
   const { data: projectInfo } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -23,6 +25,8 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
   });
 
   const handleBidClick = () => {
+    setOriginal_price(prices[project]);
+    setOriginal_time(timeSpans[project]);
     setIsBidMenuOpen(true);
   };
 
@@ -114,8 +118,8 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
           onClose={closeMenu}
           project_id={project}
           storage={storage}
-          original_price={prices[project]}
-          original_time={timeSpans[project]}
+          original_price={original_price}
+          original_time={original_time}
         ></BidMenu>
       )}
     </>

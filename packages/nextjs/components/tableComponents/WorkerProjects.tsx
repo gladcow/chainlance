@@ -5,7 +5,7 @@ import SubmitWorkMenu from "../SubmitWorkMenu";
 import { formatTableData } from "../utils";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
-const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
+const WorkerProjects: React.FC<any> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -55,6 +55,25 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
       },
       state: () => {
         return projectInfo ? projectInfo[4] : 0;
+      },
+    },
+    {
+      id: "subproject",
+      name: "Create Subproject",
+      onClick: () => {
+        handleSubmitClick();
+      },
+      onClose: () => {
+        closeMenu;
+      },
+      disabled: () => {
+        return projectInfo ? projectInfo[4] != 1 : 0;
+      },
+      state: () => {
+        return projectInfo ? projectInfo[4] : 0;
+      },
+      gone: () => {
+        return projectInfo ? projectInfo[4] != 1 : true;
       },
     },
   ];
@@ -134,4 +153,4 @@ const ProjectsWithAcceptedBids: React.FC<any> = ({ data, storage }) => {
   );
 };
 
-export default ProjectsWithAcceptedBids;
+export default WorkerProjects;
