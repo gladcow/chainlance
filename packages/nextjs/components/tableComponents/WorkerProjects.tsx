@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "../BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
+import SubCreateMenu from "../SubCreateMenu";
 import SubmitWorkMenu from "../SubmitWorkMenu";
 import { formatTableData } from "../utils";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
@@ -10,13 +11,23 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
   const [ratingButtons, setRatingButtons] = useState<any[]>([]);
+  const [isSubmitMenuOpen, setIsSubmitMenuOpen] = useState(false);
+  const [isSubCreateMenuOpen, setIsSubCreateMenuOpen] = useState(false);
 
   const handleSubmitClick = () => {
     setIsSubmitMenuOpen(true);
   };
 
-  const closeMenu = () => {
+  const closeSubmitMenu = () => {
     setIsSubmitMenuOpen(false);
+  };
+
+  const handleSubCreateClick = () => {
+    setIsSubCreateMenuOpen(true);
+  };
+
+  const closeSubCreateMenu = () => {
+    setIsSubCreateMenuOpen(false);
   };
   const { data: projectInfo } = useScaffoldContractRead({
     contractName: "ChainLance",
@@ -48,7 +59,7 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         handleSubmitClick();
       },
       onClose: () => {
-        closeMenu;
+        closeSubmitMenu;
       },
       disabled: () => {
         return projectInfo ? projectInfo[4] != 1 : 0;
@@ -61,10 +72,10 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
       id: "subproject",
       name: "Create Subproject",
       onClick: () => {
-        handleSubmitClick();
+        handleSubCreateClick();
       },
       onClose: () => {
-        closeMenu;
+        closeSubCreateMenu;
       },
       disabled: () => {
         return projectInfo ? projectInfo[4] != 1 : 0;
@@ -77,8 +88,6 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
       },
     },
   ];
-
-  const [isSubmitMenuOpen, setIsSubmitMenuOpen] = useState(false);
 
   const filteredData = formatTableData(data, titles, searchTerm);
 
@@ -148,7 +157,15 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         ratingButtons={ratingButtons}
         description={description}
       ></BaseTable>
-      {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeMenu} project_id={project}></SubmitWorkMenu>}
+      {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeSubmitMenu} project_id={project}></SubmitWorkMenu>}
+      {isSubCreateMenuOpen && (
+        <SubCreateMenu
+          onClose={closeSubCreateMenu}
+          project_id={project}
+          title={titles[project]}
+          storage={storage}
+        ></SubCreateMenu>
+      )}
     </>
   );
 };

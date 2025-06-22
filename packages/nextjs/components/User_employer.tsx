@@ -42,7 +42,8 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
   const dataToSend = useMemo(() => {
     switch (selectTable) {
       case "Open":
-        return ownerProjects ?? [];
+        if (!ownerProjects || !statesGetter) return [];
+        return ownerProjects.filter((_, idx) => statesGetter[idx] === 0);
       case "WorkInProgress":
         if (!ownerProjects || !statesGetter) return [];
         return ownerProjects.filter((_, idx) => statesGetter[idx] === 1);
