@@ -1,36 +1,29 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { DescriptionField, PriceField, TimeField } from "./InputFields";
-import { placeBid } from "./placeBid";
-import { timeDecider } from "./utils";
-import { Bee } from "@ethersphere/bee-js";
+import { subCreate } from "./SubCreate";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth/useScaffoldContractWrite";
 
 interface BidMenuProps {
   onClose: () => void;
   project_id: string;
-  storage: Bee | undefined;
-  original_price: string;
-  original_time: string;
+  title: string;
+  storage: any;
 }
 
-const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, original_price, original_time }) => {
-  const [projectDescription, setProjectDescription] = useState("");
-  const [timeSpan, setTimeSpan] = useState(Number(original_time));
-  const [price, setPrice] = useState(original_price);
+const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, storage }) => {
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [timeSpan, setTimeSpan] = useState(0);
   const [priceError, setPriceError] = useState("");
   const [timeError, setTimeError] = useState("");
   const [timeMult, setTimeMult] = useState("hours");
 
-  const { writeAsync } = useScaffoldContractWrite({
+  const { writeAsync, isLoading } = useScaffoldContractWrite({
     contractName: "ChainLance",
-    functionName: "bidProject",
+    functionName: "createSubproject",
     args: [] as unknown as [string, string, bigint, number],
   });
-  const handleSubmit = () => {
-    placeBid(project_id, projectDescription, timeSpan, price, writeAsync, storage);
-    onClose();
-  };
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*\.?\d*$/.test(value)) {
@@ -38,25 +31,32 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, origina
       Number(value);
       setPriceError("");
     } else {
-      setPriceError("Price must be an number.");
+      setPriceError("Price must be an number");
     }
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      setTimeSpan(timeDecider(timeMult, Number(value)));
+      setTimeSpan(Number(value));
       setTimeError("");
     } else {
-      setTimeError("Time must be an integer.");
+      setTimeError("Time must be an integer");
     }
   };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    subCreate(title, timeMult, project_id, description, price, timeSpan, writeAsync, storage);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="card bg-base-100 w-96 shadow-xl">
         <div className="card-body">
           <div className="flex justify-between">
-            <h2 className="card-title">Place Your Bid</h2>
+            <h2 className="card-title">Create Subproject</h2>
             <button className="btn btn-square" onClick={onClose}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -69,26 +69,22 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, origina
               </svg>
             </button>
           </div>
-          <p>You can write a message to this employer</p>
           <div className="card-actions justify-end">
-            <DescriptionField setDescription={setProjectDescription}></DescriptionField>
+            <DescriptionField setDescription={setDescription}></DescriptionField>
 
-            <PriceField
-              handlePriceChange={handlePriceChange}
-              priceError={priceError}
-              value={original_price}
-            ></PriceField>
+            <PriceField handlePriceChange={handlePriceChange} priceError={priceError}></PriceField>
 
             <TimeField
               handleTimeChange={handleTimeChange}
               setTimeMult={setTimeMult}
               timeMult={timeMult}
               timeError={timeError}
-              value={original_time}
             ></TimeField>
-            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
-              Submit bid
-            </button>
+            {true && (
+              <button className="btn btn-primary" onClick={handleSubmit} disabled={!!priceError || !!timeError}>
+                {isLoading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Subproject</>}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -96,4 +92,4 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, origina
   );
 };
 
-export default BidMenu;
+export default SubCreateMenu;

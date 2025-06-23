@@ -56,6 +56,22 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
     args: [projectInfo && projectInfo[2]],
   });
 
+  const { writeAsync: rejectWork } = useScaffoldContractWrite({
+    contractName: "ChainLance",
+    functionName: "rejectWork",
+    args: [] as unknown as [string],
+  });
+
+  const { writeAsync: cancelProject } = useScaffoldContractWrite({
+    contractName: "ChainLance",
+    functionName: "cancelProject",
+    args: [] as unknown as [string],
+  });
+
+  const handleCancelClick = () => {
+    cancelProject({ args: [project] });
+  };
+
   const titles = useFetchFields(data, storage, "title");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
@@ -105,6 +121,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
       const all_states = ["Open", "In work", "In review", "Completed", "Canceled"];
 
       setStatus({ bids_amount: bidsOnProject.length, state: all_states[Number(projectInfo[4])] });
+      console.log(all_states[Number(projectInfo[4])] == "In review");
       if (all_states[Number(projectInfo[4])] == "In review") {
         setAllButtons([
           {
@@ -121,10 +138,52 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
             },
           },
           {
+            id: "reject",
+            name: "Reject",
+            onClick: (project: any) => {
+              rejectWork({ args: [project.id] });
+            },
+            onClose: () => {
+              true;
+            },
+            disabled: (row: any) => {
+              return 0 * row;
+            },
+          },
+          {
             id: "accept",
             name: "Accept",
             onClick: (project: any) => {
               writeAsync({ args: [project.id] });
+            },
+            onClose: () => {
+              true;
+            },
+            disabled: (row: any) => {
+              return 0 * row;
+            },
+          },
+        ]);
+      } else if (all_states[Number(projectInfo[4])] == "Open") {
+        setAllButtons([
+          {
+            id: "open",
+            name: "Open",
+            onClick: (id: any) => {
+              setTab({ id: id.id, from: "employer", state: projectInfo[4] });
+            },
+            onClose: () => {
+              true;
+            },
+            disabled: (row: any) => {
+              return 0 * row;
+            },
+          },
+          {
+            id: "cancel",
+            name: "Cancel",
+            onClick: () => {
+              handleCancelClick();
             },
             onClose: () => {
               true;
