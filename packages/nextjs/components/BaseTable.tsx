@@ -28,6 +28,7 @@ interface TableProps {
   status?: { bids_amount: number; state: string };
   currentRating?: number;
   ethAddress?: string;
+  dataChanged?: any;
 }
 
 const BaseTable: React.FC<TableProps> = ({
@@ -40,10 +41,15 @@ const BaseTable: React.FC<TableProps> = ({
   description,
   ratingButtons = [],
   status,
+  dataChanged,
   currentRating = 0,
   ethAddress = "0x000000000000000000000000000000000",
 }) => {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+
+  useEffect(() => {
+    setExpandedRow(null);
+  }, [dataChanged]);
 
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

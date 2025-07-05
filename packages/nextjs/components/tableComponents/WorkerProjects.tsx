@@ -47,6 +47,12 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
     args: [projectInfo && projectInfo[2]],
   });
 
+  const { writeAsync: cancelWork } = useScaffoldContractWrite({
+    contractName: "ChainLance",
+    functionName: "cancelWork",
+    args: [] as unknown as [string],
+  });
+
   const titles = useFetchFields(data, storage, "title");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
@@ -76,6 +82,22 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
       },
       onClose: () => {
         closeSubCreateMenu;
+      },
+      disabled: () => {
+        return projectInfo ? projectInfo[4] != 1 : 0;
+      },
+      state: () => {
+        return projectInfo ? projectInfo[4] : 0;
+      },
+      gone: () => {
+        return projectInfo ? projectInfo[4] != 1 : true;
+      },
+    },
+    {
+      id: "cancelWork",
+      name: "Cancel",
+      onClick: () => {
+        cancelWork({ args: [project] });
       },
       disabled: () => {
         return projectInfo ? projectInfo[4] != 1 : 0;
@@ -156,6 +178,7 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         searchTermPair={[searchTerm, setSearchTerm]}
         ratingButtons={ratingButtons}
         description={description}
+        dataChanged={data}
       ></BaseTable>
       {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeSubmitMenu} project_id={project}></SubmitWorkMenu>}
       {isSubCreateMenuOpen && (

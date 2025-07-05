@@ -66,6 +66,7 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         currentRating={workerRating}
+        dataChanged={data}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
       ></BaseTable>

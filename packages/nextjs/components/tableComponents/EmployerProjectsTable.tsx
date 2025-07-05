@@ -121,7 +121,6 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
       const all_states = ["Open", "In work", "In review", "Completed", "Canceled"];
 
       setStatus({ bids_amount: bidsOnProject.length, state: all_states[Number(projectInfo[4])] });
-      console.log(all_states[Number(projectInfo[4])] == "In review");
       if (all_states[Number(projectInfo[4])] == "In review") {
         setAllButtons([
           {
@@ -238,6 +237,7 @@ const EmployerProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
         buttons={allButtons}
         projectSetter={setProject}
         ratingButtons={ratingButtons}
+        dataChanged={data}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
         status={status}

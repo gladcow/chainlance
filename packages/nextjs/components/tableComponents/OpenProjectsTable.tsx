@@ -110,6 +110,7 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
         currentRating={ownerRating}
         ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
+        dataChanged={data}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
       ></BaseTable>

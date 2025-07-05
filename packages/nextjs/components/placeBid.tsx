@@ -22,7 +22,6 @@ export const placeBid = async (
       }),
     );
     const id = res?.reference.toString();
-    console.log(timeSpan);
     const price_to_contract = parseEther(price);
     writeAsync({ args: [project_id, id, price_to_contract, timeSpan] });
   };

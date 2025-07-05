@@ -86,6 +86,7 @@ const ProjectBidsTable: React.FC<any> = ({ data, storage }) => {
         sortRow={filteredData}
         buttons={buttons}
         currentRating={workerRating}
+        dataChanged={data}
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
