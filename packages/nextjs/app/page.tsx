@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bee } from "@ethersphere/bee-js";
 import type { NextPage } from "next";
 import { useEffectOnce } from "usehooks-ts";
@@ -17,10 +17,16 @@ const Home: NextPage = () => {
   const [tab, setTab] = useState("main");
   const { address: connectedAddress } = useAccount();
   const [storage, setStorage] = useState<Bee>();
+  const [stamp, setStamp] = useState<string>("");
+  const [storageURL, setStorageURL] = useState<string>("http://92.63.194.135:3000");
 
   useEffectOnce(() => {
     setStorage(new Bee("http://92.63.194.135:3000"));
+    setStamp("f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50");
   });
+  useEffect(() => {
+    setStorage(new Bee(storageURL));
+  }, [storageURL]);
 
   const [projectId] = useState("");
   const {} = useScaffoldContractRead({
@@ -41,19 +47,24 @@ const Home: NextPage = () => {
         )}
         {tab === "worker" && (
           <>
-            <UserWorker address={connectedAddress} storage={storage} setTab={setTab}></UserWorker>
+            <UserWorker address={connectedAddress} storage={storage} setTab={setTab} stamp={stamp}></UserWorker>
           </>
         )}
 
         {tab === "employer" && (
           <>
-            <UserEmployer address={connectedAddress} storage={storage} setTab={setTab}></UserEmployer>
+            <UserEmployer address={connectedAddress} storage={storage} setTab={setTab} stamp={stamp}></UserEmployer>
           </>
         )}
 
         {tab === "settings" && (
           <>
-            <SettingsTab></SettingsTab>
+            <SettingsTab
+              stamp={stamp}
+              setStamp={setStamp}
+              storageURL={storageURL}
+              setStorageURL={setStorageURL}
+            ></SettingsTab>
           </>
         )}
         {tab != "main" && tab != "worker" && tab != "employer" && tab != "settings" && (

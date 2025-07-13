@@ -6,7 +6,7 @@ import SubmitWorkMenu from "../SubmitWorkMenu";
 import { formatTableData } from "../utils";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
-const WorkerProjects: React.FC<any> = ({ data, storage }) => {
+const WorkerProjects: React.FC<any> = ({ data, storage, stamp }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -187,6 +187,7 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
           project_id={project}
           title={titles[project]}
           storage={storage}
+          stamp={stamp}
         ></SubCreateMenu>
       )}
     </>

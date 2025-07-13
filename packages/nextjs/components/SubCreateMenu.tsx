@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { DescriptionField, PriceField, TimeField } from "./InputFields";
 import { subCreate } from "./SubCreate";
+import { Bee } from "@ethersphere/bee-js";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth/useScaffoldContractWrite";
 
 interface BidMenuProps {
   onClose: () => void;
   project_id: string;
   title: string;
-  storage: any;
+  storage: Bee;
+  stamp: string;
 }
 
-const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, storage }) => {
+const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, storage, stamp }) => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
@@ -47,7 +49,7 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    subCreate(title, timeMult, project_id, description, price, timeSpan, writeAsync, storage);
+    subCreate(title, timeMult, project_id, description, price, timeSpan, writeAsync, storage, stamp);
     onClose();
   };
 

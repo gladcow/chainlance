@@ -12,9 +12,10 @@ interface BidMenuProps {
   storage: Bee | undefined;
   original_price: string;
   original_time: string;
+  stamp: string;
 }
 
-const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, original_price, original_time }) => {
+const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, original_price, original_time, stamp }) => {
   const [projectDescription, setProjectDescription] = useState("");
   const [timeSpan, setTimeSpan] = useState(Number(original_time));
   const [price, setPrice] = useState(original_price);
@@ -28,7 +29,7 @@ const BidMenu: React.FC<BidMenuProps> = ({ onClose, project_id, storage, origina
     args: [] as unknown as [string, string, bigint, number],
   });
   const handleSubmit = () => {
-    placeBid(project_id, projectDescription, timeSpan, price, writeAsync, storage);
+    placeBid(project_id, projectDescription, timeSpan, price, writeAsync, storage, stamp);
     onClose();
   };
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {

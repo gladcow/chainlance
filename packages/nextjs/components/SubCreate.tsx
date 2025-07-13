@@ -1,4 +1,5 @@
 import { timeDecider } from "./utils";
+import { Bee } from "@ethersphere/bee-js";
 import { ContractFunctionExecutionError, parseEther } from "viem";
 
 export const subCreate = async (
@@ -9,12 +10,13 @@ export const subCreate = async (
   price: string,
   timeSpan: number,
   writeAsync: any,
-  storage: any,
+  storage: Bee,
+  stamp: string,
 ) => {
   const writeProjectDetailsToStorage = async function () {
     const calculatedTime = timeDecider(timeMult, timeSpan);
     const res = await storage?.uploadData(
-      "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
+      stamp,
       JSON.stringify({
         title,
         description,

@@ -5,7 +5,7 @@ import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
 import { formatTableData } from "../utils";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
-const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
+const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab, stamp }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -121,6 +121,7 @@ const OpenProjectsTable: React.FC<any> = ({ data, storage, setTab }) => {
           storage={storage}
           original_price={original_price}
           original_time={original_time}
+          stamp={stamp}
         ></BidMenu>
       )}
     </>

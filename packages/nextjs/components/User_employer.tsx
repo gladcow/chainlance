@@ -9,11 +9,12 @@ interface UserEmployerProps {
   address?: string;
   storage?: Bee;
   setTab: Dispatch<SetStateAction<string>>;
+  stamp: string;
 }
 
 type TableKey = "Open" | "WorkInProgress" | "ToReview" | "Completed";
 
-export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, setTab }) => {
+export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, setTab, stamp }) => {
   const [selectTable, setSelectTable] = useState<TableKey>("Open");
   const [showCreate, setShowCreate] = useState(false);
   const [projectsToGetter, setProjectsToGetter] = useState({});
@@ -107,7 +108,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
           </button>
         </div>
         <TableComponent data={dataToSend} storage={storage} setTab={setTab} />
-        {showCreate && <WriteCreateProject storage={storage} setCreateMenu={setShowCreate} />}
+        {showCreate && <WriteCreateProject storage={storage} setCreateMenu={setShowCreate} stamp={stamp} />}
       </div>
     </div>
   );

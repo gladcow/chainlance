@@ -10,10 +10,11 @@ interface UserWorkerProps {
   address?: string;
   storage?: Bee;
   setTab: Dispatch<SetStateAction<string>>;
+  stamp: string;
 }
 type TableKey = "Open" | "Bids" | "WorkInProgress" | "InReview" | "Completed";
 
-export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab }) => {
+export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab, stamp }) => {
   const [selectTable, setSelectTable] = useState<TableKey>("Open");
   const [projectsToGetter, setProjectsToGetter] = useState({});
 
@@ -111,7 +112,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
           <option value="Completed">Completed</option>
         </select>
 
-        <TableComponent data={dataToSend} storage={storage} setTab={setTab} />
+        <TableComponent data={dataToSend} storage={storage} setTab={setTab} stamp={stamp} />
       </div>
     </div>
   );
