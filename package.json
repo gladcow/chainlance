@@ -52,6 +52,8 @@
     "@libp2p/bootstrap": "^10.0.21",
     "@libp2p/identify": "^1.0.20",
     "@libp2p/tcp": "^9.0.23",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "@openzeppelin/contracts": "^5.0.2",
     "blockstore-core": "^4.4.1",
     "blockstore-idb": "^1.1.8",
