@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { timeRetrive } from "./Utils";
 
 interface TimeFieldProps {
-  handleTimeChange: any;
+  handleTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setTimeMult: Dispatch<SetStateAction<string>>;
   timeMult: string;
   timeError: string;
@@ -48,7 +48,7 @@ export const TimeField = ({ handleTimeChange, setTimeMult, timeMult, timeError, 
 };
 
 interface PriceFieldProps {
-  handlePriceChange: any;
+  handlePriceChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   priceError: string;
   value?: string;
 }

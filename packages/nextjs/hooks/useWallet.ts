@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
-import { BrowserProvider, type Signer, type Network } from "ethers";
+import { BrowserProvider, type Signer } from "ethers";
+import { switchToGnosis } from "./switchToGnosis";
 
 export function useWallet() {
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<Signer | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | undefined>();
   const [chainId, setChainId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum) return;
-
     const init = async () => {
+      if (typeof window === "undefined" || !window.ethereum) return;
       const browserProvider = new BrowserProvider(window.ethereum);
       setProvider(browserProvider);
 
-      const networkInfo = await browserProvider.getNetwork();
+      // проверка сети + автопереключение
+      await switchToGnosis(browserProvider);
 
-      setChainId(networkInfo.chainId.toString())
+      const networkInfo = await browserProvider.getNetwork();
+      setChainId(networkInfo.chainId.toString());
 
       try {
         const signerInstance = await browserProvider.getSigner();
@@ -24,14 +26,14 @@ export function useWallet() {
         setSigner(signerInstance);
         setAddress(userAddress);
       } catch {
-        // ??????
+        // пользователь ещё не подключил аккаунт
       }
     };
 
     init();
 
-    window.ethereum.on("accountsChanged", () => window.location.reload());
-    window.ethereum.on("chainChanged", () => window.location.reload());
+    // window.ethereum.on("accountsChanged", () => window.location.reload());
+    // window.ethereum.on("chainChanged", () => window.location.reload());
   }, []);
 
   const connect = async () => {

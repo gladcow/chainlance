@@ -28,16 +28,29 @@ export function useContractWrite({
       if (!contract) throw new Error("Contract not ready");
       setLoading(true);
       setError(null);
-      try {
-        let finalArgs = overrideArgs.length > 0 ? overrideArgs : args;
 
-        let callOverrides = overrides;
+      try {
+        let finalArgs: any[] = [];
+        let callOverrides: Record<string, any> = overrides;
+
         if (
-          finalArgs.length > 0 &&
-          typeof finalArgs[finalArgs.length - 1] === "object" &&
-          !Array.isArray(finalArgs[finalArgs.length - 1])
+          overrideArgs.length === 1 &&
+          typeof overrideArgs[0] === "object" &&
+          !Array.isArray(overrideArgs[0])
         ) {
-          callOverrides = finalArgs.pop();
+          const opt = overrideArgs[0];
+          finalArgs = opt.args ?? args;
+          callOverrides = opt.overrides ?? overrides;
+        } else {
+          finalArgs = overrideArgs.length > 0 ? [...overrideArgs] : args;
+
+          if (
+            finalArgs.length > 0 &&
+            typeof finalArgs[finalArgs.length - 1] === "object" &&
+            !Array.isArray(finalArgs[finalArgs.length - 1])
+          ) {
+            callOverrides = finalArgs.pop();
+          }
         }
 
         const tx = await contract[functionName](...finalArgs, callOverrides);

@@ -1,58 +1,46 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "../BaseTable";
-import BidMenu from "../BidMenu";
-import { formatTableData, ProjectsTableProps } from "../Utils";
-import { useContractRead } from "@/hooks/useContractRead";
 import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
+import { formatTableData, ProjectsTableProps } from "../Utils";
+import { parseEther } from "viem";
+import { useContractWrite } from "@/hooks/useContractWrite"
+import { useContractRead } from "@/hooks/useContractRead"
 
 
-
-const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab }) => {
+const ProjectBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
-  const [original_price, setOriginal_price] = useState("");
-  const [original_time, setOriginal_time] = useState("");
 
-  const { data: projectInfo } = useContractRead({
-    functionName: "projects",
+  const { write } = useContractWrite({
+    functionName: "acceptBid",
+    args: [] as unknown as [string, string],
+  });
+
+  const { data: bidInfo } = useContractRead({
+    functionName: "bids",
     args: [project],
   }) as { data: string[] | undefined };
 
-  const { data: ownerRating } = useContractRead<number | undefined>({
+  const { data: workerRating } = useContractRead({
     functionName: "rates",
-    args: [projectInfo && projectInfo[2]],
-  }) as { data?: number};
+    args: [bidInfo && bidInfo[2]],
+  }) as { data?: number };
 
-  const handleBidClick = () => {
-    setOriginal_price(prices[project]);
-    setOriginal_time(timeSpans[project]);
-    setIsBidMenuOpen(true);
-  };
-
-  const closeMenu = () => {
-    setIsBidMenuOpen(false);
-  };
-
-  const titles = useFetchFields(data, storage, "title");
+  const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
   const short_descriptions = useFetchFields(data, storage, "short_description");
 
   const buttons = [
     {
-      id: "open",
-      name: "Open",
+      id: "accept",
+      name: "Accept",
       onClick: (project: {id: string}) => {
-        if (!setTab) return
-        setTab({ id: project.id, from: "worker" });
-      },
-    },
-    {
-      id: "bid",
-      name: "Bid",
-      onClick: () => {
-        handleBidClick();
+        write({
+          args: [String(project_ids[project.id]), String(project.id)],
+          value: parseEther(prices[project.id]),
+        });
       },
     },
   ] as 
@@ -64,17 +52,12 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
     disabled?: (row?: { id: string }) => boolean;
     state?: (row?: { id: string }) => number;
     onClose?: () => void
-  }[]
+  }[] ;
 
 
-  const [isBidMenuOpen, setIsBidMenuOpen] = useState(false);
-
-  const filteredData = formatTableData(data, titles, searchTerm);
-
+  const filteredData = formatTableData(data, project_ids, searchTerm);
   const renderCellContent = (row: {id: string}, column: string) => {
     switch (column) {
-      case "title":
-        return titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "timeSpan":
         return timeSpans[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "price":
@@ -88,7 +71,7 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
     const fetchDescription = async () => {
       try {
         const description = await fetchProjectFieldFromId(storage, project, "description");
-        setDescription(description);
+        setDescription("Description:" + "\n" + description);
       } catch (error) {
         console.error("Failed to fetch description:", error);
       }
@@ -104,24 +87,15 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
-        currentRating={ownerRating}
-        ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
-        projectSetter={setProject}
+        currentRating={workerRating}
         dataChanged={data}
+        ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
+        projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
       ></BaseTable>
-      {isBidMenuOpen && (
-        <BidMenu
-          onClose={closeMenu}
-          project_id={project}
-          storage={storage}
-          original_price={original_price}
-          original_time={original_time}
-        ></BidMenu>
-      )}
     </>
   );
 };
 
-export default OpenProjectsTable;
+export default ProjectBidsTable;

@@ -1,7 +1,7 @@
 {
-  "31337": {
-    "contractName": "ChainLance",
-    "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+  "100": {
+    "contractName": "chainlance",
+    "address": "0xb19856422dfd1e30fac7F9aB97d12EcbC85AE7bb",
     "abi": [
       {
         "anonymous": false,

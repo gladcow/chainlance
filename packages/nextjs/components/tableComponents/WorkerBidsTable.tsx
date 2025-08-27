@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "../BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
-import { formatTableData, mapBidsToTitles } from "../Utils";
+import { formatTableData, mapBidsToTitles, ProjectsTableProps } from "../Utils";
 import { useContractRead } from "@/hooks/useContractRead";
 
-const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
+
+
+const WorkerBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -20,14 +22,14 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
   const { data: bidInfo } = useContractRead({
     functionName: "bids",
     args: [project],
-  }) as { data: any[] | undefined };
+  }) as { data: string[] | undefined };
 
   const { data: workerRating } = useContractRead({
     functionName: "rates",
     args: [bidInfo && bidInfo[2]],
-  });
+  }) as {data?: number};
 
-  const renderCellContent = (row: any, column: string) => {
+  const renderCellContent = (row: {id: string}, column: string) => {
     switch (column) {
       case "Title of a project":
         return bids_titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
@@ -37,8 +39,6 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
         return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "short description":
         return short_descriptions[row.id] || "";
-      default:
-        return row[column];
     }
   };
 
@@ -63,7 +63,7 @@ const WorkerBidsTable: React.FC<any> = ({ data, storage }) => {
         sortRow={filteredData}
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
-        // currentRating={workerRating}
+        currentRating={workerRating}
         dataChanged={data}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}

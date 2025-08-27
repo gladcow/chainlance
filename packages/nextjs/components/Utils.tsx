@@ -1,5 +1,8 @@
+import { Bee } from "@ethersphere/bee-js";
+import { Dispatch, SetStateAction } from "react";
+
 export const formatTableData = (
-  initialData: any[] | undefined,
+  initialData: string[] | undefined,
   fields: { [key: string]: string },
   searchTerm: string,
 ) => {
@@ -110,3 +113,10 @@ export const calculateGradient = (timeValue: number, mounted: boolean, resolvedT
     ${mix(end, start, normalized)}
   )`;
 };
+
+
+export interface ProjectsTableProps {
+  data: string[] | undefined;
+  storage: Bee | undefined;
+  setTab?: Dispatch<SetStateAction<{ id: string; from?: string; state?: string; }>>
+}

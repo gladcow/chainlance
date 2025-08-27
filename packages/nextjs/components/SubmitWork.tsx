@@ -1,10 +1,10 @@
 import { ContractFunctionExecutionError } from "viem";
 
-export const submitWork = async (project_id: string, writeAsync: any) => {
+export const submitWork = async (project_id: string, write: (...overrideArgs: unknown[]) => Promise<unknown>) => {
   const writeProjectDetailsToStorage = async function () {
-    writeAsync({ args: [project_id] });
+    write({ args: [project_id] });
   };
-  if (writeAsync) {
+  if (project_id) {
     try {
       await writeProjectDetailsToStorage();
     } catch (error) {

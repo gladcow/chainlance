@@ -1,5 +1,5 @@
 interface SearchFieldProps {
-  searchTermPair: any[];
+  searchTermPair: [string, React.Dispatch<React.SetStateAction<string>>];
 }
 export const SearchField = ({ searchTermPair }: SearchFieldProps) => {
   return (

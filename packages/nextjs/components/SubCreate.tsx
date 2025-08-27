@@ -1,3 +1,4 @@
+import { Bee } from "@ethersphere/bee-js";
 import { timeDecider } from "./Utils";
 import { ContractFunctionExecutionError, parseEther } from "viem";
 
@@ -8,8 +9,8 @@ export const subCreate = async (
   description: string,
   price: string,
   timeSpan: number,
-  writeAsync: any,
-  storage: any,
+  write: (...overrideArgs: unknown[]) => Promise<unknown>,
+  storage: Bee | undefined,
 ) => {
   const writeProjectDetailsToStorage = async function () {
     const calculatedTime = timeDecider(timeMult, timeSpan);
@@ -25,9 +26,9 @@ export const subCreate = async (
     );
 
     const id = res?.reference.toString();
-    writeAsync({ args: [project_id, id, parseEther(price), timeSpan] });
+    write({ args: [project_id, id, parseEther(price), timeSpan] });
   };
-  if (writeAsync) {
+  if (project_id) {
     try {
       await writeProjectDetailsToStorage();
     } catch (error) {

@@ -7,7 +7,7 @@ export const placeBid = async (
   description: string,
   timeSpan: number,
   price: string,
-  writeAsync: any,
+  write: (...overrideArgs: unknown[]) => Promise<unknown>,
   storage: Bee | undefined,
 ) => {
   const writeProjectDetailsToStorage = async function () {
@@ -23,9 +23,9 @@ export const placeBid = async (
     );
     const id = res?.reference.toString();
     const price_to_contract = parseEther(price);
-    writeAsync({ args: [project_id, id, price_to_contract, timeSpan] });
+    write({ args: [project_id, id, price_to_contract, timeSpan] });
   };
-  if (writeAsync) {
+  if (project_id) {
     try {
       await writeProjectDetailsToStorage();
     } catch (error) {

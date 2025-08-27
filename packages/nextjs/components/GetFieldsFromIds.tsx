@@ -22,8 +22,8 @@ const fetchProjectFieldFromId = async (storage: Bee | undefined, projectId: stri
   try {
     const data = await storage.downloadData(projectId);
     if (!data) return "";
-
-    const parsedData = data.json() as unknown as ParsedData;
+    
+    const parsedData = data.toJSON() as unknown as ParsedData;
     return parsedData[field]?.toString() || "";
   } catch (error) {
     console.error(`Error fetching project field for projectId "${projectId}":`, error);
@@ -32,7 +32,7 @@ const fetchProjectFieldFromId = async (storage: Bee | undefined, projectId: stri
 };
 
 const useFetchFields = (
-  data: any[] | undefined,
+  data: string[] | undefined,
   storage: Bee | undefined,
   field: keyof ParsedData,
 ): { [key: string]: string } => {

@@ -5,64 +5,54 @@ import { Bee } from "@ethersphere/bee-js";
 import type { NextPage } from "next";
 import { useEffectOnce } from "@/hooks/useEffectOnce";
 import { useWallet } from "@/hooks/useWallet";
-// import { useAccount } from "wagmi";
 import { MainTab } from "@/components/MainTab";
 import { NavBarChain } from "@/components/NavBarChain";
 import { Footer } from "@/components/Footer";
-import { useContractRead } from "@/hooks/useContractRead";
-// import { SettingsTab } from "~~/components/SettingsTab";
+import { SettingsTab } from "@/components/SettingsTab";
 import { UserWorker } from "@/components/UserWorker";
-// import { UserEmployer } from "~~/components/User_employer";
-// import ProjectPage from "~~/components/tableComponents/ProjectPage";
-// import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { UserEmployer } from "@/components/UserEmployer";
+import ProjectPage from "@/components/tableComponents/ProjectPage";
 
 const Home: NextPage = () => {
-  const [tab, setTab] = useState("main");
+  const [tab, setTab] = useState<{id: string, from?: string, state?: string}>({id: "main", from:'', state:''});
   const { address: connectedAddress } = useWallet();
 
   const [storage, setStorage] = useState<Bee>();
 
   useEffectOnce(() => {
     setStorage(new Bee("http://92.63.194.135:3000"));
+    
   });
-
-
-  // const {} = useScaffoldContractRead({
-  //   contractName: "ChainLance",
-  //   functionName: "projects",
-  //   args: [projectId],
-  //   watch: true,
-  // });
 
   return (
     <>
       <NavBarChain tab={tab} setTab={setTab}></NavBarChain>
       <div className="flex flex-row items-start h-96">
-        {tab === "main" && (
+        {tab.id === "main" && (
           <>
             <MainTab></MainTab>
           </>
         )}
-        {tab === "worker" && (
+        {tab.id === "worker" && (
           <>
             <UserWorker address={connectedAddress} storage={storage} setTab={setTab}></UserWorker>
           </>
         )}
 
-        {tab === "employer" && (
+        {tab.id === "employer" && (
           <>
-            {/* <UserEmployer address={connectedAddress} storage={storage} setTab={setTab}></UserEmployer> */}
+            <UserEmployer address={connectedAddress} storage={storage} setTab={setTab}></UserEmployer>
           </>
         )}
 
-        {tab === "settings" && (
+        {tab.id === "settings" && (
           <>
-            {/* <SettingsTab></SettingsTab> */}
+            <SettingsTab></SettingsTab>
           </>
         )}
-        {tab != "main" && tab != "worker" && tab != "employer" && tab != "settings" && (
+        {tab.id != "main" && tab.id != "worker" && tab.id != "employer" && tab.id != "settings" && (
           <>
-            {/* <ProjectPage project={tab} storage={storage} setTab={setTab}></ProjectPage> */}
+            <ProjectPage project={tab} storage={storage} setTab={setTab}></ProjectPage>
           </>
         )}
       </div>

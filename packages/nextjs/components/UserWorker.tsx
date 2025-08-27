@@ -3,13 +3,13 @@ import OpenProjectsTable from "./tableComponents/OpenProjectsTable";
 import WorkerBidsTable from "./tableComponents/WorkerBidsTable";
 import WorkerProjects from "./tableComponents/WorkerProjects";
 import { Bee } from "@ethersphere/bee-js";
-import { useEffectOnce } from "@/hooks/useEffectOnce"
 import { useContractRead } from "@/hooks/useContractRead";
+import { ProjectsTableProps } from "./Utils";
 
 interface UserWorkerProps {
   address?: string;
   storage?: Bee;
-  setTab: Dispatch<SetStateAction<string>>;
+  setTab: Dispatch<SetStateAction<{ id: string; from?: string; state?: string; }>>
 }
 type TableKey = "Open" | "Bids" | "WorkInProgress" | "InReview" | "Completed";
 
@@ -20,33 +20,34 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
   const { data: projectlist } = useContractRead({
     functionName: "listProjectsWithState",
     args: [0],
-  }) as { data?: Array<{ id: string; [key: string]: any }> };
+  }) as { data?: Array<string> };
 
   const { data: workerBids } = useContractRead({
     functionName: "listWorkerBids",
     args: [address],
-  }) as { data?: any[] };
+  }) as { data?: string[] };
 
   const { data: projectsWithWorker } = useContractRead({
     functionName: "listWorkerProjects",
     args: [address],
-  }) as { data?: Array<{ id: string; [key: string]: any }> };
+  }) as { data?: Array<string> };
 
   const { data: statesGetter } = useContractRead({
     functionName: "getProjectStates",
-    args: [projectsToGetter] as unknown as any,
+    args: [projectsToGetter] as unknown as bigint[],
     enabled:
       selectTable === "Completed" ||
       selectTable === "WorkInProgress" ||
       (selectTable === "InReview" && !!projectsWithWorker),
   }) as { data?: number[] };
 
-  useEffectOnce(() => {
+  useEffect(() => {
     setSelectTable("Open");
-  });
+  },[]);
 
   useEffect(() => {
-    setProjectsToGetter(projectsWithWorker ? projectsWithWorker : {});
+    const plainProjects = projectsWithWorker ? [...projectsWithWorker] : [];
+    setProjectsToGetter(plainProjects);
   }, [projectsWithWorker]);
 
   const dataToSend = useMemo(() => {
@@ -57,17 +58,17 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
         return workerBids ?? [];
       case "WorkInProgress":
         if (!projectsWithWorker || !statesGetter) return [];
-        return projectsWithWorker.filter((_, idx) => statesGetter[idx] === 1);
+        return projectsWithWorker.filter((_, idx) => Number(statesGetter[idx]) === 1);
       case "InReview":
         if (!projectsWithWorker || !statesGetter) return [];
-        return projectsWithWorker.filter((_, idx) => statesGetter[idx] === 2);
+        return projectsWithWorker.filter((_, idx) => Number(statesGetter[idx]) === 2);
       case "Completed":
         if (!projectsWithWorker || !statesGetter) return [];
-        return projectsWithWorker.filter((_, idx) => statesGetter[idx] === 3);
+        return projectsWithWorker.filter((_, idx) => Number(statesGetter[idx]) === 3);
     }
   }, [selectTable, projectlist, workerBids, projectsWithWorker, statesGetter]);
 
-  type AnyComp = React.FC<any>;
+  type AnyComp = React.FC<ProjectsTableProps>;
   const TableComponent: AnyComp = useMemo(() => {
     switch (selectTable) {
       case "Bids":
@@ -98,7 +99,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
         <select
           className="select select-bordered mr-5 ml-5 mt-5 mb-5 max-w-32"
           value={selectTable}
-          onChange={e => setSelectTable(e.target.value as any)}
+          onChange={e => setSelectTable(e.target.value as SetStateAction<TableKey>)}
         >
           <option value="Open">Open Projects</option>
           <option value="Bids">My Bids</option>

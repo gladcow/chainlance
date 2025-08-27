@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { DescriptionField, PriceField, TimeField } from "./InputFields";
-import { subCreate } from "./SubCreate";
-import { useContractWrite } from "@/hooks/useContractWrite";
+import { Dispatch, SetStateAction, useState } from "react";
+import { DescriptionField, PriceField, TimeField, TitleField } from "./InputFields";
+import { timeDecider } from "./Utils";
 import { Bee } from "@ethersphere/bee-js";
+import { parseEther } from "viem";
+import { useContractWrite } from "@/hooks/useContractWrite"
 
-interface BidMenuProps {
-  onClose: () => void;
-  project_id: string;
-  title: string;
+interface WriteCreateProjectProps {
   storage: Bee | undefined;
+  setCreateMenu: Dispatch<SetStateAction<boolean>>;
 }
 
-const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, storage }) => {
+export const WriteCreateProject = ({ storage, setCreateMenu }: WriteCreateProjectProps) => {
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
@@ -20,9 +20,28 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
   const [timeMult, setTimeMult] = useState("hours");
 
   const { write, loading } = useContractWrite({
-    functionName: "createSubproject",
-    args: [] as unknown as [string, string, bigint, number],
+    functionName: "createProject",
+    args: [] as unknown as [string, bigint, number],
   });
+
+  const writeProjectDetailsToStorage = async function () {
+    const calculatedTime = timeDecider(timeMult, timeSpan);
+    const res = await storage?.uploadData(
+      "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
+      JSON.stringify({
+        title,
+        description,
+        short_description: description.slice(0, 500),
+        price,
+        timeSpan: calculatedTime,
+      }),
+    );
+
+    const id = res?.reference.toString();
+    write({
+      args: [id, parseEther(price), Math.round(calculatedTime)],
+    });
+  };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -45,19 +64,18 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    subCreate(title, timeMult, project_id, description, price, timeSpan, write, storage);
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="card bg-base-100 w-96 shadow-xl">
         <div className="card-body">
           <div className="flex justify-between">
-            <h2 className="card-title">Create Subproject</h2>
-            <button className="btn btn-square" onClick={onClose}>
+            <h2 className="card-title">Create Project</h2>
+            <button
+              className="btn btn-square"
+              onClick={() => {
+                setCreateMenu(false);
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -70,6 +88,8 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
             </button>
           </div>
           <div className="card-actions justify-end">
+            <TitleField setTitle={setTitle}></TitleField>
+
             <DescriptionField setDescription={setDescription}></DescriptionField>
 
             <PriceField handlePriceChange={handlePriceChange} priceError={priceError}></PriceField>
@@ -81,8 +101,15 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
               timeError={timeError}
             ></TimeField>
             {true && (
-              <button className="btn btn-primary" onClick={handleSubmit} disabled={!!priceError || !!timeError}>
-                {loading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Subproject</>}
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  writeProjectDetailsToStorage();
+                  setCreateMenu(false);
+                }}
+                disabled={!!priceError || !!timeError}
+              >
+                {loading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
               </button>
             )}
           </div>
@@ -91,5 +118,3 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
     </div>
   );
 };
-
-export default SubCreateMenu;

@@ -1,9 +1,9 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { TabButton } from "./TabButton"
 
 interface NavBarChainProps {
-  tab: string;
-  setTab: (tab: string) => void;
+  tab: {id: string, from?: string, state?: string};
+  setTab: Dispatch<SetStateAction<{ id: string; from?: string; state?: string; }>>;
 }
 
 export const NavBarChain = ({ tab, setTab }: NavBarChainProps) => {

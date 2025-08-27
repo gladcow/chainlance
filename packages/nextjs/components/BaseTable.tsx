@@ -5,30 +5,32 @@ import { calculateGradient, timeRetrive } from "./Utils";
 import { useTheme } from "next-themes";
 
 interface TableProps {
-  renderFunction: any;
-  sortRow: any[];
+  renderFunction: (row: {id: string}, column: string) => string | React.JSX.Element | undefined;
+  sortRow: {id: string}[];
   projectSetter: React.Dispatch<React.SetStateAction<string>>;
-  searchTermPair: any[];
+  searchTermPair: [string, React.Dispatch<React.SetStateAction<string>>];
   description: string;
   ratingButtons?: {
     id: string;
-    name: string;
-    onClick: (row: any) => void;
+    onClick: (row: {id: string}) => void;
     color?: string;
-    disabled?: boolean | ((row: any) => boolean);
   }[];
   emptyTableMessage?: string;
   buttons?:
     | {
         id: string;
         name: string;
-        onClick: (row: any) => void;
+        onClick: (row?: {id: string}) => void;
+        gone?: (row?: {id: string}) => boolean;
+        disabled?: (row?: {id: string}) => boolean;
+        state?: (row?: {id: string}) => number;
+
       }[]
-    | any[];
+    ;
   status?: { bids_amount: number; state: string };
   currentRating?: number;
   ethAddress?: string;
-  dataChanged?: any;
+  dataChanged?: string[];
 }
 
 const BaseTable: React.FC<TableProps> = ({
@@ -89,14 +91,14 @@ const BaseTable: React.FC<TableProps> = ({
                       style={{
                         background: calculateGradient(timeValue, mounted, resolvedTheme ? resolvedTheme : "dark"),
                         boxShadow: "0 4px 6px -1px var(--tw-shadow-color)",
-                        ["--tw-shadow-color" as any]:
+                        ["--tw-shadow-color" as string]:
                           resolvedTheme === "dark" ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.1)",
                       }}
                     >
                       <div className="flex flex-col gap-3 text-primary-content">
                         <div className="flex items-center gap-2">
                           <ClockIcon className="w-5 h-5" />
-                          <span className="font-medium">{timeRetrive(renderFunction(row, "timeSpan"))}</span>
+                          <span className="font-medium">{timeRetrive(Number(renderFunction(row, "timeSpan")))}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CurrencyDollarIcon className="w-5 h-5" />

@@ -3,15 +3,20 @@ import BaseTable from "../BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
 import SubCreateMenu from "../SubCreateMenu";
 import SubmitWorkMenu from "../SubmitWorkMenu";
-import { formatTableData } from "../Utils";
+import { formatTableData, ProjectsTableProps } from "../Utils";
 import { useContractRead } from "@/hooks/useContractRead";
 import { useContractWrite } from "@/hooks/useContractWrite"
 
-const WorkerProjects: React.FC<any> = ({ data, storage }) => {
+
+const WorkerProjects: React.FC<ProjectsTableProps> = ({ data, storage }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
-  const [ratingButtons, setRatingButtons] = useState<any[]>([]);
+  const [ratingButtons, setRatingButtons] = useState<{
+    id: string;
+    color: string;
+    onClick: () => void
+  }[]>([]);
   const [isSubmitMenuOpen, setIsSubmitMenuOpen] = useState(false);
   const [isSubCreateMenuOpen, setIsSubCreateMenuOpen] = useState(false);
 
@@ -33,7 +38,7 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
   const { data: projectInfo } = useContractRead({
     functionName: "projects",
     args: [project],
-  }) as { data: any[] | undefined };
+  }) as { data: string[] | undefined };
 
   const { write: rateEmployer } = useContractWrite({
     functionName: "rateOwner",
@@ -43,7 +48,7 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
   const { data: employerRating } = useContractRead({
     functionName: "rates",
     args: [projectInfo && projectInfo[2]],
-  });
+  }) as {data?: number};
 
   const { write: cancelWork } = useContractWrite({
     functionName: "cancelWork",
@@ -62,13 +67,13 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         handleSubmitClick();
       },
       onClose: () => {
-        closeSubmitMenu;
+        closeSubmitMenu();
       },
       disabled: () => {
-        return projectInfo ? projectInfo[4] != 1 : 0;
+        return projectInfo ? Number(projectInfo[4])!= 1 : 0;
       },
       state: () => {
-        return projectInfo ? projectInfo[4] : 0;
+        return projectInfo ? Number(projectInfo[4]) : 0;
       },
     },
     {
@@ -78,16 +83,16 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         handleSubCreateClick();
       },
       onClose: () => {
-        closeSubCreateMenu;
+        closeSubCreateMenu();
       },
       disabled: () => {
-        return projectInfo ? projectInfo[4] != 1 : 0;
+        return projectInfo ? Number(projectInfo[4]) != 1 : 0;
       },
       state: () => {
-        return projectInfo ? projectInfo[4] : 0;
+        return projectInfo ? Number(projectInfo[4]) : 0;
       },
       gone: () => {
-        return projectInfo ? projectInfo[4] != 1 : true;
+        return projectInfo ? Number(projectInfo[4]) != 1 : true;
       },
     },
     {
@@ -97,20 +102,29 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         cancelWork({ args: [project] });
       },
       disabled: () => {
-        return projectInfo ? projectInfo[4] != 1 : 0;
+        return projectInfo ? Number(projectInfo[4]) != 1 : 0;
       },
       state: () => {
-        return projectInfo ? projectInfo[4] : 0;
+        return projectInfo ? Number(projectInfo[4]) : 0;
       },
       gone: () => {
-        return projectInfo ? projectInfo[4] != 1 : true;
+        return projectInfo ? Number(projectInfo[4]) != 1 : true;
       },
     },
-  ];
+  ] as 
+  {
+    id: string;
+    name: string;
+    onClick: (project?: { id: string }) => void;
+    gone?: (row?: { id: string }) => boolean;
+    disabled?: (row?: { id: string }) => boolean;
+    state?: (row?: { id: string }) => number;
+    onClose?: () => void
+  }[] ;
 
   const filteredData = formatTableData(data, titles, searchTerm);
 
-  const renderCellContent = (row: any, column: string) => {
+  const renderCellContent = (row: {id: string}, column: string) => {
     switch (column) {
       case "title":
         return titles[row.id] || <span className="loading loading-spinner loading-sm"></span>;
@@ -120,8 +134,6 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         return prices[row.id] || <span className="loading loading-spinner loading-sm"></span>;
       case "short description":
         return short_descriptions[row.id] || "";
-      default:
-        return row[column];
     }
   };
   useEffect(() => {
@@ -169,7 +181,7 @@ const WorkerProjects: React.FC<any> = ({ data, storage }) => {
         renderFunction={renderCellContent}
         sortRow={filteredData}
         buttons={buttons}
-        // currentRating={employerRating}
+        currentRating={employerRating}
         ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}
