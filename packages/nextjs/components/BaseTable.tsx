@@ -30,7 +30,7 @@ interface TableProps {
   status?: { bids_amount: number; state: string };
   currentRating?: number;
   ethAddress?: string;
-  dataChanged?: string[];
+  activeTable?: string;
 }
 
 const BaseTable: React.FC<TableProps> = ({
@@ -43,7 +43,7 @@ const BaseTable: React.FC<TableProps> = ({
   description,
   ratingButtons = [],
   status,
-  dataChanged,
+  activeTable,
   currentRating = 0,
   ethAddress = "0x000000000000000000000000000000000",
 }) => {
@@ -51,7 +51,7 @@ const BaseTable: React.FC<TableProps> = ({
 
   useEffect(() => {
     setExpandedRow(null);
-  }, [dataChanged]);
+  }, [activeTable]);
 
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -67,18 +67,18 @@ const BaseTable: React.FC<TableProps> = ({
           sortRow.map((row, index) => {
             const timeValue = Number(renderFunction(row, "timeSpan"));
             return (
-              <div key={index} className="card bg-primary shadow-lg border border-base-300">
+              <div key={index} className="card bg-base-300 shadow-lg border border-base-300">
                 <div className="card-body p-4">
                   {/* Main Row */}
                   <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
                     {/* Left Section - Title and Description */}
                     <div className="flex-1">
-                      <h2 className="text-xl font-bold text-primary-content mb-2">
+                      <h2 className="text-xl font-bold text-base-content mb-2">
                         {renderFunction(row, "title")
                           ? renderFunction(row, "title")
                           : renderFunction(row, "Title of a project")}
                       </h2>
-                      <p className="text-primary-content/80 break-all">
+                      <p className="text-base-content/80 break-all">
                         {renderFunction(row, "short description")
                           ? renderFunction(row, "short description")
                           : "No short description"}
@@ -127,7 +127,7 @@ const BaseTable: React.FC<TableProps> = ({
                             {/* <BlockieAvatar address={ethAddress} size={60} /> */}
                             <div className="space-y-2">
                               <p className="font-mono text-sm text-base-content/80 break-all">{ethAddress}</p>
-                              <div className="rating rating-sm pb-3 flex items-center gap-2">
+                              <div className="pb-3 flex items-center gap-2">
                                 <h2 className="flex items-center">
                                   rates at
                                   <span className={`text mx-1 ${currentRating >= 0 ? "text-success" : "text-error"}`}>
@@ -142,12 +142,12 @@ const BaseTable: React.FC<TableProps> = ({
                                           onClick={() => button.onClick(row)}
                                         >
                                           {button.id === "rate-good" ? (
-                                            <svg
+                                           <svg
                                               className="w-6 h-6"
                                               fill="none"
                                               viewBox="0 0 24 24"
                                               stroke="currentColor"
-                                              strokeWidth={1.5}
+                                              strokeWidth={2}
                                             >
                                               <path
                                                 strokeLinecap="round"
@@ -186,7 +186,7 @@ const BaseTable: React.FC<TableProps> = ({
                                 <button
                                   key={button.id}
                                   disabled={!!button.disabled?.()}
-                                  className={`btn btn-sm ${button.disabled?.() ? "btn-disabled" : "btn-secondary"}`}
+                                  className={`btn btn-sm ${button.disabled?.() ? "btn-disabled" : "btn-primary"}`}
                                   onClick={() => button.onClick(row)}
                                 >
                                   {button.state?.() === 3 && "Completed"}

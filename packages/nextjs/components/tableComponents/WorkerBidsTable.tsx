@@ -6,7 +6,7 @@ import { useContractRead } from "@/hooks/useContractRead";
 
 
 
-const WorkerBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
+const WorkerBidsTable: React.FC<ProjectsTableProps> = ({ data, storage, activeTable }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -64,7 +64,7 @@ const WorkerBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         currentRating={workerRating}
-        dataChanged={data}
+        activeTable={activeTable}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
       ></BaseTable>

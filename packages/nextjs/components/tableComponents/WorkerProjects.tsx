@@ -8,7 +8,7 @@ import { useContractRead } from "@/hooks/useContractRead";
 import { useContractWrite } from "@/hooks/useContractWrite"
 
 
-const WorkerProjects: React.FC<ProjectsTableProps> = ({ data, storage }) => {
+const WorkerProjects: React.FC<ProjectsTableProps> = ({ data, storage, activeTable }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -187,7 +187,7 @@ const WorkerProjects: React.FC<ProjectsTableProps> = ({ data, storage }) => {
         searchTermPair={[searchTerm, setSearchTerm]}
         ratingButtons={ratingButtons}
         description={description}
-        dataChanged={data}
+        activeTable={activeTable}
       ></BaseTable>
       {isSubmitMenuOpen && <SubmitWorkMenu onClose={closeSubmitMenu} project_id={project}></SubmitWorkMenu>}
       {isSubCreateMenuOpen && (

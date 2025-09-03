@@ -20,6 +20,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
   const { data: projectlist } = useContractRead({
     functionName: "listProjectsWithState",
     args: [0],
+    watch: true
   }) as { data?: Array<string> };
 
   const { data: workerBids } = useContractRead({
@@ -30,6 +31,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
   const { data: projectsWithWorker } = useContractRead({
     functionName: "listWorkerProjects",
     args: [address],
+    watch: true
   }) as { data?: Array<string> };
 
   const { data: statesGetter } = useContractRead({
@@ -108,7 +110,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
           <option value="Completed">Completed</option>
         </select>
 
-        <TableComponent data={dataToSend} storage={storage} setTab={setTab} />
+        <TableComponent data={dataToSend} storage={storage} setTab={setTab} activeTable={selectTable}/>
       </div>
     </div>
   );

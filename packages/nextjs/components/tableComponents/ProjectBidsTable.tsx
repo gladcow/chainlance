@@ -7,7 +7,7 @@ import { useContractWrite } from "@/hooks/useContractWrite"
 import { useContractRead } from "@/hooks/useContractRead"
 
 
-const ProjectBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
+const ProjectBidsTable: React.FC<ProjectsTableProps> = ({ data, storage, activeTable }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -39,7 +39,9 @@ const ProjectBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
       onClick: (project: {id: string}) => {
         write({
           args: [String(project_ids[project.id]), String(project.id)],
-          value: parseEther(prices[project.id]),
+          overrides: {
+               value: parseEther(prices[project.id]),
+          },
         });
       },
     },
@@ -88,7 +90,7 @@ const ProjectBidsTable: React.FC<ProjectsTableProps> = ({ data, storage }) => {
         sortRow={filteredData}
         buttons={buttons}
         currentRating={workerRating}
-        dataChanged={data}
+        activeTable={activeTable}
         ethAddress={bidInfo ? bidInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
         searchTermPair={[searchTerm, setSearchTerm]}

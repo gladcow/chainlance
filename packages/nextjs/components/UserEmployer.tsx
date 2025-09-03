@@ -20,6 +20,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
   const { data: ownerProjects } = useContractRead({
     functionName: "listOwnerProjects",
     args: [address],
+    watch: true
   }) as { data?: Array<string> };
 
   const { data: statesGetter } = useContractRead({
@@ -107,7 +108,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
             </svg>
           </button>
         </div>
-        <TableComponent data={dataToSend} storage={storage} setTab={setTab} />
+        <TableComponent data={dataToSend} storage={storage} setTab={setTab} activeTable={selectTable}/>
         {showCreate && <WriteCreateProject storage={storage} setCreateMenu={setShowCreate} />}
       </div>
     </div>

@@ -7,7 +7,7 @@ import { useContractWrite } from "@/hooks/useContractWrite";
 
 
 
-const EmployerProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab }) => {
+const EmployerProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab, activeTable }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -209,9 +209,9 @@ const EmployerProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, se
         buttons={allButtons}
         projectSetter={setProject}
         ratingButtons={ratingButtons}
-        dataChanged={data}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
+        activeTable={activeTable}
         status={status}
       ></BaseTable>
     </>
