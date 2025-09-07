@@ -4,5 +4,10 @@
   "packageManager": "yarn@4.6.0",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "start": "yarn workspace @chainlance/nextjs next dev",
+    "build": "yarn workspace @chainlance/nextjs next build",
+    "start-build": "yarn workspace @chainlance/nextjs serve -s out"
+  }
 }

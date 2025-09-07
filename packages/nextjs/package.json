@@ -11,9 +11,11 @@
   "dependencies": {
     "@ethersphere/bee-js": "^9.8.1",
     "ethers": "^6.15.0",
+    "lucide-react": "^0.542.0",
     "next": "15.4.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "serve": "^14.2.4",
     "viem": "^2.33.3",
     "vue": "^3.5.20"
   },

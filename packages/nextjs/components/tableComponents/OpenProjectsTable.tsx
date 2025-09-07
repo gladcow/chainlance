@@ -7,7 +7,7 @@ import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
 
 
 
-const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab }) => {
+const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab, activeTable }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
@@ -107,9 +107,9 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
         currentRating={ownerRating}
         ethAddress={projectInfo ? projectInfo[2] : "000000000000000000000"}
         projectSetter={setProject}
-        dataChanged={data}
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
+        activeTable={activeTable}
       ></BaseTable>
       {isBidMenuOpen && (
         <BidMenu

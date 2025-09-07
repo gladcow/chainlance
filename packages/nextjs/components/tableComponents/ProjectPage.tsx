@@ -44,8 +44,8 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) =
   }, [project, storage]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn min-w-[600px]">
-      <div className="bg-primary rounded-2xl shadow-xl overflow-hidden border border-primary/20">
+    <div className="max-w-6xl mx-auto px-4 py-8 animate-fadeIn min-w-[800px]">
+      <div className="bg-primary rounded-2xl shadow-xl overflow-hidden border-2 border-success">
         {/* Project Header */}
         <div className="bg-gradient-to-r from-blue-600 to-green-600 p-8 relative">
           {/* Back Button */}
@@ -85,14 +85,14 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) =
         </div>
 
         {/* Project Description */}
-        <div className="p-8 bg-primary border-b border-primary/30">
+        <div className="p-8 bg-base-100 border-b border-primary/30">
           <h2 className="text-xl font-semibold mb-4 text-primary-content">Project Description</h2>
           <p className="leading-relaxed whitespace-pre-line text-primary-content/90">{description}</p>
         </div>
 
         {/* Bids Section */}
         {project.from == "employer" && Number(project.state) == 0 && (
-          <div className="p-8 bg-secondary">
+          <div className="p-8 bg-base-200">
             <h2 className="text-2xl font-bold text-primary mb-6 flex items-center space-x-3">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -104,7 +104,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) =
               </svg>
               <h2 className="text-primary-content">Project Bids</h2>
             </h2>
-            <ProjectBidsTable data={projectBids} storage={storage} />
+            <ProjectBidsTable data={projectBids} storage={storage}/>
           </div>
         )}
       </div>
