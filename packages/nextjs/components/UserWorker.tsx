@@ -26,6 +26,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
   const { data: workerBids } = useContractRead({
     functionName: "listWorkerBids",
     args: [address],
+    watch: true
   }) as { data?: string[] };
 
   const { data: projectsWithWorker } = useContractRead({
@@ -41,6 +42,7 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
       selectTable === "Completed" ||
       selectTable === "WorkInProgress" ||
       (selectTable === "InReview" && !!projectsWithWorker),
+    watch: true
   }) as { data?: number[] };
 
   useEffect(() => {
@@ -59,13 +61,13 @@ export const UserWorker: React.FC<UserWorkerProps> = ({ address, storage, setTab
       case "Bids":
         return workerBids ?? [];
       case "WorkInProgress":
-        if (!projectsWithWorker || !statesGetter) return [];
+        if (!projectsWithWorker || !statesGetter || projectsWithWorker.length != statesGetter.length) return [];
         return projectsWithWorker.filter((_, idx) => Number(statesGetter[idx]) === 1);
       case "InReview":
-        if (!projectsWithWorker || !statesGetter) return [];
+        if (!projectsWithWorker || !statesGetter || projectsWithWorker.length != statesGetter.length) return [];
         return projectsWithWorker.filter((_, idx) => Number(statesGetter[idx]) === 2);
       case "Completed":
-        if (!projectsWithWorker || !statesGetter) return [];
+        if (!projectsWithWorker || !statesGetter || projectsWithWorker.length != statesGetter.length) return [];
         return projectsWithWorker.filter((_, idx) => Number(statesGetter[idx]) === 3);
     }
   }, [selectTable, projectlist, workerBids, projectsWithWorker, statesGetter]);

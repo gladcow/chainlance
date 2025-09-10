@@ -26,6 +26,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
   const { data: statesGetter } = useContractRead({
     functionName: "getProjectStates",
     args: [projectsToGetter] as unknown as string[],
+    watch: true
   }) as { data?: number[] };
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export const UserEmployer: React.FC<UserEmployerProps> = ({ address, storage, se
     const plainProjects = ownerProjects ? [...ownerProjects] : [];
     setProjectsToGetter(plainProjects);
   }, [ownerProjects]);
+
   const dataToSend = useMemo(() => {
     switch (selectTable) {
         

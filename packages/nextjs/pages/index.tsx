@@ -15,7 +15,7 @@ import ProjectPage from "@/components/tableComponents/ProjectPage";
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState<{id: string, from?: string, state?: string}>({id: "main", from:'', state:''});
-  const { address: connectedAddress } = useWallet();
+  const { address: connectedAddress, connect, switchNetwork, chainId } = useWallet();
 
   const [storage, setStorage] = useState<Bee>();
 
@@ -26,7 +26,7 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <NavBarChain tab={tab} setTab={setTab}></NavBarChain>
+      <NavBarChain tab={tab} setTab={setTab} connect={connect} address={connectedAddress} chainId={chainId} switchNetwork={switchNetwork}></NavBarChain>
       <div className="flex flex-row items-start h-96">
         {tab.id === "main" && (
           <>

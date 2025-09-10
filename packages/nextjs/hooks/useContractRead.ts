@@ -16,10 +16,10 @@ export function useContractRead<T>({
   enabled?: boolean;
 }) {
   const { provider, chainId } = useWallet();
+  // console.log(provider, chainId)
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   const contract = useMemo(() => {
     if (!provider || !chainId || !enabled) return null;
     return useContract(chainId, provider);

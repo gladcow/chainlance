@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ethersphere/bee-js": "^9.8.1",
+    "@metamask/providers": "^22.1.1",
     "ethers": "^6.15.0",
     "lucide-react": "^0.542.0",
     "next": "15.4.6",
