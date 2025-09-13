@@ -1,4 +1,31 @@
-export const SettingsTab = () => {
+import { Bee } from "@ethersphere/bee-js";
+import { Dispatch, SetStateAction, useState } from "react";
+
+interface SettingTabProps {
+setStorageAdress: Dispatch<SetStateAction<string>>;
+storageAdress: string;
+setStorageStamp:  Dispatch<SetStateAction<string>>;
+storageStamp: string;
+setStorage: Dispatch<SetStateAction<Bee | undefined>>;
+}
+
+export const SettingsTab = ({ setStorageAdress, storageAdress, setStorageStamp, storageStamp, setStorage }: SettingTabProps) => {
+  
+  const [localAddress, setLocalAddress] = useState(storageAdress);
+  const [localStamp, setLocalStamp] = useState(storageStamp);
+
+  const handleSave = () => {
+    setStorageAdress(localAddress);
+    setStorageStamp(localStamp);
+
+    try {
+      setStorage(new Bee(localAddress));
+    } catch (err) {
+      console.log(err)
+      setStorage(new Bee("http://92.63.194.135:3000"));
+    }
+  };
+
   return (
     <div className="card bg-base-100 w-96 m-5 shadow-xl">
       <div className="card-body">
@@ -6,19 +33,19 @@ export const SettingsTab = () => {
         <p>Change storage url</p>
         <input
           type="text"
-          placeholder="Url"
+          value={localAddress}
           className="input border border-primary"
-          onChange={e => {
-            console.log(e.target.value);
-          }}
+          onChange={(e) => setLocalAddress(e.target.value)}
         />
-        <div className="card-actions justify-end">
-          <button
-            onClick={() => {
-              console.log("saved?");
-            }}
-            className="btn btn-primary"
-          >
+        <p>Change storage stamp</p>
+        <input
+          type="text"
+          value={localStamp}
+          className="input border border-primary"
+          onChange={(e) => setLocalStamp(e.target.value)}
+        />
+        <div className="mt-3 flex justify-start">
+          <button className="btn btn-primary btn-sm" onClick={handleSave}>
             Save
           </button>
         </div>

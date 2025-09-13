@@ -18,11 +18,16 @@ const Home: NextPage = () => {
   const { address: connectedAddress, connect, switchNetwork, chainId } = useWallet();
 
   const [storage, setStorage] = useState<Bee>();
+  const [storageAdress, setStorageAdress] = useState<string>('');
+  const [storageStamp, setStorageStamp] = useState<string>('');
 
   useEffectOnce(() => {
-    setStorage(new Bee("http://92.63.194.135:3000"));
-    
+    setStorageAdress("http://92.63.194.135:3000")
+    setStorageStamp("f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50")
   });
+  useEffectOnce(() => {
+    setStorage(new Bee("http://92.63.194.135:3000"));
+  })
 
   return (
     <>
@@ -35,19 +40,20 @@ const Home: NextPage = () => {
         )}
         {tab.id === "worker" && (
           <>
-            <UserWorker address={connectedAddress} storage={storage} setTab={setTab}></UserWorker>
+            <UserWorker address={connectedAddress} storage={storage} setTab={setTab} storageStamp={storageStamp}></UserWorker>
           </>
         )}
 
         {tab.id === "employer" && (
           <>
-            <UserEmployer address={connectedAddress} storage={storage} setTab={setTab}></UserEmployer>
+            <UserEmployer address={connectedAddress} storage={storage} setTab={setTab} storageStamp={storageStamp}></UserEmployer>
           </>
         )}
 
         {tab.id === "settings" && (
           <>
-            <SettingsTab></SettingsTab>
+            <SettingsTab setStorageStamp={setStorageStamp} setStorageAdress={setStorageAdress} 
+            storageAdress={storageAdress} storageStamp={storageStamp} setStorage={setStorage}></SettingsTab>
           </>
         )}
         {tab.id != "main" && tab.id != "worker" && tab.id != "employer" && tab.id != "settings" && (

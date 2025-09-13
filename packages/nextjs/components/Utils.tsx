@@ -120,4 +120,5 @@ export interface ProjectsTableProps {
   storage: Bee | undefined;
   setTab?: Dispatch<SetStateAction<{ id: string; from?: string; state?: string; }>>
   activeTable?: string;
+  storageStamp?: string;
 }

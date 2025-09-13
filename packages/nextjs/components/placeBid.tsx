@@ -9,10 +9,11 @@ export const placeBid = async (
   price: string,
   write: (...overrideArgs: unknown[]) => Promise<unknown>,
   storage: Bee | undefined,
+  storageStamp: string
 ) => {
   const writeProjectDetailsToStorage = async function () {
     const res = await storage?.uploadData(
-      "f1e4ff753ea1cb923269ed0cda909d13a10d624719edf261e196584e9e764e50",
+      storageStamp,
       JSON.stringify({
         project_id: project_id,
         description: description,

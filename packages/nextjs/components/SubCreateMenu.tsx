@@ -9,9 +9,10 @@ interface BidMenuProps {
   project_id: string;
   title: string;
   storage: Bee | undefined;
+  storageStamp: string;
 }
 
-const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, storage }) => {
+const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, storage, storageStamp }) => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [timeSpan, setTimeSpan] = useState(0);
@@ -47,7 +48,7 @@ const SubCreateMenu: React.FC<BidMenuProps> = ({ onClose, project_id, title, sto
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    subCreate(title, timeMult, project_id, description, price, timeSpan, write, storage);
+    subCreate(title, timeMult, project_id, description, price, timeSpan, write, storage, storageStamp);
     onClose();
   };
 
