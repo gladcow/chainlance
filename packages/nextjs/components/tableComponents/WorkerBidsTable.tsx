@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import BaseTable from "../BaseTable";
 import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
 import { formatTableData, mapBidsToTitles, ProjectsTableProps } from "../Utils";
@@ -14,7 +14,8 @@ const WorkerBidsTable: React.FC<ProjectsTableProps> = ({ data, storage, activeTa
   const project_ids = useFetchFields(data, storage, "project_id");
   const timeSpans = useFetchFields(data, storage, "timeSpan");
   const prices = useFetchFields(data, storage, "price");
-  const title_projects = useFetchFields(Object.values(project_ids), storage, "title");
+  const projectIdsArray = useMemo(() => Object.values(project_ids), [project_ids]);
+  const title_projects = useFetchFields(projectIdsArray, storage, "title");
   const bids_titles = mapBidsToTitles(title_projects, project_ids);
   const filteredData = formatTableData(data, bids_titles, searchTerm);
   const short_descriptions = useFetchFields(data, storage, "short_description");
