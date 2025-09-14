@@ -5,7 +5,13 @@ export function useContract(
   chainId: string,
   signerOrProvider: ethers.Signer | ethers.BrowserProvider,
 ) {
-  const address = (contract as any)[chainId].address;
-  if (!address) throw new Error("Contract not deployed for this chainId (");
+  try {
+  var address = (contract as any)[chainId].address;
+  }
+  catch(err){
+    return
+  }
+  
+  // if (!address) throw new Error("Contract not deployed for this chainId (");
   return new ethers.Contract(address, (contract as any)[chainId].abi, signerOrProvider);
 }

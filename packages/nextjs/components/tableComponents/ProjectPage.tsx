@@ -21,6 +21,7 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) =
   const { data: projectBids } = useContractRead({
     functionName: "listProjectBids",
     args: [project.id],
+    watch: true
   }) as { data: string[] | undefined };
 
   useEffect(() => {
