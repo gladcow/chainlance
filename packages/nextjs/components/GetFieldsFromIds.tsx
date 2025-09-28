@@ -8,6 +8,7 @@ interface ParsedData {
   timeSpan: number;
   project_id: string;
   short_description: string;
+  attachments?: string[];
 }
 
 const isValidProjectId = (projectId: string): boolean => {

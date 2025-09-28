@@ -40,7 +40,7 @@ const Home: NextPage = () => {
         )}
         {tab.id === "worker" && (
           <>
-            <UserWorker address={connectedAddress} storage={storage} setTab={setTab} storageStamp={storageStamp}></UserWorker>
+            <UserWorker address={connectedAddress} storage={storage} storageAddress={storageAdress} setTab={setTab} storageStamp={storageStamp}></UserWorker>
           </>
         )}
 

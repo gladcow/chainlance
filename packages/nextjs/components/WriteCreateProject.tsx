@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { DescriptionField, PriceField, TimeField, TitleField } from "./InputFields";
-import { timeDecider } from "./Utils";
-import { Bee } from "@ethersphere/bee-js";
-import { parseEther } from "viem";
+import { Dispatch, SetStateAction, useState } from "react"
+import { DescriptionField, PriceField, TimeField, TitleField } from "./InputFields"
+import { timeDecider } from "./Utils"
+import { Bee } from "@ethersphere/bee-js"
+import { parseEther } from "viem"
 import { useContractWrite } from "@/hooks/useContractWrite"
+// import pako from "pako"
 
 interface WriteCreateProjectProps {
   storage: Bee | undefined;
@@ -19,14 +20,37 @@ export const WriteCreateProject = ({ storage, setCreateMenu, storageStamp }: Wri
   const [priceError, setPriceError] = useState("");
   const [timeError, setTimeError] = useState("");
   const [timeMult, setTimeMult] = useState("hours");
+  const [files, setFiles] = useState<File[]>([]);
 
   const { write, loading } = useContractWrite({
     functionName: "createProject",
     args: [] as unknown as [string, bigint, number],
   });
 
+  const uploadFilesToSwarm = async (): Promise<string[]> => {
+    if (!storage) return []
+
+    const hashes: string[] = []
+    for (const file of files) {
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error(`file ${file.name} too big (max 50MB)`)
+      }
+
+      const buffer = await file.arrayBuffer()
+      const data = new Uint8Array(buffer)
+      // data = pako.gzip(data)
+
+      const res = await storage?.uploadFile(storageStamp, data, file.name, 
+      {
+        contentType: file.type,
+      })
+      hashes.push(res?.reference.toString())
+    }
+    return hashes
+  }
   const writeProjectDetailsToStorage = async function () {
     const calculatedTime = timeDecider(timeMult, timeSpan);
+    const attachments = await uploadFilesToSwarm()
     const res = await storage?.uploadData(
       storageStamp,
       JSON.stringify({
@@ -35,10 +59,12 @@ export const WriteCreateProject = ({ storage, setCreateMenu, storageStamp }: Wri
         short_description: description.slice(0, 500),
         price,
         timeSpan: calculatedTime,
+        attachments,
       }),
     );
 
     const id = res?.reference.toString();
+    if (!id) return
     write({
       args: [id, parseEther(price), Math.round(calculatedTime)],
     });
@@ -48,10 +74,9 @@ export const WriteCreateProject = ({ storage, setCreateMenu, storageStamp }: Wri
     const value = e.target.value;
     if (/^\d*\.?\d*$/.test(value)) {
       setPrice(value);
-      Number(value);
       setPriceError("");
     } else {
-      setPriceError("Price must be an number");
+      setPriceError("Price must be a number");
     }
   };
 
@@ -62,6 +87,12 @@ export const WriteCreateProject = ({ storage, setCreateMenu, storageStamp }: Wri
       setTimeError("");
     } else {
       setTimeError("Time must be an integer");
+    }
+  }
+
+  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFiles(Array.from(e.target.files))
     }
   };
 
@@ -89,30 +120,40 @@ export const WriteCreateProject = ({ storage, setCreateMenu, storageStamp }: Wri
             </button>
           </div>
           <div className="card-actions justify-end">
-            <TitleField setTitle={setTitle}></TitleField>
+            <TitleField setTitle={setTitle} />
 
-            <DescriptionField setDescription={setDescription}></DescriptionField>
+            <DescriptionField setDescription={setDescription} />
 
-            <PriceField handlePriceChange={handlePriceChange} priceError={priceError}></PriceField>
+            <PriceField handlePriceChange={handlePriceChange} priceError={priceError} />
 
-            <TimeField
-              handleTimeChange={handleTimeChange}
-              setTimeMult={setTimeMult}
-              timeMult={timeMult}
-              timeError={timeError}
-            ></TimeField>
-            {true && (
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  writeProjectDetailsToStorage();
+            <TimeField handleTimeChange={handleTimeChange} setTimeMult={setTimeMult} timeMult={timeMult} timeError={timeError} />
+
+            <div className="w-full">
+              <label className="label">Attachments</label>
+              <input type="file" multiple onChange={handleFilesChange} className="file-input file-input-bordered w-full" />
+              {files.length > 0 && (
+                <ul className="mt-2 text-sm max-h-24 overflow-y-auto">
+                  {files.map((f, i) => (
+                    <li key={i}>{f.name} ({(f.size / 1024 / 1024).toFixed(2)} MB)</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <button
+              className="btn btn-primary mt-4"
+              onClick={async () => {
+                try {
+                  await writeProjectDetailsToStorage();
                   setCreateMenu(false);
-                }}
-                disabled={!!priceError || !!timeError}
-              >
-                {loading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
-              </button>
-            )}
+                } catch (err) {
+                  alert("err: " + err);
+                }
+              }}
+              disabled={!!priceError || !!timeError}
+            >
+              {loading ? <span className="loading loading-spinner loading-sm m-5"></span> : <>Create Project</>}
+            </button>
           </div>
         </div>
       </div>

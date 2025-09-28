@@ -31,6 +31,8 @@ interface TableProps {
   currentRating?: number;
   ethAddress?: string;
   activeTable?: string;
+  attachments?: string[];
+  storageAdress?: string
 }
 
 const BaseTable: React.FC<TableProps> = ({
@@ -46,6 +48,8 @@ const BaseTable: React.FC<TableProps> = ({
   activeTable,
   currentRating = 0,
   ethAddress = "0x000000000000000000000000000000000",
+  attachments,
+  storageAdress,
 }) => {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
@@ -231,6 +235,25 @@ const BaseTable: React.FC<TableProps> = ({
                             {description}
                           </p>
                         </div>
+                        {attachments && attachments.length > 0 && (
+                          <div className="mt-4">
+                            <h3 className="font-bold mb-2">Attachments:</h3>
+                            <ul className="list-disc pl-5">
+                              {attachments.map((hash, idx) => (
+                                <li key={idx}>
+                                  <a
+                                    href={`${storageAdress}/bzz/${hash}/`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="link link-primary"
+                                  >
+                                    File {idx + 1}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

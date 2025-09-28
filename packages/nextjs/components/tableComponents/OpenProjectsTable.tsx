@@ -7,12 +7,13 @@ import { fetchProjectFieldFromId, useFetchFields } from "../GetFieldsFromIds";
 
 
 
-const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab, activeTable, storageStamp }) => {
+const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab, activeTable, storageStamp, storageAddress }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [project, setProject] = useState("");
   const [description, setDescription] = useState("");
   const [original_price, setOriginal_price] = useState("");
   const [original_time, setOriginal_time] = useState("");
+  const [attachments, setAttachments] = useState<string[]>([]);
 
   const { data: projectInfo } = useContractRead({
     functionName: "projects",
@@ -89,6 +90,14 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
       try {
         const description = await fetchProjectFieldFromId(storage, project, "description");
         setDescription(description);
+        
+        const files = await fetchProjectFieldFromId(storage, project, "attachments");
+        console.log(typeof(files))
+        if (typeof(files)=='string') {
+          setAttachments(files.split(",").map(f => f.trim()).filter(Boolean));
+        } else {
+          setAttachments([]);
+        }
       } catch (error) {
         console.error("Failed to fetch description:", error);
       }
@@ -110,6 +119,8 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
         searchTermPair={[searchTerm, setSearchTerm]}
         description={description}
         activeTable={activeTable}
+        attachments={attachments}
+        storageAdress={storageAddress}
       ></BaseTable>
       {isBidMenuOpen && (
         <BidMenu
