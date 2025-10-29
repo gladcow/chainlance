@@ -10,13 +10,15 @@ interface ProjectPageProps {
   project: {id: string, from?: string, state?: string};
   storage: Bee | undefined;
   setTab: Dispatch<SetStateAction<{ id: string; from?: string; state?: string; }>>;
+  storageAddress: string
 }
 
-const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) => {
+const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab, storageAddress }) => {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [timespan, setTimespan] = useState("");
   const [price, setPrice] = useState("");
+  const [attachments, setAttachments] = useState<string[]>([]);
 
   const { data: projectBids } = useContractRead({
     functionName: "listProjectBids",
@@ -31,6 +33,13 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) =
         const title = await fetchProjectFieldFromId(storage, project.id, "title");
         const timespan = await fetchProjectFieldFromId(storage, project.id, "timeSpan");
         const price = await fetchProjectFieldFromId(storage, project.id, "price");
+        const files = await fetchProjectFieldFromId(storage, project.id, "attachments");
+                console.log(typeof(files))
+                if (typeof(files)=='string') {
+                  setAttachments(files.split(",").map(f => f.trim()).filter(Boolean));
+                } else {
+                  setAttachments([]);
+                }
         setTimespan(timespan);
         setPrice(price);
         setTitle(title);
@@ -90,6 +99,25 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, storage, setTab }) =
           <h2 className="text-xl font-semibold mb-4 text-primary-content">Project Description</h2>
           <p className="leading-relaxed whitespace-pre-line text-primary-content/90">{description}</p>
         </div>
+        {attachments && (
+          <div className="p-8 bg-base-100 border-b border-primary/30">
+          <h2 className="text-xl font-semibold mb-4 text-primary-content">Attachments:</h2>
+          <ul className="list-disc pl-5">
+            {attachments.map((hash, idx) => (
+              <li key={idx}>
+                <a
+                  href={`${storageAddress}/bzz/${hash}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link link-primary"
+                >
+                  File {idx + 1}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        )}
 
         {/* Bids Section */}
         {project.from == "employer" && Number(project.state) == 0 && (

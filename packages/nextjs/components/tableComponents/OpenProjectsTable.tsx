@@ -120,7 +120,7 @@ const OpenProjectsTable: React.FC<ProjectsTableProps> = ({ data, storage, setTab
         description={description}
         activeTable={activeTable}
         attachments={attachments}
-        storageAdress={storageAddress}
+        storageAddress={storageAddress}
       ></BaseTable>
       {isBidMenuOpen && (
         <BidMenu

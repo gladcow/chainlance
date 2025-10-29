@@ -2,20 +2,20 @@ import { Bee } from "@ethersphere/bee-js";
 import { Dispatch, SetStateAction, useState } from "react";
 
 interface SettingTabProps {
-setStorageAdress: Dispatch<SetStateAction<string>>;
+setStorageAddress: Dispatch<SetStateAction<string>>;
 storageAdress: string;
 setStorageStamp:  Dispatch<SetStateAction<string>>;
 storageStamp: string;
 setStorage: Dispatch<SetStateAction<Bee | undefined>>;
 }
 
-export const SettingsTab = ({ setStorageAdress, storageAdress, setStorageStamp, storageStamp, setStorage }: SettingTabProps) => {
+export const SettingsTab = ({ setStorageAddress, storageAdress, setStorageStamp, storageStamp, setStorage }: SettingTabProps) => {
   
   const [localAddress, setLocalAddress] = useState(storageAdress);
   const [localStamp, setLocalStamp] = useState(storageStamp);
 
   const handleSave = () => {
-    setStorageAdress(localAddress);
+    setStorageAddress(localAddress);
     setStorageStamp(localStamp);
 
     try {
